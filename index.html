@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
@@ -20,16 +19,8 @@
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        /* Hide default number input spinners */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-        /* Style for the individual player prop rows */
+        
+        /* Style for the individual player prop rows in the form */
         .player-prop-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) auto;
@@ -98,16 +89,6 @@
             transform: translateY(0);
         }
 
-        /* Success message animation */
-        .success-message {
-            transform: translateY(-100%);
-            transition: all 0.5s ease;
-        }
-
-        .success-message.show {
-            transform: translateY(0);
-        }
-
         /* Improved input focus states */
         .form-input:focus {
             ring-color: #3b82f6;
@@ -125,32 +106,75 @@
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
-        /* Loading spinner */
-        .spinner {
-            border: 2px solid #f3f4f6;
-            border-top: 2px solid #3b82f6;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
+        /* Card specific styles for responsiveness */
+        .parlay-card-grid {
+            display: grid;
+            gap: 1.5rem; /* Gap between cards */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Auto-fit cards, min width 280px */
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .parlay-card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pushes buttons to the bottom */
+            border: 1px solid #e5e7eb;
+            cursor: pointer; /* Indicate it's clickable */
+        }
+        .parlay-card-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .parlay-card-detail strong {
+            color: #4b5563;
+        }
+        .parlay-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: flex-end; /* Align buttons to the right */
+        }
+        .parlay-card-bets ul {
+            margin-top: 0.5rem;
+            list-style: none; /* Remove default list style */
+            padding-left: 0; /* Remove default padding */
+        }
+        .parlay-card-bets li {
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+            padding-left: 1.25rem; /* Indent for custom bullet */
+            position: relative;
+        }
+        .parlay-card-bets li::before { 
+            content: '•'; /* Custom bullet point */
+            color: #6b7280; /* Gray color for bullets */
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        /* Hidden class for toggling details */
+        .parlay-card-hidden-details.hidden {
+            display: none;
         }
     </style>
 </head>
 <body class="bg-gray-100 p-4 sm:p-6 md:p-8">
     <div class="container">
+        <!-- Header -->
         <header class="text-center mb-8">
             <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Are You Actually Winning?</h1>
             <p class="text-gray-600">Track your parlay betting performance honestly</p>
         </header>
 
+        <!-- Input Form -->
         <section class="bg-white p-6 rounded-lg shadow-sm mb-8">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Parlay</h2>
             <form id="parlayForm" class="space-y-6">
+                <!-- Overall Parlay Details -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                         <label for="result" class="block text-sm font-medium text-gray-700 mb-1">Parlay Result</label>
@@ -171,7 +195,7 @@
                     
                     <div>
                         <label for="amountWagered" class="block text-sm font-medium text-gray-700 mb-1">Amount Wagered ($)</label>
-                        <input type="number" 
+                        <input type="text" 
                                id="amountWagered" 
                                step="0.01" 
                                min="0" 
@@ -182,7 +206,7 @@
                     
                     <div class="lg:col-span-1">
                         <label for="amountWonLoss" class="block text-sm font-medium text-gray-700 mb-1">Amount Won/Loss ($)</label>
-                        <input type="number" 
+                        <input type="text" 
                                id="amountWonLoss" 
                                step="0.01" 
                                placeholder="0.00" 
@@ -191,10 +215,12 @@
                     </div>
                 </div>
 
+                <!-- Individual Player/Team Bets Section -->
                 <div>
                     <label class="block text-lg font-semibold text-gray-700 mb-3">Individual Player/Team Bets</label>
                     <div id="playerPropInputs" class="space-y-3 mb-4">
-                        </div>
+                        <!-- Dynamic player prop inputs will be added here -->
+                    </div>
                     <button type="button" 
                                 id="addPlayerPropBtn" 
                                 class="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out">
@@ -202,6 +228,7 @@
                     </button>
                 </div>
 
+                <!-- Submit Button -->
                 <div class="flex justify-end">
                     <button type="submit" 
                                 id="submitBtn" 
@@ -212,6 +239,7 @@
             </form>
         </section>
 
+        <!-- Summary Statistics -->
         <section class="bg-blue-50 p-6 rounded-lg shadow-sm mb-8">
             <h2 class="text-2xl font-semibold text-blue-800 mb-4">Summary Statistics</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-blue-700 mb-6">
@@ -251,8 +279,8 @@
                 <div class="flex items-center space-x-3">
                     <select id="successPercentageCalc" 
                                 class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800">
-                        <option value="parlays">Parlay Success Rate</option>
-                        <option value="props">Individual Props Success Rate</option>
+                        <option value="parlays">Parlays</option>
+                        <option value="props">Individual Props</option>
                     </select>
                     <p class="text-2xl font-bold text-blue-900"><span id="successPercentage">0.00</span>%</p>
                 </div>
@@ -266,9 +294,12 @@
             </div>
         </section>
 
+        <!-- Parlay History - Table for Desktop, Cards for Mobile -->
         <section class="bg-white p-6 rounded-lg shadow-sm">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">Parlay History</h2>
-            <div class="overflow-x-auto">
+            
+            <!-- Table View (visible on md screens and up) -->
+            <div class="overflow-x-auto hidden md:block">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -282,16 +313,24 @@
                         </tr>
                     </thead>
                     <tbody id="parlayTableBody" class="bg-white divide-y divide-gray-200">
-                        </tbody>
+                        <!-- Parlay table entries will be dynamically added here -->
+                    </tbody>
                 </table>
-                <div id="noParlaysMessage" class="text-center text-gray-500 py-12 hidden">
-                    <p class="text-lg">No parlays tracked yet.</p>
-                    <p class="text-sm">Add your first parlay above to get started!</p>
-                </div>
+            </div>
+
+            <!-- Card View (visible on screens smaller than md) -->
+            <div id="parlayHistoryContainer" class="parlay-card-grid block md:hidden">
+                <!-- Parlay cards will be dynamically added here -->
+            </div>
+
+            <div id="noParlaysMessage" class="text-center text-gray-500 py-12 hidden">
+                <p class="text-lg">No parlays tracked yet.</p>
+                <p class="text-sm">Add your first parlay above to get started!</p>
             </div>
         </section>
     </div>
 
+    <!-- Welcome Modal -->
     <div id="welcomeModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 class="text-2xl font-bold text-gray-800 mb-4">Welcome to AYAW!</h3>
@@ -336,8 +375,9 @@ class ParlayTracker {
         this.submitBtn = document.getElementById('submitBtn');
         this.clearAllBtn = document.getElementById('clearAllBtn');
 
-        // Table elements
-        this.parlayTableBody = document.getElementById('parlayTableBody');
+        // Table and Card elements
+        this.parlayTableBody = document.getElementById('parlayTableBody'); // Re-added for table view
+        this.parlayHistoryContainer = document.getElementById('parlayHistoryContainer');
         this.noParlaysMessage = document.getElementById('noParlaysMessage');
 
         // Summary elements
@@ -368,8 +408,8 @@ class ParlayTracker {
         this.amountWonLossInput.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
 
         // Auto-calculation handlers
-        this.resultInput.addEventListener('change', this.updateWonLossBasedOnResult.bind(this));
-        this.amountWageredInput.addEventListener('input', this.updateWonLossBasedOnResult.bind(this));
+        this.resultInput.addEventListener('change', (event) => this.updateWonLossBasedOnResult(event));
+        this.amountWageredInput.addEventListener('input', (event) => this.updateWonLossBasedOnResult(event));
 
         // Form and button handlers
         this.parlayForm.addEventListener('submit', this.handleFormSubmit.bind(this));
@@ -400,6 +440,7 @@ class ParlayTracker {
 
     // Input handling methods
     handleInputFocus(event) {
+        // Select all text if the value is '0.00' when focused, for easier clearing
         if (event.target.value === '0.00') {
             event.target.select();
         }
@@ -407,51 +448,99 @@ class ParlayTracker {
 
     sanitizeMoneyInput(event) {
         const input = event.target;
-        const value = input.value;
+        const originalValue = input.value;
+        const originalSelectionStart = input.selectionStart; // Save cursor position
+        
         let cleanedValue = '';
         let hasDecimal = false;
         let hasNegative = false;
+        
+        // Track characters removed BEFORE the cursor to adjust its position
+        let charsRemovedBeforeCursor = 0;
 
-        for (let i = 0; i < value.length; i++) {
-            const char = value[i];
+        for (let i = 0; i < originalValue.length; i++) {
+            const char = originalValue[i];
             
+            // Allow a leading minus sign only for 'amountWonLoss'
             if (input.id === 'amountWonLoss' && char === '-' && i === 0 && !hasNegative) {
                 cleanedValue += char;
                 hasNegative = true;
             } else if (char === '.' && !hasDecimal) {
+                // Allow only one decimal point
                 cleanedValue += char;
                 hasDecimal = true;
             } else if (/\d/.test(char)) {
+                // Allow digits
                 cleanedValue += char;
+            } else {
+                // If an invalid character is encountered, it will be removed.
+                // If this character was before the original cursor position, adjust the cursor offset.
+                if (i < originalSelectionStart) {
+                    charsRemovedBeforeCursor++;
+                }
             }
         }
 
-        input.value = cleanedValue;
+        // Handle cases like '007' becoming '7' or '0.5'
+        // If there's more than one character, the first is '0', and the second isn't '.', remove the leading '0'.
+        if (cleanedValue.length > 1 && cleanedValue[0] === '0' && cleanedValue[1] !== '.') {
+            cleanedValue = cleanedValue.substring(1);
+            // If the removed '0' was before the original cursor, adjust cursor offset
+            if (originalSelectionStart > 0 && originalValue[0] === '0') {
+                charsRemovedBeforeCursor++;
+            }
+        }
+        
+        // Only update the input's value if it has actually changed
+        if (originalValue !== cleanedValue) {
+            input.value = cleanedValue;
+            
+            // Calculate the new cursor position
+            let newSelectionStart = originalSelectionStart - charsRemovedBeforeCursor;
+            
+            // Ensure cursor doesn't go below 0 or beyond the new string length
+            newSelectionStart = Math.max(0, newSelectionStart);
+            newSelectionStart = Math.min(newSelectionStart, cleanedValue.length);
+
+            // Set the cursor position
+            input.setSelectionRange(newSelectionStart, newSelectionStart);
+        }
     }
 
     formatCurrencyOnBlur(event) {
         const input = event.target;
         const value = input.value.trim();
-        const numericValue = parseFloat(value.replace(/[^0-9.-]/g, ''));
-
-        if (isNaN(numericValue) || numericValue === 0) {
-            input.value = '0.00';
+        
+        // If the value is empty after trimming, leave it empty.
+        if (value === '') {
+            input.value = '';
             return;
         }
 
+        const numericValue = parseFloat(value.replace(/[^0-9.-]/g, ''));
+
+        // If it's not a valid number after cleaning, clear it.
+        if (isNaN(numericValue)) {
+            input.value = '';
+            return;
+        }
+
+        // Format to two decimal places
         input.value = numericValue.toFixed(2);
     }
 
-    updateWonLossBasedOnResult() {
+    updateWonLossBasedOnResult(event) {
         const parlayResult = this.resultInput.value;
         const wageredValue = parseFloat(this.amountWageredInput.value || '0');
-
+        const wonLossInput = this.amountWonLossInput;
+        
+        // Always trigger update for Loss or Push, or clear for Win
         if (parlayResult === 'Win') {
-            this.amountWonLossInput.value = ''; // Clear for manual entry on win
+            wonLossInput.value = ''; 
         } else if (parlayResult === 'Loss') {
-            this.amountWonLossInput.value = (-wageredValue).toFixed(2);
+            wonLossInput.value = (-wageredValue).toFixed(2);
         } else if (parlayResult === 'Push') {
-            this.amountWonLossInput.value = '0.00';
+            wonLossInput.value = '0.00';
         }
     }
 
@@ -566,11 +655,13 @@ class ParlayTracker {
         });
 
         if (!allValid) {
+            // Using a simple alert for now as per instructions, can be replaced by custom modal
             alert('Please fill in all Player/Team and Prop Type fields for individual bets.');
             return false;
         }
 
         if (bets.length === 0) {
+            // Using a simple alert for now as per instructions, can be replaced by custom modal
             alert('Please add at least one individual player/team bet for the parlay.');
             return false;
         }
@@ -629,6 +720,7 @@ class ParlayTracker {
     }
 
     deleteParlay(index) {
+        // Replace with custom modal if alerts are not allowed
         if (!confirm('Are you sure you want to delete this parlay entry? This action cannot be undone.')) {
             return;
         }
@@ -643,6 +735,7 @@ class ParlayTracker {
     }
 
     clearAllParlays() {
+        // Replace with custom modal if alerts are not allowed
         if (!confirm('Are you sure you want to clear all parlay entries? This action cannot be undone.')) {
             return;
         }
@@ -655,20 +748,30 @@ class ParlayTracker {
 
     // UI rendering methods
     renderParlays() {
-        this.parlayTableBody.innerHTML = '';
+        this.parlayTableBody.innerHTML = ''; // Clear existing table rows
+        this.parlayHistoryContainer.innerHTML = ''; // Clear existing cards
         
         if (this.parlays.length === 0) {
             this.noParlaysMessage.style.display = 'block';
         } else {
             this.noParlaysMessage.style.display = 'none';
-            this.parlays.forEach((parlay, index) => this.renderParlayRow(parlay, index));
+            this.parlays.forEach((parlay, index) => {
+                // Render for table view (desktop)
+                const tableRow = this.createParlayTableRowElement(parlay, index);
+                this.parlayTableBody.appendChild(tableRow);
+
+                // Render for card view (mobile)
+                const card = this.createParlayCardElement(parlay, index);
+                this.parlayHistoryContainer.appendChild(card);
+            });
         }
         
         this.updateSummary();
     }
 
-    renderParlayRow(parlay, index) {
-        const row = this.parlayTableBody.insertRow();
+    // New function to create a table row element
+    createParlayTableRowElement(parlay, index) {
+        const row = document.createElement('tr');
         row.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
 
         // Date cell
@@ -688,11 +791,13 @@ class ParlayTracker {
         this.renderWonLossCell(row, parlay.amountWonLoss);
 
         // Individual bets cell
-        this.renderBetsCell(row, parlay.bets);
+        this.renderBetsCell(row, parlay.bets); // This will render as a list inside the table cell
 
         // Actions cell
         this.renderActionsCell(row, index);
+        return row;
     }
+
 
     addCell(row, content, className) {
         const cell = row.insertCell();
@@ -701,13 +806,13 @@ class ParlayTracker {
         return cell;
     }
 
-    applyResultStyling(cell, result) {
+    applyResultStyling(element, result) { // Renamed from applyResultStyling to be more general
         const colorMap = {
             'Win': 'text-green-600',
             'Loss': 'text-red-600',
             'Push': 'text-gray-600'
         };
-        cell.classList.add(colorMap[result] || 'text-gray-600');
+        element.classList.add(colorMap[result] || 'text-gray-600');
     }
 
     renderWonLossCell(row, amountWonLoss) {
@@ -727,32 +832,36 @@ class ParlayTracker {
         }
     }
 
-    renderBetsCell(row, bets) {
-        const cell = row.insertCell();
-        cell.className = 'px-6 py-4 text-sm text-gray-900';
+    renderBetsCell(rowOrDiv, bets) { // Now accepts row for table or div for card
+        // This function is for rendering in the table. For cards, it's done directly in createParlayCardElement
+        // This is specifically for the table row's 'Individual Bets' column
+        if (rowOrDiv.tagName === 'TR') { // Check if it's a table row
+            const cell = rowOrDiv.insertCell();
+            cell.className = 'px-6 py-4 text-sm text-gray-900';
 
-        if (!bets || bets.length === 0) {
-            cell.textContent = 'N/A';
-            return;
-        }
+            if (!bets || bets.length === 0) {
+                cell.textContent = 'N/A';
+                return;
+            }
 
-        const betsList = document.createElement('ul');
-        betsList.className = 'list-disc list-inside text-xs';
-        
-        bets.forEach(bet => {
-            const listItem = document.createElement('li');
-            const resultColorMap = {
-                'Win': 'text-green-600',
-                'Loss': 'text-red-600',
-                'Push': 'text-gray-800'
-            };
-            const resultColor = resultColorMap[bet.individualResult] || 'text-gray-800';
+            const betsList = document.createElement('ul');
+            betsList.className = 'list-disc list-inside text-xs';
             
-            listItem.innerHTML = `<span class="font-medium">${bet.playerName}</span>: ${bet.propType} (<span class="${resultColor}">${bet.individualResult}</span>)`;
-            betsList.appendChild(listItem);
-        });
-        
-        cell.appendChild(betsList);
+            bets.forEach(bet => {
+                const listItem = document.createElement('li');
+                const resultColorMap = {
+                    'Win': 'text-green-600',
+                    'Loss': 'text-red-600',
+                    'Push': 'text-gray-800'
+                };
+                const resultColor = resultColorMap[bet.individualResult] || 'text-gray-800';
+                
+                listItem.innerHTML = `<span class="font-medium">${bet.playerName}</span>: ${bet.propType} (<span class="${resultColor}">${bet.individualResult}</span>)`;
+                betsList.appendChild(listItem);
+            });
+            
+            cell.appendChild(betsList);
+        }
     }
 
     renderActionsCell(row, index) {
@@ -774,6 +883,83 @@ class ParlayTracker {
         button.addEventListener('click', onClickHandler);
         return button;
     }
+
+    createParlayCardElement(parlay, index) {
+        const card = document.createElement('div');
+        card.className = 'parlay-card';
+
+        const resultColorClass = {
+            'Win': 'text-green-600',
+            'Loss': 'text-red-600',
+            'Push': 'text-gray-600'
+        }[parlay.result] || 'text-gray-600';
+
+        const wonLossValue = parseFloat(parlay.amountWonLoss);
+        let wonLossText = wonLossValue.toFixed(2);
+        let wonLossColorClass = 'text-gray-600';
+        if (wonLossValue > 0) {
+            wonLossText = `+${wonLossText}`;
+            wonLossColorClass = 'text-green-600';
+        } else if (wonLossValue < 0) {
+            wonLossColorClass = 'text-red-600';
+        }
+
+        // Generate individual bets list HTML for the collapsible section
+        let betsListHtml = '';
+        if (parlay.bets && parlay.bets.length > 0) {
+            betsListHtml = `
+                <h4 class="font-semibold text-gray-700 text-sm mb-2 mt-4">Individual Bets:</h4>
+                <ul class="parlay-card-bets">
+                    ${parlay.bets.map(bet => {
+                        const betResultColor = {
+                            'Win': 'text-green-600',
+                            'Loss': 'text-red-600',
+                            'Push': 'text-gray-800'
+                        }[bet.individualResult] || 'text-gray-800';
+                        return `<li><span class="font-medium">${bet.playerName}</span>: ${bet.propType} (<span class="${betResultColor}">${bet.individualResult}</span>)</li>`;
+                    }).join('')}
+                </ul>
+            `;
+        }
+
+        card.innerHTML = `
+            <h3 class="text-xl font-bold mb-2 ${resultColorClass}">${parlay.result}</h3>
+            <div class="space-y-1 text-gray-700">
+                <div class="parlay-card-detail"><strong>Date:</strong> <span>${new Date(parlay.date).toLocaleDateString()}</span></div>
+                <div class="parlay-card-detail"><strong>Wagered:</strong> <span>$${parseFloat(parlay.amountWagered).toFixed(2)}</span></div>
+                <div class="parlay-card-detail"><strong>Won/Loss:</strong> <span class="font-bold ${wonLossColorClass}">$${wonLossText}</span></div>
+            </div>
+            
+            <div class="parlay-card-hidden-details hidden">
+                <div class="parlay-card-detail mt-4"><strong>Type:</strong> <span>${parlay.playType}</span></div>
+                ${betsListHtml}
+            </div>
+
+            <div class="parlay-card-actions">
+                <button type="button" class="bg-blue-100 text-blue-700 py-1 px-3 rounded-md hover:bg-blue-200 transition duration-150 ease-in-out text-sm edit-btn">Edit</button>
+                <button type="button" class="bg-red-100 text-red-700 py-1 px-3 rounded-md hover:bg-red-200 transition duration-150 ease-in-out text-sm delete-btn">Delete</button>
+            </div>
+        `;
+
+        // Attach event listeners to buttons within the card
+        card.querySelector('.edit-btn').addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent card expansion when clicking edit
+            this.editParlay(index);
+        });
+        card.querySelector('.delete-btn').addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent card expansion when clicking delete
+            this.deleteParlay(index);
+        });
+
+        // Add click listener to the card itself to toggle details
+        card.addEventListener('click', () => {
+            const hiddenDetails = card.querySelector('.parlay-card-hidden-details');
+            hiddenDetails.classList.toggle('hidden');
+        });
+
+        return card;
+    }
+
 
     // Summary calculation and display
     updateSummary() {
@@ -812,10 +998,10 @@ class ParlayTracker {
         
         // Apply color to net profit/loss
         if (netProfitLoss > 0) {
-            this.netProfitLossSpan.classList.remove('text-red-700', 'text-yellow-700');
+            this.netProfitLossSpan.classList.remove('text-red-700', 'text-gray-700');
             this.netProfitLossSpan.classList.add('text-green-700');
         } else if (netProfitLoss < 0) {
-            this.netProfitLossSpan.classList.remove('text-green-700', 'text-yellow-700');
+            this.netProfitLossSpan.classList.remove('text-green-700', 'text-gray-700');
             this.netProfitLossSpan.classList.add('text-red-700');
         } else {
             this.netProfitLossSpan.classList.remove('text-green-700', 'text-red-700');
@@ -853,8 +1039,8 @@ class ParlayTracker {
         this.addPlayerPropRow(); // Add one empty row for new input
         this.submitBtn.textContent = 'Add Parlay Entry';
         this.editingIndex = -1;
-        this.amountWageredInput.value = '0.00';
-        this.amountWonLossInput.value = '0.00';
+        this.amountWageredInput.value = ''; // Set to empty string to allow full deletion
+        this.amountWonLossInput.value = ''; // Set to empty string to allow full deletion
     }
 
     // Modal display logic
@@ -886,3 +1072,4 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 </body>
 </html>
+
