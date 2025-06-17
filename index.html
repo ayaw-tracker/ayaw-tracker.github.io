@@ -307,15 +307,20 @@
             let hasDecimal = false;
             let hasNegative = false;
 
-            // --- NEW LOGIC ADDED HERE ---
-        // If the current value is "0.00" and the user is typing a digit,
-        // clear the input value so the new digit becomes the start.
-        // This handles the "0.009" issue.
-        if ((value === '0.00' || value === '0') && /\d/.test(event.data) && event.inputType === 'insertText') {
-            input.value = event.data; // Start with the newly typed digit
-            return; // Exit, let the next event handle further sanitization if needed
-         }
-            // --- END NEW LOGIC ---
+                    // --- REVISED LOGIC HERE ---
+            // If input is empty, '0', or '0.00' AND a digit or negative sign is being typed,
+            // prepare to overwrite the existing content.
+            if ((value === '0.00' || value === '0' || value === '') && (/\d/.test(event.data) || (event.data === '-' && input.id === 'amountWonLoss'))) {
+                // If it's a digit, start with that digit.
+                // If it's a negative sign, start with that.
+                input.value = event.data || ''; // Set to the typed character, or empty string if somehow event.data is null
+                // Move caret to the end if it's not a negative sign that keeps it at the start
+                if (event.data !== '-') {
+                    requestAnimationFrame(() => input.setSelectionRange(input.value.length, input.value.length));
+                }
+                return; // Exit, as we've handled the initial keypress specifically
+            }
+            // --- END REVISED LOGIC ---
             
             for (let i = 0; i < value.length; i++) {
                 const char = value[i];
