@@ -199,29 +199,6 @@
             </button>
         </div>
     </div>
-    
-    <!-- Parlay Detail Modal -->
-    <div id="parlayDetailModal" class="modal-overlay">
-        <div class="modal-content text-left"> <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Parlay Details</h3>
-            <div id="modalDetailsContent" class="text-gray-700 space-y-2">
-                <p><strong>Date:</strong> <span id="modalDate"></span></p>
-                <p><strong>Result:</strong> <span id="modalResult"></span></p>
-                <p><strong>Payout Type:</strong> <span id="modalPayoutType"></span></p>
-                <p><strong>Wagered:</strong> $<span id="modalWagered"></span></p>
-                <p><strong>Won/Loss:</strong> $<span id="modalWonLoss"></span></p>
-
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                    <h4 class="text-xl font-semibold mb-2">Individual Bets:</h4>
-                    <ul id="modalIndividualBets" class="list-disc list-inside text-sm">
-                        <p id="noIndividualBetsMessage" class="text-gray-500 text-center" style="display: none;">No individual bets recorded for this parlay.</p>
-                    </ul>
-                </div>
-            </div>
-            <button id="closeDetailModalBtn" class="bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150 mt-6 block mx-auto">
-                Close
-            </button>
-        </div>
-    </div>
 
     <script>
         // Array to store parlay data
@@ -270,57 +247,6 @@
         // Modal elements
         const welcomeModal = document.getElementById('welcomeModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
-        const parlayDetailModal = document.getElementById('parlayDetailModal');
-        const modalDate = document.getElementById('modalDate');
-        const modalResult = document.getElementById('modalResult');
-        const modalPayoutType = document.getElementById('modalPayoutType');
-        const modalWagered = document.getElementById('modalWagered');
-        const modalWonLoss = document.getElementById('modalWonLoss');
-        const modalIndividualBets = document.getElementById('modalIndividualBets');
-        const noIndividualBetsMessage = document.getElementById('noIndividualBetsMessage');
-        const closeDetailModalBtn = document.getElementById('closeDetailModalBtn');
-        // ===========================================
-
-        // ... your other functions (e.g., loadParlays(), saveParlays(), addPlayerPropRow(), calculateParlayOdds(), updateSummary(), editParlay(), deleteParlay()) ...
-
-        // === New Parlay Details Modal Functions (Add these here) ===
-        function showParlayDetails(parlay) {
-            // ... function logic ...
-        }
-
-        function closeParlayDetailModal() {
-            // ... function logic ...
-        }
-
-        // === New Parlay Details Modal Event Listeners (Add these here) ===
-        closeDetailModalBtn.addEventListener('click', closeParlayDetailModal);
-        parlayDetailModal.addEventListener('click', (e) => {
-            if (e.target === parlayDetailModal) {
-                closeParlayDetailModal();
-            }
-        });
-        // ===========================================
-
-        // Your existing renderParlays function (with the new changes we discussed inside it)
-        function renderParlays() {
-         // ...
-        }
-        console.log('renderParlays called.'); // Add this line
-        console.log('Parlays array content:', parlays); // Add this line
-        parlayTableBody.innerHTML = ''; // Clear existing rows
-        if (parlays.length === 0) {
-            noParlaysMessage.style.display = 'block';
-        } else {
-            noParlaysMessage.style.display = 'none';
-            parlays.forEach((parlay, index) => {
-                const row = parlayTableBody.insertRow();
-                // ... rest of your renderParlays function ...
-            });
-        }
-        updateSummary();
-    }
-
-        // ... your existing DOMContentLoaded listener and other initialization code ...
 
 
         // Function to load parlays from local storage
@@ -366,7 +292,7 @@
             let value = input.value.trim();
             let numericValue = parseFloat(value.replace(/[^0-9.-]/g, '')); // This extracts the number.
 
-            if (isNaN(numericValue) || numericValue === 0) {
+            if (isNaN(numericValue) || numbericValue === 0) {
                 // If it's completely non-numeric after trimming, reset to 0.00
                 input.value = '0.00';
                 return;
@@ -469,10 +395,6 @@
                     const row = parlayTableBody.insertRow();
                     row.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50'; // Zebra stripping for readability
 
-                    // Make the row clickable to open the details modal
-                    row.style.cursor = 'pointer'; // Visual cue that it's clickable
-                    row.addEventListener('click', () => showParlayDetails(parlay));
-                    
                     // Date Cell
                     const dateCell = row.insertCell();
                     dateCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
@@ -518,13 +440,25 @@
                     // Individual Bets Cell (Player/Team, Prop Type, Individual Result)
                     const betsCell = row.insertCell();
                     betsCell.className = 'px-6 py-4 text-sm text-gray-900';
-                    // Display only a count or "N/A" for the main table cell
+                    const betsList = document.createElement('ul');
+                    betsList.className = 'list-disc list-inside text-xs';
                     if (parlay.bets && parlay.bets.length > 0) {
-                        betsCell.textContent = `${parlay.bets.length} Individual Bet(s)`;
+                        parlay.bets.forEach(bet => {
+                            const listItem = document.createElement('li');
+                            let resultColor = 'text-gray-800'; // Default color
+                            if (bet.individualResult === 'Win') {
+                                resultColor = 'text-green-600';
+                            } else if (bet.individualResult === 'Loss') {
+                                resultColor = 'text-red-600';
+                            }
+                            listItem.innerHTML = `<span class="font-medium">${bet.playerName}</span>: ${bet.propType} (<span class="${resultColor}">${bet.individualResult}</span>)`;
+                            betsList.appendChild(listItem);
+                        });
+                        betsCell.appendChild(betsList);
                     } else {
                         betsCell.textContent = 'N/A';
                     }
-                    
+
                     // Actions Cell (Edit and Delete Buttons)
                     const actionsCell = row.insertCell();
                     // Apply flex-col and space-y-1 for vertical stacking, and items-start for left alignment
