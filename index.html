@@ -261,8 +261,8 @@
             let wonLossValue = 0.00;
 
             if (parlayResult === 'Win') {
-                wonLossValue = wageredValue;
-                amountWonLossInput.value = `+${wonLossValue.toFixed(2)}`; // Add + for win
+                 // When result is 'Win', clear the Amount Won/Loss input for manual entry
+            amountWonLossInput.value = '';
             } else if (parlayResult === 'Loss') {
                 wonLossValue = -wageredValue;
                 amountWonLossInput.value = wonLossValue.toFixed(2); // Negative sign automatically included by toFixed
@@ -339,7 +339,6 @@
 
         // Add event listeners for auto-filling won/loss based on result change and wagered change
         resultInput.addEventListener('change', updateWonLossBasedOnParlayResult);
-        amountWageredInput.addEventListener('input', updateWonLossBasedOnParlayResult);
 
 
         // Function to add a new player prop input row to the form
