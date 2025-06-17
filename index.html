@@ -257,18 +257,20 @@
         // Function to update Amount Won/Loss based on Parlay Result and Amount Wagered
         function updateWonLossBasedOnParlayResult() {
             const parlayResult = resultInput.value;
-            const wageredValue = parseFloat(amountWageredInput.value || '0');
-           if (parlayResult === 'Win') {
-        // When result is 'Win', clear the Amount Won/Loss input for manual entry
-        amountWonLossInput.value = '';
-    } else if (parlayResult === 'Loss') {
-        const wonLossValue = -wageredValue;
-        amountWonLossInput.value = wonLossValue.toFixed(2);
-    } else if (parlayResult === 'Push') {
-        const wonLossValue = 0.00;
-        amountWonLossInput.value = wonLossValue.toFixed(2);
-    }
-}
+            const wageredValue = parseFloat(amountWageredInput.value || '0.00');
+            let wonLossValue = 0.00;
+
+            if (parlayResult === 'Win') {
+                wonLossValue = wageredValue;
+                amountWonLossInput.value = `+${wonLossValue.toFixed(2)}`; // Add + for win
+            } else if (parlayResult === 'Loss') {
+                wonLossValue = -wageredValue;
+                amountWonLossInput.value = wonLossValue.toFixed(2); // Negative sign automatically included by toFixed
+            } else if (parlayResult === 'Push') {
+                wonLossValue = 0.00;
+                amountWonLossInput.value = wonLossValue.toFixed(2);
+            }
+        }
 
         // Function to sanitize and format money input on blur
         function formatCurrencyOnBlur(event) {
@@ -289,18 +291,14 @@
             } else {
                 // Format to two decimal places
                 let formattedValue = numericValue.toFixed(2);
-                // Special handling for amountWonLoss to ensure correct sign display
-        if (input.id === 'amountWonLoss') {
-            if (numericValue > 0) {
-               input.value = `+${formattedValue}`; // Always show + for positive wins
-            } else {
-                input.value = formattedValue; // Negative sign is included by toFixed for negative numbers, 0.00 for zero
+                // Re-add '+' sign if it was a positive value and for amountWonLoss
+                if (input.id === 'amountWonLoss' && numericValue > 0) {
+                     input.value = `+${formattedValue}`;
+                } else {
+                    input.value = formattedValue;
+                }
             }
-        } else { // For amountWagered
-            input.value = formattedValue;
         }
-    }
-}
 
         // Function to sanitize money input as typed (allow digits, one decimal, leading minus for won/loss)
         function sanitizeMoneyInput(event) {
@@ -308,48 +306,22 @@
             let value = input.value;
             let cleanedValue = '';
             let hasDecimal = false;
-            let isNegativeAllowed = (input.id === 'amountWonLoss'); // Only won/loss can be negative
+            let hasNegative = false;
 
-            // Handle leading minus sign for allowed inputs
-    if (isNegativeAllowed && value.startsWith('-')) {
-        cleanedValue += '-';
-        value = value.substring(1); // Process the rest of the string
-    }
-
-    for (let i = 0; i < value.length; i++) {
-        const char = value[i];
-        if (char === '.' && !hasDecimal) {
-            cleanedValue += char;
-            hasDecimal = true;
-        } else if (/\d/.test(char)) { // Allow digits
-            cleanedValue += char;
-        }
-    }
-
-    // If the cleaned value is just '-' or '.', don't format it immediately
-    if (cleanedValue === '-' || cleanedValue === '.') {
-        input.value = cleanedValue;
-        return;
-    }
-
-    // Handle cases like "0."
-    if (cleanedValue.startsWith('0') && cleanedValue.length > 1 && !cleanedValue.includes('.')) {
-         cleanedValue = cleanedValue.substring(1); // Remove leading zero if not "0."
-         if(cleanedValue === '') cleanedValue = '0'; // If it was just "0", keep "0"
-    }
-
-    // If there's a decimal, limit to two decimal places while typing
-    if (hasDecimal && cleanedValue.indexOf('.') !== cleanedValue.lastIndexOf('.')) {
-        // This is a defensive check, should be prevented by the hasDecimal flag
-        cleanedValue = cleanedValue.substring(0, cleanedValue.lastIndexOf('.'));
-    }
-    let parts = cleanedValue.split('.');
-    if (parts[1] && parts[1].length > 2) {
-        cleanedValue = parts[0] + '.' + parts[1].substring(0, 2);
-    }
-
-    input.value = cleanedValue;
-}
+            for (let i = 0; i < value.length; i++) {
+                const char = value[i];
+                // Allow leading negative sign only for amountWonLossInput
+                if (input.id === 'amountWonLoss' && char === '-' && i === 0 && !hasNegative) {
+                    cleanedValue += char;
+                    hasNegative = true;
+                } else if (char === '.' && !hasDecimal) {
+                    cleanedValue += char;
+                    hasDecimal = true;
+                } else if (/\d/.test(char)) { // Allow digits
+                    cleanedValue += char;
+                }
+            }
+            input.value = cleanedValue;
 
             // If the input changing is amountWagered or amountWonLoss when in editing mode,
             // we should NOT override a manual input. This auto-fill only happens on result change.
@@ -360,15 +332,14 @@
         }
 
         // Attach event listeners for money inputs
-amountWageredInput.addEventListener('input', sanitizeMoneyInput);
-amountWageredInput.addEventListener('blur', formatCurrencyOnBlur);
-amountWageredInput.addEventListener('input', updateWonLossBasedOnParlayResult); // This line is crucial for live updates
+        amountWageredInput.addEventListener('input', sanitizeMoneyInput);
+        amountWageredInput.addEventListener('blur', formatCurrencyOnBlur);
+        amountWonLossInput.addEventListener('input', sanitizeMoneyInput);
+        amountWonLossInput.addEventListener('blur', formatCurrencyOnBlur);
 
-amountWonLossInput.addEventListener('input', sanitizeMoneyInput);
-amountWonLossInput.addEventListener('blur', formatCurrencyOnBlur);
-
-// Add event listeners for auto-filling won/loss based on result change.
-resultInput.addEventListener('change', updateWonLossBasedOnParlayResult);
+        // Add event listeners for auto-filling won/loss based on result change and wagered change
+        resultInput.addEventListener('change', updateWonLossBasedOnParlayResult);
+        amountWageredInput.addEventListener('input', updateWonLossBasedOnParlayResult);
 
 
         // Function to add a new player prop input row to the form
