@@ -307,6 +307,16 @@
             let hasDecimal = false;
             let hasNegative = false;
 
+            // --- NEW LOGIC ADDED HERE ---
+        // If the current value is "0.00" and the user is typing a digit,
+        // clear the input value so the new digit becomes the start.
+        // This handles the "0.009" issue.
+        if ((value === '0.00' || value === '0') && /\d/.test(event.data) && event.inputType === 'insertText') {
+            input.value = event.data; // Start with the newly typed digit
+            return; // Exit, let the next event handle further sanitization if needed
+         }
+            // --- END NEW LOGIC ---
+            
             for (let i = 0; i < value.length; i++) {
                 const char = value[i];
                 // Allow leading negative sign only for amountWonLossInput
