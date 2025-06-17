@@ -292,7 +292,7 @@
             let value = input.value.trim();
             let numericValue = parseFloat(value.replace(/[^0-9.-]/g, '')); // This extracts the number.
 
-            if (isNaN(numericValue)) {
+            if (isNaN(numericValue) || numbericValue === 0) {
                 // If it's completely non-numeric after trimming, reset to 0.00
                 input.value = '0.00';
                 return;
@@ -332,14 +332,6 @@
                     }
                     else {
                 input.value = cleanedValue;
-            }
-        }
-
-            // If the input changing is amountWagered or amountWonLoss when in editing mode,
-            // we should NOT override a manual input. This auto-fill only happens on result change.
-            if (input.id === 'amountWagered' || input.id === 'amountWonLoss') {
-                // We'll let the blur event handle the final formatting and sign for Won/Loss.
-                // The auto-fill logic will primarily trigger on resultInput change.
             }
         }
 
