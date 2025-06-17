@@ -212,6 +212,21 @@
         const playTypeInput = document.getElementById('playType'); // Now Payout Type
         const amountWageredInput = document.getElementById('amountWagered');
         const amountWonLossInput = document.getElementById('amountWonLoss');
+            // --- ADD THE FOCUS EVENT LISTENERS HERE ---
+        amountWageredInput.addEventListener('focus', function() {
+            // If the value is '0.00', select all its text
+            if (this.value === '0.00') {
+                this.select(); // This will highlight "0.00"
+            }
+        });
+
+        amountWonLossInput.addEventListener('focus', function() {
+            // If the value is '0.00', select all its text
+            if (this.value === '0.00') {
+                this.select(); // This will highlight "0.00"
+            }
+        });
+            // --- END OF FOCUS EVENT LISTENERS ---
         const playerPropInputsContainer = document.getElementById('playerPropInputs');
         const addPlayerPropBtn = document.getElementById('addPlayerPropBtn');
         const parlayTableBody = document.getElementById('parlayTableBody');
@@ -275,28 +290,16 @@
         function formatCurrencyOnBlur(event) {
             let input = event.target;
             let value = input.value.trim();
-
-            // Handle empty, just hyphen, or just decimal input
-            if (value === '' || value === '-' || value === '.') {
-                input.value = '0.00';
-                return;
-            }
-
-            let numericValue = parseFloat(value);
+            let numericValue = parseFloat(value.replace(/[^0-9.-]/g, '')); // This extracts the number.
 
             if (isNaN(numericValue)) {
                 // If it's completely non-numeric after trimming, reset to 0.00
                 input.value = '0.00';
-            } else {
-                // Format to two decimal places
-                let formattedValue = numericValue.toFixed(2);
-                // Re-add '+' sign if it was a positive value and for amountWonLoss
-                if (input.id === 'amountWonLoss') {
-                     input.value = formattedValue; 
-                } else {
-                    input.value = formattedValue;
-                }
-            }
+                return;
+            } 
+            
+            let formattedValue = numericValue.toFixed(2);
+            input.value = formattedValue;
         }
 
         // Function to sanitize money input as typed (allow digits, one decimal, leading minus for won/loss)
@@ -307,20 +310,6 @@
             let hasDecimal = false;
             let hasNegative = false;
 
-                    // --- REVISED LOGIC HERE ---
-            // If input is empty, '0', or '0.00' AND a digit or negative sign is being typed,
-            // prepare to overwrite the existing content.
-            if ((value === '0.00' || value === '0' || value === '') && (/\d/.test(event.data) || (event.data === '-' && input.id === 'amountWonLoss'))) {
-                // If it's a digit, start with that digit.
-                // If it's a negative sign, start with that.
-                input.value = event.data || ''; // Set to the typed character, or empty string if somehow event.data is null
-                // Move caret to the end if it's not a negative sign that keeps it at the start
-                if (event.data !== '-') {
-                    requestAnimationFrame(() => input.setSelectionRange(input.value.length, input.value.length));
-                }
-                return; // Exit, as we've handled the initial keypress specifically
-            }
-            // --- END REVISED LOGIC ---
             
             for (let i = 0; i < value.length; i++) {
                 const char = value[i];
@@ -335,7 +324,16 @@
                     cleanedValue += char;
                 }
             }
+                if (cleanedValue === '-' && input.id === 'amountWonLoss') {
             input.value = cleanedValue;
+        }
+                    else if (cleanedValue === '') {
+                input.value = '';
+                    }
+                    else {
+                input.value = cleanedValue;
+            }
+        }
 
             // If the input changing is amountWagered or amountWonLoss when in editing mode,
             // we should NOT override a manual input. This auto-fill only happens on result change.
