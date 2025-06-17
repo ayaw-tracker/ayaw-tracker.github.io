@@ -305,6 +305,20 @@
         function renderParlays() {
          // ...
         }
+        console.log('renderParlays called.'); // Add this line
+        console.log('Parlays array content:', parlays); // Add this line
+        parlayTableBody.innerHTML = ''; // Clear existing rows
+        if (parlays.length === 0) {
+            noParlaysMessage.style.display = 'block';
+        } else {
+            noParlaysMessage.style.display = 'none';
+            parlays.forEach((parlay, index) => {
+                const row = parlayTableBody.insertRow();
+                // ... rest of your renderParlays function ...
+            });
+        }
+        updateSummary();
+    }
 
         // ... your existing DOMContentLoaded listener and other initialization code ...
 
@@ -352,7 +366,7 @@
             let value = input.value.trim();
             let numericValue = parseFloat(value.replace(/[^0-9.-]/g, '')); // This extracts the number.
 
-            if (isNaN(numericValue) || numbericValue === 0) {
+            if (isNaN(numericValue) || numericValue === 0) {
                 // If it's completely non-numeric after trimming, reset to 0.00
                 input.value = '0.00';
                 return;
