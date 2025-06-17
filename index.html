@@ -257,8 +257,7 @@
         // Function to update Amount Won/Loss based on Parlay Result and Amount Wagered
         function updateWonLossBasedOnParlayResult() {
             const parlayResult = resultInput.value;
-            const wageredValue = parseFloat(amountWageredInput.value || '0.00');
-            let wonLossValue = 0.00;
+            const wageredValue = parseFloat(amountWageredInput.value || '0');
 
             if (parlayResult === 'Win') {
                  // When result is 'Win', clear the Amount Won/Loss input for manual entry
