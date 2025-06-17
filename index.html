@@ -257,12 +257,11 @@
         // Function to update Amount Won/Loss based on Parlay Result and Amount Wagered
         function updateWonLossBasedOnParlayResult() {
             const parlayResult = resultInput.value;
-            const wageredValue = parseFloat(amountWageredInput.value || '0.00');
-            let wonLossValue = 0.00;
+            // Parse wagered value *inside* this function to ensure it's current.
+            const wageredValue = parseFloat(amountWageredInput.value || '0'); //use '0' not '0.00' for parsing for cleaner NaN handling
 
             if (parlayResult === 'Win') {
-                wonLossValue = wageredValue;
-                amountWonLossInput.value = `+${wonLossValue.toFixed(2)}`; // Add + for win
+                amountWonLossInput.value = ''; // Add + for win
             } else if (parlayResult === 'Loss') {
                 wonLossValue = -wageredValue;
                 amountWonLossInput.value = wonLossValue.toFixed(2); // Negative sign automatically included by toFixed
@@ -292,8 +291,8 @@
                 // Format to two decimal places
                 let formattedValue = numericValue.toFixed(2);
                 // Re-add '+' sign if it was a positive value and for amountWonLoss
-                if (input.id === 'amountWonLoss' && numericValue > 0) {
-                     input.value = `+${formattedValue}`;
+                if (input.id === 'amountWonLoss') {
+                     input.value = formattedValue; 
                 } else {
                     input.value = formattedValue;
                 }
