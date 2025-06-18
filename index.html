@@ -134,7 +134,8 @@
         }
         /* New style for the subtle expand/collapse indicator on cards */
         .parlay-card-summary::after {
-            content: '+'; /* Plus sign as initial indicator */
+            /* Removed content to remove the +/-, but kept position for potential future use or alignment */
+            content: ''; 
             position: absolute;
             right: 0.75rem; /* Align to the right edge of the card */
             top: 1rem; /* Adjust vertical position */
@@ -144,7 +145,8 @@
         }
 
         .parlay-card-summary.expanded::after {
-            content: '−'; /* Minus sign when expanded */
+            /* Removed content to remove the +/-, but kept transform for potential future use */
+            content: '';
             transform: rotate(180deg); /* Optional: rotate for visual flair */
         }
 
@@ -237,7 +239,7 @@
     <div class="container">
         <!-- Header -->
         <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Are You Actually Winning?</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Are You Actually Winning(?)</h1>
             <p class="text-gray-600">Track your parlay betting performance honestly</p>
         </header>
 
@@ -437,6 +439,9 @@ class ParlayTracker {
         this.parlays = [];
         this.currentSuccessCalcMethod = 'parlays';
         this.editingIndex = -1;
+        // ADD UNDO PROPERTIES HERE
+        this.undoStack = []; // Stores past states for undo functionality
+        this.MAX_UNDO_HISTORY = 10; // Limit undo history to prevent excessive memory usage
         
         this.initializeElements();
         this.attachEventListeners();
@@ -496,29 +501,65 @@ class ParlayTracker {
         // Form and button handlers
         this.parlayForm.addEventListener('submit', this.handleFormSubmit.bind(this));
         this.addPlayerPropBtn.addEventListener('click', () => this.addPlayerPropRow());
-        this.clearAllBtn.addEventListener('click', this.clearAllParlays.bind(this));
+        // Reverted clearAllBtn to use native confirm()
+        this.clearAllBtn.addEventListener('click', this.clearAllParlays.bind(this)); 
         this.successPercentageCalcSelect.addEventListener('change', this.handleSuccessCalcChange.bind(this));
         this.closeModalBtn.addEventListener('click', this.closeWelcomeModal.bind(this));
+        // ADD KEYBOARD EVENT LISTENER HERE
+        document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
     }
 
     // Data persistence methods
+    // Replace this existing block:
+    // loadData() {    const storedParlays = localStorage.getItem('parlays');    if (storedParlays) {        this.parlays = JSON.parse(storedParlays);    }    // ... rest of method}
     loadData() {
-        const storedParlays = localStorage.getItem('parlays');
-        if (storedParlays) {
-            this.parlays = JSON.parse(storedParlays);
-        }
-
-        const storedCalcMethod = localStorage.getItem('successCalcMethod');
-        if (storedCalcMethod) {
-            this.currentSuccessCalcMethod = storedCalcMethod;
-            this.successPercentageCalcSelect.value = storedCalcMethod;
+        try {
+            const storedParlays = localStorage.getItem('parlays');
+            if (storedParlays) {
+                this.parlays = JSON.parse(storedParlays);
+            }
+            const storedCalcMethod = localStorage.getItem('successCalcMethod');
+            if (storedCalcMethod) {
+                this.currentSuccessCalcMethod = storedCalcMethod;
+                this.successPercentageCalcSelect.value = storedCalcMethod;
+            }
+        } catch (error) {
+            console.error("Error loading data from localStorage:", error);
+            // Optionally, clear corrupted data or show a user message
+            // localStorage.removeItem('parlays');
+            // localStorage.removeItem('successCalcMethod');
+            // alert('Some stored data might be corrupted and could not be loaded.');
+            this.parlays = []; // Reset parlays if load fails
         }
     }
-
+    // Replace this existing block:
+    // saveData() {    localStorage.setItem('parlays', JSON.stringify(this.parlays));    localStorage.setItem('successCalcMethod', this.currentSuccessCalcMethod);}
     saveData() {
-        localStorage.setItem('parlays', JSON.stringify(this.parlays));
-        localStorage.setItem('successCalcMethod', this.currentSuccessCalcMethod);
+        try {
+            localStorage.setItem('parlays', JSON.stringify(this.parlays));
+            localStorage.setItem('successCalcMethod', this.currentSuccessCalcMethod);
+        } catch (error) {
+            console.error("Error saving data to localStorage:", error);
+            // Optionally, show a user message if save fails
+            // alert('Failed to save data. Please check browser storage settings.');
+        }
     }
+    // ADD saveStateForUndo() METHOD HERE
+    saveStateForUndo() {
+        // Create a deep copy of the current parlays array and other relevant state
+        const currentState = {
+            parlays: JSON.parse(JSON.stringify(this.parlays)), // Deep copy the array and its objects
+            // Add other state variables if they also need to be undone, e.g., currentSuccessCalcMethod
+            // currentSuccessCalcMethod: this.currentSuccessCalcMethod
+        };
+        this.undoStack.push(currentState);
+        // Trim the undo stack to prevent it from growing too large
+        if (this.undoStack.length > this.MAX_UNDO_HISTORY) {
+            this.undoStack.shift(); // Remove the oldest state
+        }
+        console.log(`State saved for undo. Stack size: ${this.undoStack.length}`);
+    }
+
 
     // Input handling methods
     handleInputFocus(event) {
@@ -641,7 +682,7 @@ class ParlayTracker {
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-0.5">Prop Type</label>
                 <input type="text" placeholder="e.g., Over 25.5 Pts" 
-                        class="prop-type mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                        class="prop-type mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" 
                         value="${prop}" required>
             </div>
             <div>
@@ -683,6 +724,9 @@ class ParlayTracker {
 
         const parlayData = this.createParlayData(bets);
         
+        // Save state for undo before modifying parlays array for Add/Update operations
+        this.saveStateForUndo(); 
+
         if (this.editingIndex !== -1) {
             this.updateParlay(parlayData);
         } else {
@@ -737,13 +781,11 @@ class ParlayTracker {
         });
 
         if (!allValid) {
-            // Using a simple alert for now as per instructions, can be replaced by custom modal
             alert('Please fill in all Player/Team and Prop Type fields for individual bets.');
             return false;
         }
 
         if (bets.length === 0) {
-            // Using a simple alert for now as per instructions, can be replaced by custom modal
             alert('Please add at least one individual player/team bet for the parlay.');
             return false;
         }
@@ -801,31 +843,46 @@ class ParlayTracker {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // Reverted to use native confirm()
     deleteParlay(index) {
-        // Replace with custom modal if alerts are not allowed
-        if (!confirm('Are you sure you want to delete this parlay entry? This action cannot be undone.')) {
-            return;
+        this.saveStateForUndo(); // Save state before the confirm dialog appears
+        if (confirm('Are you sure you want to delete this parlay entry? This action cannot be undone.')) {
+            this.parlays.splice(index, 1);
+            this.saveData();
+            this.renderParlays();
+            if (this.editingIndex === index) {
+                this.resetForm();
+            }
         }
+    }
 
-        this.parlays.splice(index, 1);
-        this.saveData();
-        this.renderParlays();
-
-        if (this.editingIndex === index) {
+    // Reverted to use native confirm()
+    clearAllParlays() {
+        this.saveStateForUndo(); // Save state before the confirm dialog appears
+        if (confirm('Are you sure you want to delete ALL parlay entries? This action cannot be undone.')) {
+            this.parlays = [];
+            this.saveData();
+            this.renderParlays();
             this.resetForm();
         }
     }
 
-    clearAllParlays() {
-        // Replace with custom modal if alerts are not allowed
-        if (!confirm('Are you sure you want to delete ALL parlay entries? This action cannot be undone.')) {
-            return;
+    // ADD undo() METHOD HERE
+    undo() {
+        if (this.undoStack.length > 0) {
+            const previousState = this.undoStack.pop();
+            this.parlays = previousState.parlays;
+            // Restore other state variables if they were saved in the undo state
+            // this.currentSuccessCalcMethod = previousState.currentSuccessCalcMethod; 
+            
+            this.saveData(); // Save the restored state to localStorage
+            this.renderParlays(); // Re-render the UI
+            this.resetForm(); // Reset form in case an edit was undone
+            console.log(`Undo performed. Stack size: ${this.undoStack.length}`);
+        } else {
+            console.log("Nothing to undo.");
+            alert("Nothing to undo!"); // Reverted to native alert for this message
         }
-
-        this.parlays = [];
-        this.saveData();
-        this.renderParlays();
-        this.resetForm();
     }
 
     // UI rendering and updates
@@ -909,7 +966,7 @@ class ParlayTracker {
                 <div class="parlay-card-detail">
                     <span class="text-gray-600">Won/Loss:</span> <strong class="${wonLossClass}">${wonLossSign}$${parlay.amountWonLoss.toFixed(2)}</strong>
                 </div>
-                <!-- The ::after pseudo-element on .parlay-card-summary now provides the +/– indicator -->
+                <!-- The ::after pseudo-element on .parlay-card-summary no longer provides the +/– indicator text -->
             </div>
             
             <div class="parlay-card-toggle-details hidden">
@@ -938,7 +995,7 @@ class ParlayTracker {
             const parlayCardSummary = card.querySelector('.parlay-card-summary'); 
 
             toggleDetailsDiv.classList.toggle('hidden'); // Toggle visibility
-            parlayCardSummary.classList.toggle('expanded'); // Toggle class for pseudo-element change
+            parlayCardSummary.classList.toggle('expanded'); // Toggle class for pseudo-element change (now unused but harmless)
         });
 
         return card;
@@ -1058,6 +1115,24 @@ class ParlayTracker {
         this.welcomeModal.classList.remove('show');
         this.welcomeModal.classList.add('hidden');
         localStorage.setItem('hasVisitedAyaw', 'true');
+    }
+
+    // ADD handleKeyboardShortcuts() METHOD HERE
+    handleKeyboardShortcuts(event) {
+        // Prevent default browser behavior for common shortcuts if we're handling them
+        if ((event.ctrlKey || event.metaKey) && event.key === 'z') { // Ctrl+Z or Cmd+Z for Undo
+            event.preventDefault();
+            this.undo();
+        }
+        // Add other shortcuts here as needed, e.g.:
+        // if (event.key === 'Escape' && !this.welcomeModal.classList.contains('hidden')) {
+        //     event.preventDefault();
+        //     this.closeWelcomeModal();
+        // }
+        // if ((event.ctrlKey || event.metaKey) && event.key === 's') { // Ctrl+S or Cmd+S to submit (example)
+        //     event.preventDefault();
+        //     this.parlayForm.requestSubmit(); // Programmatically submit the form
+        // }
     }
 }
 
