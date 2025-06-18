@@ -121,8 +121,18 @@
             flex-direction: column;
             justify-content: space-between; /* Pushes buttons to the bottom */
             border: 1px solid #e5e7eb;
-            cursor: pointer; /* Indicate it's clickable */
+            /* Remove global cursor: pointer here as we want it on the summary for the card */
         }
+        /* Specific styling for the card summary section */
+        .parlay-card-summary {
+            cursor: pointer; /* Indicate this part is clickable */
+            padding-bottom: 0.75rem; /* Space before the hidden details toggle indicator */
+            margin-bottom: 0.75rem; /* Space below the summary before the hidden details */
+            border-bottom: 1px dashed #e5e7eb; /* Separator line */
+            display: flex;
+            flex-direction: column;
+        }
+
         .parlay-card-detail {
             display: flex;
             justify-content: space-between;
@@ -157,17 +167,18 @@
             font-weight: bold;
         }
         /* Hidden class for toggling details */
-        .parlay-card-hidden-details.hidden {
+        /* Updated this to use display: none for clean hiding/showing */
+        .parlay-card-toggle-details.hidden {
             display: none;
         }
 
-        /* --- Custom CSS for the collapsible section and arrow --- */
+        /* --- Custom CSS for the main collapsible section and arrow --- */
         .parlay-section summary {
           /* Remove default user agent styling for summary */
           list-style: none; /* Removes the default triangle marker */
           outline: none;    /* Removes the focus outline for better aesthetics */
           /* Center the text and make it a flex container for responsiveness */
-          display: flex; /* Changed from block to flex for vertical centering of content */
+          display: flex; 
           justify-content: center; /* Center horizontally */
           align-items: center; /* Center vertically */
           transition: font-weight 0.2s ease-in-out; /* Smooth transition for hover effect */
@@ -205,6 +216,20 @@
           border-top: 1px dashed #e5e7eb; /* A subtle dashed line above the content */
           margin-top: 1rem; /* Space between the summary and the dashed line */
         }
+
+        /* Style for the expand/collapse indicator on cards */
+        .card-toggle-indicator {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed #e5e7eb;
+            transition: color 0.2s ease;
+        }
+        .card-toggle-indicator:hover {
+            color: #374151;
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-4 sm:p-6 md:p-8">
@@ -224,10 +249,6 @@
 
         <!-- Input Form - Now Collapsible and Centered with Hover Effect -->
         <details class="parlay-section bg-white p-6 rounded-lg shadow-sm mb-8">
-            <!--
-              The summary is now flex to center its content.
-              The arrow span has been removed from the HTML.
-            -->
             <summary class="cursor-pointer flex justify-center items-center text-2xl font-semibold text-gray-700 mb-4">
                 <h3>Add New Parlay</h3>
             </summary>
@@ -863,7 +884,7 @@ class ParlayTracker {
 
     createCard(parlay, index) {
         const card = document.createElement('div');
-        card.className = 'parlay-card';
+        card.className = 'parlay-card'; // This class has padding, border, shadow
 
         const formattedDate = new Date(parlay.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         const wonLossClass = parlay.amountWonLoss > 0 ? 'text-green-600 font-bold' : (parlay.amountWonLoss < 0 ? 'text-red-600 font-bold' : 'text-gray-600');
@@ -874,7 +895,7 @@ class ParlayTracker {
         ).join('');
 
         card.innerHTML = `
-            <div>
+            <div class="parlay-card-summary">
                 <div class="parlay-card-detail">
                     <span class="text-gray-600">Date:</span> <strong>${formattedDate}</strong>
                 </div>
@@ -882,26 +903,49 @@ class ParlayTracker {
                     <span class="text-gray-600">Result:</span> <strong class="${parlay.result === 'Win' ? 'text-green-600' : parlay.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${parlay.result}</strong>
                 </div>
                 <div class="parlay-card-detail">
-                    <span class="text-gray-600">Type:</span> <strong>${parlay.playType}</strong>
-                </div>
-                <div class="parlay-card-detail">
                     <span class="text-gray-600">Wagered:</span> <strong>$${parlay.amountWagered.toFixed(2)}</strong>
                 </div>
                 <div class="parlay-card-detail">
                     <span class="text-gray-600">Won/Loss:</span> <strong class="${wonLossClass}">${wonLossSign}$${parlay.amountWonLoss.toFixed(2)}</strong>
                 </div>
-                <div class="parlay-card-bets">
+                <div class="card-toggle-indicator">View Details & Bets ▼</div>
+            </div>
+            
+            <div class="parlay-card-toggle-details hidden">
+                <div class="parlay-card-detail mt-3">
+                    <span class="text-gray-600">Type:</span> <strong>${parlay.playType}</strong>
+                </div>
+                <div class="parlay-card-bets mt-2">
                     <p class="text-sm font-medium text-gray-700 mb-1">Individual Bets:</p>
                     <ul>
                         ${betsHtml}
                     </ul>
                 </div>
             </div>
+
             <div class="parlay-card-actions">
                 <button onclick="tracker.editParlay(${index})" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-md text-sm hover:bg-indigo-200">Edit</button>
                 <button onclick="tracker.deleteParlay(${index})" class="bg-red-100 text-red-700 px-3 py-1 rounded-md text-sm hover:bg-red-200">Delete</button>
             </div>
         `;
+
+        // Add event listener to toggle details when the summary part of the card is clicked
+        card.querySelector('.parlay-card-summary').addEventListener('click', (event) => {
+            // Prevent event from bubbling up and interfering with other card clicks if any
+            event.stopPropagation(); 
+            const toggleDetailsDiv = card.querySelector('.parlay-card-toggle-details');
+            const toggleIndicator = card.querySelector('.card-toggle-indicator');
+
+            toggleDetailsDiv.classList.toggle('hidden'); // Toggle visibility
+
+            // Update indicator text
+            if (toggleDetailsDiv.classList.contains('hidden')) {
+                toggleIndicator.textContent = 'View Details & Bets ▼';
+            } else {
+                toggleIndicator.textContent = 'Hide Details & Bets ▲';
+            }
+        });
+
         return card;
     }
 
