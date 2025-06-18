@@ -121,7 +121,6 @@
             flex-direction: column;
             justify-content: space-between; /* Pushes buttons to the bottom */
             border: 1px solid #e5e7eb;
-            /* Remove global cursor: pointer here as we want it on the summary for the card */
         }
         /* Specific styling for the card summary section */
         .parlay-card-summary {
@@ -131,6 +130,22 @@
             border-bottom: 1px dashed #e5e7eb; /* Separator line */
             display: flex;
             flex-direction: column;
+            position: relative; /* Needed for absolute positioning of pseudo-element */
+        }
+        /* New style for the subtle expand/collapse indicator on cards */
+        .parlay-card-summary::after {
+            content: '+'; /* Plus sign as initial indicator */
+            position: absolute;
+            right: 0.75rem; /* Align to the right edge of the card */
+            top: 1rem; /* Adjust vertical position */
+            font-size: 1.2rem;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+        }
+
+        .parlay-card-summary.expanded::after {
+            content: '−'; /* Minus sign when expanded */
+            transform: rotate(180deg); /* Optional: rotate for visual flair */
         }
 
         .parlay-card-detail {
@@ -167,7 +182,6 @@
             font-weight: bold;
         }
         /* Hidden class for toggling details */
-        /* Updated this to use display: none for clean hiding/showing */
         .parlay-card-toggle-details.hidden {
             display: none;
         }
@@ -182,6 +196,7 @@
           justify-content: center; /* Center horizontally */
           align-items: center; /* Center vertically */
           transition: font-weight 0.2s ease-in-out; /* Smooth transition for hover effect */
+          touch-action: manipulation; /* Added to help fix double-tap on mobile */
         }
 
         /* Hide the default marker specifically for Webkit browsers (Chrome, Safari) */
@@ -215,20 +230,6 @@
           padding-top: 1rem; /* Adds padding above the form when expanded */
           border-top: 1px dashed #e5e7eb; /* A subtle dashed line above the content */
           margin-top: 1rem; /* Space between the summary and the dashed line */
-        }
-
-        /* Style for the expand/collapse indicator on cards */
-        .card-toggle-indicator {
-            text-align: center;
-            font-size: 0.9rem;
-            color: #6b7280;
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px dashed #e5e7eb;
-            transition: color 0.2s ease;
-        }
-        .card-toggle-indicator:hover {
-            color: #374151;
         }
     </style>
 </head>
@@ -908,7 +909,7 @@ class ParlayTracker {
                 <div class="parlay-card-detail">
                     <span class="text-gray-600">Won/Loss:</span> <strong class="${wonLossClass}">${wonLossSign}$${parlay.amountWonLoss.toFixed(2)}</strong>
                 </div>
-                <div class="card-toggle-indicator">View Details & Bets ▼</div>
+                <!-- The ::after pseudo-element on .parlay-card-summary now provides the +/– indicator -->
             </div>
             
             <div class="parlay-card-toggle-details hidden">
@@ -934,16 +935,10 @@ class ParlayTracker {
             // Prevent event from bubbling up and interfering with other card clicks if any
             event.stopPropagation(); 
             const toggleDetailsDiv = card.querySelector('.parlay-card-toggle-details');
-            const toggleIndicator = card.querySelector('.card-toggle-indicator');
+            const parlayCardSummary = card.querySelector('.parlay-card-summary'); 
 
             toggleDetailsDiv.classList.toggle('hidden'); // Toggle visibility
-
-            // Update indicator text
-            if (toggleDetailsDiv.classList.contains('hidden')) {
-                toggleIndicator.textContent = 'View Details & Bets ▼';
-            } else {
-                toggleIndicator.textContent = 'Hide Details & Bets ▲';
-            }
+            parlayCardSummary.classList.toggle('expanded'); // Toggle class for pseudo-element change
         });
 
         return card;
@@ -1071,5 +1066,6 @@ const tracker = new ParlayTracker();
     </script>
 </body>
 </html>
+
 
 
