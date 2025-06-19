@@ -881,15 +881,16 @@
 
             this.parlays.forEach((parlay, index) => {
                 // Render for Table View (Desktop)
+                // Removed background color based on parlay result
                 const tableRow = `
-                    <tr class="${parlay.result === 'Win' ? 'bg-green-50' : parlay.result === 'Loss' ? 'bg-red-50' : 'bg-yellow-50'}">
+                    <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.date}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${parlay.result === 'Win' ? 'text-green-600' : parlay.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${parlay.result}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${parlay.result}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.playType}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${parlay.amountWagered.toFixed(2)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${parlay.amountWonLoss >= 0 ? 'text-green-600' : 'text-red-600'}">$${parlay.amountWonLoss.toFixed(2)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ${parlay.individualBets.map(bet => `${bet.player} (${bet.result})`).join(', ')}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">$${parlay.amountWonLoss.toFixed(2)}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            ${parlay.individualBets.map(bet => `<div>${bet.player}: ${bet.prop} (<span class="${bet.result === 'Win' ? 'text-green-600' : bet.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${bet.result}</span>)</div>`).join('')}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button onclick="tracker.editParlay(${index})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
@@ -902,13 +903,14 @@
                 }
 
                 // Render for Card View (Mobile)
+                // Removed background and border colors based on parlay result
                 const cardHtml = `
-                    <div class="parlay-card ${parlay.result === 'Win' ? 'border-green-300 bg-green-50' : parlay.result === 'Loss' ? 'border-red-300 bg-red-50' : 'border-yellow-300 bg-yellow-50'}">
+                    <div class="parlay-card border-gray-200 bg-white">
                         <div class="parlay-card-summary" data-index="${index}">
                             <h3 class="text-lg font-semibold text-gray-800 mb-2">${parlay.date} - ${parlay.playType}</h3>
                             <div class="parlay-card-detail">
                                 <span>Result:</span>
-                                <strong class="${parlay.result === 'Win' ? 'text-green-600' : parlay.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${parlay.result}</strong>
+                                <strong class="text-gray-800">${parlay.result}</strong>
                             </div>
                             <div class="parlay-card-detail">
                                 <span>Wagered:</span>
@@ -916,7 +918,7 @@
                             </div>
                             <div class="parlay-card-detail">
                                 <span>Profit/Loss:</span>
-                                <strong class="${parlay.amountWonLoss >= 0 ? 'text-green-600' : 'text-red-600'}">$${parlay.amountWonLoss.toFixed(2)}</strong>
+                                <strong class="text-gray-800">$${parlay.amountWonLoss.toFixed(2)}</strong>
                             </div>
                         </div>
                         <div class="parlay-card-toggle-details hidden">
