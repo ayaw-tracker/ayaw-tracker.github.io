@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> <!-- Removed class="dark" to allow original light mode -->
+<html lang="en"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -503,6 +503,18 @@
         </section>
     </div>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold mb-4">Confirm Clear All</h3>
+            <p class="mb-6">Are you sure you want to clear all parlay entries? This action cannot be undone.</p>
+            <div class="flex justify-center space-x-4">
+                <button id="cancelClearBtn" class="bg-gray-200 text-gray-800 py-2 px-6 rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">Cancel</button>
+                <button id="confirmClearBtn" class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">Clear All</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Welcome Modal -->
     <div id="welcomeModal" class="modal-overlay hidden">
         <div class="modal-content">
@@ -536,6 +548,9 @@ class ParlayTracker {
         this.currentSuccessCalcMethod = 'parlays';
         this.editingIndex = -1;
         this.undoStack = [];
+        this.confirmationModal = null; // New property for confirmation modal
+        this.cancelClearBtn = null; // New property for cancel button
+        this.confirmClearBtn = null; // New property for confirm button
 
         this.init();
     }
@@ -583,7 +598,10 @@ class ParlayTracker {
 
             // Modal elements
             welcomeModal: 'welcomeModal',
-            closeModalBtn: 'closeModalBtn'
+            closeModalBtn: 'closeModalBtn',
+            confirmationModal: 'confirmationModal', // New confirmation modal element
+            cancelClearBtn: 'cancelClearBtn', // New cancel button for confirmation
+            confirmClearBtn: 'confirmClearBtn' // New confirm button for confirmation
         };
 
         // Assign elements to instance properties
@@ -595,62 +613,37 @@ class ParlayTracker {
         });
     }
 
-    // Attach all event listeners with proper error handling
+    // Attach all event listeners directly
     attachEventListeners() {
-        const listeners = [
-            // Money input handlers
-            { element: this.amountWageredInput, events: ['focus', 'input', 'blur'] },
-            { element: this.amountWonLossInput, events: ['focus', 'input', 'blur'] },
-            
-            // Form handlers
-            { element: this.resultInput, events: ['change'] },
-            { element: this.parlayForm, events: ['submit'] },
-            { element: this.addPlayerPropBtn, events: ['click'] },
-            { element: this.clearAllBtn, events: ['click'] },
-            { element: this.successPercentageCalcSelect, events: ['change'] },
-            { element: this.closeModalBtn, events: ['click'] }
-        ];
+        // Input focus and money input handlers
+        this.amountWageredInput?.addEventListener('focus', this.handleInputFocus.bind(this));
+        this.amountWageredInput?.addEventListener('input', (e) => {
+            this.sanitizeMoneyInput(e);
+            this.updateWonLossBasedOnResult();
+        });
+        this.amountWageredInput?.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
 
-        listeners.forEach(({ element, events }) => {
-            if (!element) return;
+        this.amountWonLossInput?.addEventListener('focus', this.handleInputFocus.bind(this));
+        this.amountWonLossInput?.addEventListener('input', this.sanitizeMoneyInput.bind(this));
+        this.amountWonLossInput?.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
+        
+        // Form and button handlers
+        this.resultInput?.addEventListener('change', this.updateWonLossBasedOnResult.bind(this));
+        this.parlayForm?.addEventListener('submit', this.handleFormSubmit.bind(this));
+        this.addPlayerPropBtn?.addEventListener('click', () => this.addPlayerPropRow());
+        this.clearAllBtn?.addEventListener('click', this.showClearConfirmation.bind(this)); // Show confirmation modal
+        this.successPercentageCalcSelect?.addEventListener('change', this.handleSuccessCalcChange.bind(this));
+        this.closeModalBtn?.addEventListener('click', this.closeWelcomeModal.bind(this));
 
-            events.forEach(event => {
-                const handler = this.getEventHandler(element, event);
-                if (handler) {
-                    element.addEventListener(event, handler);
-                }
-            });
+        // Confirmation modal buttons
+        this.cancelClearBtn?.addEventListener('click', this.hideClearConfirmation.bind(this));
+        this.confirmClearBtn?.addEventListener('click', () => {
+            this.hideClearConfirmation();
+            this.executeClearAllParlays(); // Execute clear only after confirmation
         });
 
         // Global keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
-    }
-
-    // Get appropriate event handler for element and event type
-    getEventHandler(element, event) {
-        const handlers = {
-            focus: this.handleInputFocus.bind(this),
-            input: (e) => {
-                this.sanitizeMoneyInput(e);
-                if (element === this.amountWageredInput || element === this.resultInput) { // Added resultInput to trigger on change
-                    this.updateWonLossBasedOnResult(e);
-                }
-            },
-            blur: this.formatCurrencyOnBlur.bind(this),
-            change: this.updateWonLossBasedOnResult.bind(this), // Keep this for immediate change updates
-            submit: this.handleFormSubmit.bind(this),
-            click: () => {
-                if (element === this.addPlayerPropBtn) {
-                    this.addPlayerPropRow();
-                } else if (element === this.clearAllBtn) {
-                    this.clearAllParlays();
-                } else if (element === this.closeModalBtn) {
-                    this.closeWelcomeModal();
-                }
-            }
-        };
-
-        return handlers[event];
     }
 
     // Data persistence methods
@@ -756,7 +749,7 @@ class ParlayTracker {
         input.value = numericValue.toFixed(2);
     }
 
-    updateWonLossBasedOnResult(event) {
+    updateWonLossBasedOnResult() {
         if (!this.resultInput || !this.amountWageredInput || !this.amountWonLossInput) {
             console.error("One or more required input elements for updateWonLossBasedOnResult are missing.");
             return;
@@ -805,9 +798,12 @@ class ParlayTracker {
         `;
         this.playerPropInputsContainer.appendChild(div);
 
-        div.querySelector('.remove-prop-btn').addEventListener('click', () => {
-            div.classList.add('removing');
-            div.addEventListener('animationend', () => div.remove());
+        div.querySelector('.remove-prop-btn').addEventListener('click', (e) => {
+            const row = e.target.closest('.player-prop-row');
+            if (row) {
+                row.classList.add('removing');
+                row.addEventListener('animationend', () => row.remove());
+            }
         });
     }
     
@@ -822,26 +818,54 @@ class ParlayTracker {
         event.preventDefault();
         this.saveStateForUndo(); // Save state before any potential modification
 
-        if (!this.resultInput || !this.playTypeInput || !this.amountWageredInput || !this.amountWonLossInput) {
-            console.error("Form submission aborted: Missing one or more required input elements.");
+        // Input Validation
+        const amountWagered = parseFloat(this.amountWageredInput?.value || '0');
+        const amountWonLoss = parseFloat(this.amountWonLossInput?.value || '0');
+
+        if (isNaN(amountWagered) || amountWagered < 0) {
+            alert('Please enter a valid non-negative number for Amount Wagered.');
+            this.amountWageredInput?.focus();
+            return;
+        }
+        if (isNaN(amountWonLoss)) {
+             alert('Please enter a valid number for Amount Won/Loss.');
+             this.amountWonLossInput?.focus();
+             return;
+        }
+        // Additional check for required fields, if they are empty, this will be caught by HTML5 required attribute first
+        if (!this.resultInput?.value || !this.playTypeInput?.value) {
+            alert('Please fill in all parlay details.');
             return;
         }
 
+
         const result = this.resultInput.value;
         const playType = this.playTypeInput.value;
-        const amountWagered = parseFloat(this.amountWageredInput.value);
-        const amountWonLoss = parseFloat(this.amountWonLossInput.value);
         const date = new Date().toISOString().split('T')[0]; //YYYY-MM-DD
 
         const individualBets = [];
         if (this.playerPropInputsContainer) {
             const playerPropRows = this.playerPropInputsContainer.querySelectorAll('.player-prop-row');
+            let allPropsValid = true;
             playerPropRows.forEach(row => {
-                const player = row.querySelector('.player-name')?.value || '';
-                const prop = row.querySelector('.prop-type')?.value || '';
-                const propResult = row.querySelector('.prop-result')?.value || 'Win';
-                individualBets.push({ player, prop, result: propResult });
+                const playerInput = row.querySelector('.player-name');
+                const propInput = row.querySelector('.prop-type');
+                const propResultInput = row.querySelector('.prop-result');
+
+                if (!playerInput?.value.trim() || !propInput?.value.trim()) {
+                    allPropsValid = false;
+                }
+                individualBets.push({ 
+                    player: playerInput?.value || '', 
+                    prop: propInput?.value || '', 
+                    result: propResultInput?.value || 'Win' 
+                });
             });
+
+            if (!allPropsValid) {
+                alert('Please ensure all individual player/team bets have a player/team name and prop type.');
+                return;
+            }
         }
 
         const newParlay = {
@@ -934,16 +958,36 @@ class ParlayTracker {
         this.updateSummary();
     }
 
-    clearAllParlays() {
-        if (confirm('Are you sure you want to clear all parlay entries? This cannot be undone.')) {
-            this.saveStateForUndo(); // Save state before clearing
-            this.parlays = [];
-            this.saveData();
-            this.renderParlays();
-            this.updateSummary();
-            this.resetForm();
+    // Show custom confirmation modal
+    showClearConfirmation() {
+        if (this.confirmationModal) {
+            this.confirmationModal.classList.remove('hidden');
+            setTimeout(() => {
+                this.confirmationModal.classList.add('show');
+            }, 10);
         }
     }
+
+    // Hide custom confirmation modal
+    hideClearConfirmation() {
+        if (this.confirmationModal) {
+            this.confirmationModal.classList.remove('show');
+            this.confirmationModal.addEventListener('transitionend', () => {
+                this.confirmationModal.classList.add('hidden');
+            }, { once: true });
+        }
+    }
+
+    // Execute clear all parlays after confirmation
+    executeClearAllParlays() {
+        this.saveStateForUndo(); // Save state before clearing
+        this.parlays = [];
+        this.saveData();
+        this.renderParlays();
+        this.updateSummary();
+        this.resetForm();
+    }
+
 
     // Rendering methods
     renderParlays() {
@@ -966,17 +1010,32 @@ class ParlayTracker {
         }
 
         this.parlays.forEach((parlay, index) => {
+            // Helper to get text color based on result
+            const getResultTextColor = (result) => {
+                if (result === 'Win') return 'text-green-600';
+                if (result === 'Loss') return 'text-red-600';
+                if (result === 'Push') return 'text-yellow-600';
+                return ''; // Default or no color
+            };
+
+            // Format date for display
+            const formattedDate = new Date(parlay.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+
             // Render for Table View (Desktop)
-            // Removed background color based on parlay result
             const tableRow = `
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formattedDate}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${parlay.result}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.playType}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${parlay.amountWagered.toFixed(2)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">$${parlay.amountWonLoss.toFixed(2)}</td>
                     <td class="px-6 py-4 text-sm text-gray-900">
-                        ${parlay.individualBets.map(bet => `<div>${bet.player}: ${bet.prop} (<span class="${bet.result === 'Win' ? 'text-green-600' : bet.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${bet.result}</span>)</div>`).join('')}
+                        ${parlay.individualBets.map(bet => `<div>${bet.player}: ${bet.prop} (<span class="${getResultTextColor(bet.result)}">${bet.result}</span>)</div>`).join('')}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button onclick="tracker.editParlay(${index})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
@@ -989,11 +1048,10 @@ class ParlayTracker {
             }
 
             // Render for Card View (Mobile)
-            // Removed background and border colors based on parlay result
             const cardHtml = `
                 <div class="parlay-card border-gray-200 bg-white">
                     <div class="parlay-card-summary" data-index="${index}">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">${parlay.date} - ${parlay.playType}</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">${formattedDate} - ${parlay.playType}</h3>
                         <div class="parlay-card-detail">
                             <span>Result:</span>
                             <strong class="text-gray-800">${parlay.result}</strong>
@@ -1010,7 +1068,7 @@ class ParlayTracker {
                     <div class="parlay-card-toggle-details hidden">
                         <p class="text-sm font-medium text-gray-700 mb-1">Individual Bets:</p>
                         <ul class="parlay-card-bets">
-                            ${parlay.individualBets.map(bet => `<li>${bet.player}: ${bet.prop} (<span class="${bet.result === 'Win' ? 'text-green-600' : bet.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${bet.result}</span>)</li>`).join('')}
+                            ${parlay.individualBets.map(bet => `<li>${bet.player}: ${bet.prop} (<span class="${getResultTextColor(bet.result)}">${bet.result}</span>)</li>`).join('')}
                         </ul>
                     </div>
                     <div class="parlay-card-actions">
