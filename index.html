@@ -121,7 +121,8 @@
         .parlay-card-grid {
             display: grid;
             gap: 1.5rem; /* Gap between cards */
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Auto-fit cards, min width 280px */
+            /* Adjusted minmax for better mobile responsiveness */
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
         }
         .parlay-card {
             background-color: #ffffff; /* White for card */
@@ -166,6 +167,8 @@
             justify-content: space-between;
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
+            /* Added flex-wrap for better mobile wrapping of detail items */
+            flex-wrap: wrap; 
         }
         .parlay-card-detail strong {
             color: #4b5563; /* Darker text for strong */
