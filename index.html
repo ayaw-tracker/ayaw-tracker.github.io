@@ -7,29 +7,43 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Base body styles, reverted to light mode */
+        /* ==========================================================================
+           PARLAY BETTING APP STYLES
+           ========================================================================== */
+
+        /* ==========================================================================
+           BASE STYLES
+           ========================================================================== */
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Lighter gray for body */
+            background-color: #f3f4f6;
         }
 
-        /* Container styles, reverted to light mode */
+        /* ==========================================================================
+           LAYOUT COMPONENTS
+           ========================================================================== */
+
         .container {
             max-width: 1024px;
             margin: 2rem auto;
             padding: 1.5rem;
-            background-color: #ffffff; /* White for container */
+            background-color: #ffffff;
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
-        /* Style for the individual player prop rows in the form, reverted to light mode */
+
+        /* ==========================================================================
+           FORM COMPONENTS
+           ========================================================================== */
+
+        /* Player Prop Form Rows */
         .player-prop-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) auto;
             gap: 0.75rem;
             padding: 0.75rem;
-            background-color: #f9fafb; /* Lighter background for rows */
+            background-color: #f9fafb;
             border-radius: 0.5rem;
             border: 1px solid #e5e7eb;
             align-items: center;
@@ -39,25 +53,131 @@
             animation: slideIn 0.3s ease forwards;
         }
 
-        @keyframes slideIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         .player-prop-row.removing {
             animation: slideOut 0.3s ease forwards;
         }
 
-        @keyframes slideOut {
-            to {
-                opacity: 0;
-                transform: translateX(-100%);
-            }
+        /* Form Input Focus States */
+        .form-input:focus {
+            ring-color: #3b82f6;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        /* Modal specific styles (unchanged, remains light) */
+        /* ==========================================================================
+           BUTTON COMPONENTS
+           ========================================================================== */
+
+        .btn-primary {
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        /* ==========================================================================
+           CARD COMPONENTS
+           ========================================================================== */
+
+        /* Card Grid Layout */
+        .parlay-card-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+
+        /* Individual Cards */
+        .parlay-card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Card Summary Section */
+        .parlay-card-summary {
+            cursor: pointer;
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px dashed #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .parlay-card-summary::after {
+            content: '';
+            position: absolute;
+            right: 0.75rem;
+            top: 1rem;
+            font-size: 1.2rem;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+        }
+
+        .parlay-card-summary.expanded::after {
+            content: '';
+            transform: rotate(180deg);
+        }
+
+        /* Card Details */
+        .parlay-card-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .parlay-card-detail strong {
+            color: #4b5563;
+        }
+
+        /* Card Actions */
+        .parlay-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Card Bets List */
+        .parlay-card-bets ul {
+            margin-top: 0.5rem;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .parlay-card-bets li {
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+            padding-left: 1.25rem;
+            position: relative;
+        }
+
+        .parlay-card-bets li::before {
+            content: '•';
+            color: #6b7280;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* Card Toggle Details */
+        .parlay-card-toggle-details.hidden {
+            display: none;
+        }
+
+        /* ==========================================================================
+           MODAL COMPONENTS
+           ========================================================================== */
+
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -73,138 +193,42 @@
             opacity: 0;
             visibility: hidden;
         }
+
         .modal-overlay.show {
             opacity: 1;
             visibility: visible;
         }
+
         .modal-content {
-            background-color: #ffffff; /* Always white for modal content */
+            background-color: #ffffff;
             padding: 2rem;
             border-radius: 0.75rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid #e5e7eb;
             max-width: 500px;
             width: 90%;
             text-align: center;
             transform: translateY(-20px);
             transition: transform 0.3s ease-in-out;
-            border: 1px solid #e5e7eb; /* Subtle border for definition */
-            color: #1f2937; /* Default dark text for modal */
+            color: #1f2937;
         }
+
         .modal-content h3 {
-            color: #1f2937; /* Ensure heading is dark in modal */
+            color: #1f2937;
         }
+
         .modal-content p {
-            color: #4b5563; /* Ensure paragraph is dark in modal */
+            color: #4b5563;
         }
+
         .modal-overlay.show .modal-content {
             transform: translateY(0);
         }
 
-        /* Improved input focus states */
-        .form-input:focus {
-            ring-color: #3b82f6;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
+        /* ==========================================================================
+           COLLAPSIBLE SECTION COMPONENTS
+           ========================================================================== */
 
-        /* Hover effects for buttons */
-        .btn-primary {
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        /* Card specific styles for responsiveness, reverted to light mode */
-        .parlay-card-grid {
-            display: grid;
-            gap: 1.5rem; /* Gap between cards */
-            /* Adjusted minmax for better mobile responsiveness */
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
-        }
-        .parlay-card {
-            background-color: #ffffff; /* White for card */
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; /* Pushes buttons to the bottom */
-            border: 1px solid #e5e7eb;
-        }
-
-        /* Specific styling for the card summary section, reverted to light mode */
-        .parlay-card-summary {
-            cursor: pointer; /* Indicate this part is clickable */
-            padding-bottom: 0.75rem;
-            margin-bottom: 0.75rem;
-            border-bottom: 1px dashed #e5e7eb; /* Separator line */
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* New style for the subtle expand/collapse indicator on cards */
-        .parlay-card-summary::after {
-            content: '';
-            position: absolute;
-            right: 0.75rem;
-            top: 1rem;
-            font-size: 1.2rem;
-            color: #6b7280; /* Gray for icon */
-            transition: transform 0.2s ease;
-        }
-
-        .parlay-card-summary.expanded::after {
-            content: '';
-            transform: rotate(180deg);
-        }
-
-        .parlay-card-detail {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            /* Added flex-wrap for better mobile wrapping of detail items */
-            flex-wrap: wrap; 
-        }
-        .parlay-card-detail strong {
-            color: #4b5563; /* Darker text for strong */
-        }
-
-        .parlay-card-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            justify-content: flex-end;
-        }
-        .parlay-card-bets ul {
-            margin-top: 0.5rem;
-            list-style: none;
-            padding-left: 0;
-        }
-        .parlay-card-bets li {
-            font-size: 0.85rem;
-            margin-bottom: 0.25rem;
-            padding-left: 1.25rem;
-            position: relative;
-        }
-        .parlay-card-bets li::before {
-            content: '•';
-            color: #6b7280; /* Gray for bullets */
-            position: absolute;
-            left: 0;
-            font-weight: bold;
-        }
-
-        /* Hidden class for toggling details */
-        .parlay-card-toggle-details.hidden {
-            display: none;
-        }
-
-        /* --- Custom CSS for the main collapsible section and arrow --- */
         .parlay-section summary {
             list-style: none;
             outline: none;
@@ -215,10 +239,7 @@
             touch-action: manipulation;
         }
 
-        .parlay-section summary::-webkit-details-marker {
-            display: none;
-        }
-
+        .parlay-section summary::-webkit-details-marker,
         .parlay-section summary::marker {
             display: none;
         }
@@ -228,50 +249,73 @@
             font-weight: 600;
         }
 
-        .parlay-section .arrow {
-            display: none;
-        }
-
         .parlay-section summary:hover h3 {
             font-weight: 800;
         }
 
-        /* Styling for the content area that expands/collapses, reverted to light mode */
+        .parlay-section .arrow {
+            display: none;
+        }
+
         .parlay-section .parlay-content {
             padding-top: 1rem;
-            border-top: 1px dashed #e5e7eb; /* A subtle dashed line above the content */
+            border-top: 1px dashed #e5e7eb;
             margin-top: 1rem;
         }
 
-        /* All text and background colors are now managed directly by Tailwind classes */
+        /* ==========================================================================
+           ANIMATIONS
+           ========================================================================== */
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideOut {
+            to {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+        }
     </style>
 </head>
+
 <body class="bg-gray-100 p-4 sm:p-6 md:p-8 text-gray-800">
     <div class="container bg-white">
         <!-- Header -->
         <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Are You Actually Winning?</h1>
-            <p class="text-gray-600">Track your parlay betting performance honestly</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
+                Are You Actually Winning?
+            </h1>
+            <p class="text-gray-600">
+                Track your parlay betting performance honestly
+            </p>
         </header>
 
-        <!-- New Mission Statement Section -->
+        <!-- Mission Statement -->
         <section class="bg-gray-50 p-6 rounded-lg shadow-sm mb-8 text-center">
             <p class="text-gray-700 text-lg font-medium">
                 The truth is in the numbers. Let your data tell the story.
             </p>
         </section>
 
-        <!-- Input Form - Now Collapsible and Centered with Hover Effect -->
+        <!-- Parlay Input Form -->
         <details class="parlay-section bg-white p-6 rounded-lg shadow-sm mb-8">
             <summary class="cursor-pointer flex justify-center items-center text-2xl font-semibold text-gray-700 mb-4">
                 <h3>Add New Parlay</h3>
             </summary>
+            
             <div class="parlay-content">
                 <form id="parlayForm" class="space-y-6">
-                    <!-- Overall Parlay Details -->
+                    <!-- Parlay Details -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
-                            <label for="result" class="block text-sm font-medium text-gray-700 mb-1">Parlay Result</label>
+                            <label for="result" class="block text-sm font-medium text-gray-700 mb-1">
+                                Parlay Result
+                            </label>
                             <select id="result" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
                                 <option value="Win">Win</option>
                                 <option value="Loss">Loss</option>
@@ -280,7 +324,9 @@
                         </div>
                         
                         <div>
-                            <label for="playType" class="block text-sm font-medium text-gray-700 mb-1">Payout Type</label>
+                            <label for="playType" class="block text-sm font-medium text-gray-700 mb-1">
+                                Payout Type
+                            </label>
                             <select id="playType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
                                 <option value="Power">Power Play</option>
                                 <option value="Flex">Flex Play</option>
@@ -288,7 +334,9 @@
                         </div>
                         
                         <div>
-                            <label for="amountWagered" class="block text-sm font-medium text-gray-700 mb-1">Amount Wagered ($)</label>
+                            <label for="amountWagered" class="block text-sm font-medium text-gray-700 mb-1">
+                                Amount Wagered ($)
+                            </label>
                             <input type="text" 
                                    id="amountWagered" 
                                    step="0.01" 
@@ -298,7 +346,9 @@
                         </div>
                         
                         <div class="lg:col-span-1">
-                            <label for="amountWonLoss" class="block text-sm font-medium text-gray-700 mb-1">Amount Won/Loss ($)</label>
+                            <label for="amountWonLoss" class="block text-sm font-medium text-gray-700 mb-1">
+                                Amount Won/Loss ($)
+                            </label>
                             <input type="text" 
                                    id="amountWonLoss" 
                                    step="0.01" 
@@ -308,9 +358,11 @@
                         </div>
                     </div>
 
-                    <!-- Individual Player/Team Bets Section -->
+                    <!-- Individual Bets Section -->
                     <div>
-                        <label class="block text-lg font-semibold text-gray-700 mb-3">Individual Player/Team Bets</label>
+                        <label class="block text-lg font-semibold text-gray-700 mb-3">
+                            Individual Player/Team Bets
+                        </label>
                         <div id="playerPropInputs" class="space-y-3 mb-4">
                             <!-- Dynamic player prop inputs will be added here -->
                         </div>
@@ -335,7 +387,11 @@
 
         <!-- Summary Statistics -->
         <section class="bg-blue-50 p-6 rounded-lg shadow-sm mb-8">
-            <h2 class="text-2xl font-semibold text-blue-800 mb-4">Summary Statistics</h2>
+            <h2 class="text-2xl font-semibold text-blue-800 mb-4">
+                Summary Statistics
+            </h2>
+            
+            <!-- Statistics Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-blue-700 mb-6">
                 <div class="bg-white p-4 rounded-lg">
                     <p class="text-sm text-blue-600 mb-1">Total Wagered</p>
@@ -368,18 +424,24 @@
                 </div>
             </div>
 
+            <!-- Success Rate -->
             <div class="bg-white p-4 rounded-lg mb-6">
-                <label for="successPercentageCalc" class="block text-sm font-medium text-blue-700 mb-2">Success Rate</label>
+                <label for="successPercentageCalc" class="block text-sm font-medium text-blue-700 mb-2">
+                    Success Rate
+                </label>
                 <div class="flex items-center space-x-3">
                     <select id="successPercentageCalc" 
                                  class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800">
                         <option value="parlays">Parlays</option>
                         <option value="props">Individual Props</option>
                     </select>
-                    <p class="text-2xl font-bold text-blue-900"><span id="successPercentage">0.00</span>%</p>
+                    <p class="text-2xl font-bold text-blue-900">
+                        <span id="successPercentage">0.00</span>%
+                    </p>
                 </div>
             </div>
 
+            <!-- Clear All Button -->
             <div class="text-center">
                 <button id="clearAllBtn" 
                                  class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out">
@@ -388,22 +450,38 @@
             </div>
         </section>
 
-        <!-- Parlay History - Table for Desktop, Cards for Mobile -->
+        <!-- Parlay History -->
         <section class="bg-white p-6 rounded-lg shadow-sm">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Parlay History</h2>
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">
+                Parlay History
+            </h2>
             
-            <!-- Table View (visible on md screens and up) -->
+            <!-- Desktop Table View -->
             <div class="overflow-x-auto hidden md:block">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Result</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wagered</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Won/Loss</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Individual Bets</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Result
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Type
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Wagered
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Won/Loss
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Individual Bets
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
                         </tr>
                     </thead>
                     <tbody id="parlayTableBody" class="bg-white divide-y divide-gray-200">
@@ -412,11 +490,12 @@
                 </table>
             </div>
 
-            <!-- Card View (visible on screens smaller than md) -->
+            <!-- Mobile Card View -->
             <div id="parlayHistoryContainer" class="parlay-card-grid block md:hidden">
                 <!-- Parlay cards will be dynamically added here -->
             </div>
 
+            <!-- No Parlays Message -->
             <div id="noParlaysMessage" class="text-center text-gray-500 py-12 hidden">
                 <p class="text-lg">No parlays tracked yet.</p>
                 <p class="text-sm">Add your first parlay above to get started!</p>
@@ -441,669 +520,666 @@
             </div>
         </div>
     </div>
+<script> 
+// Parlay Tracker Application - Cleaned and Refactored
+class ParlayTracker {
+    // Static constants
+    static MAX_UNDO_HISTORY = 10;
+    static STORAGE_KEYS = {
+        PARLAYS: 'parlays',
+        SUCCESS_CALC_METHOD: 'successCalcMethod',
+        HAS_VISITED: 'hasVisited'
+    };
 
-    <script>
-    // Parlay Tracker Application
-    class ParlayTracker {
-        constructor() {
-            this.parlays = [];
-            this.currentSuccessCalcMethod = 'parlays';
-            this.editingIndex = -1;
-            
-            // --- UNDO PROPERTIES ADDED --- //
-            this.undoStack = [];
-            this.MAX_UNDO_HISTORY = 10;
+    constructor() {
+        this.parlays = [];
+        this.currentSuccessCalcMethod = 'parlays';
+        this.editingIndex = -1;
+        this.undoStack = [];
 
+        this.init();
+    }
+
+    // Main initialization method
+    async init() {
+        try {
             this.initializeElements();
             this.attachEventListeners();
             this.loadData();
             this.initializeUI();
+        } catch (error) {
+            console.error('Failed to initialize ParlayTracker:', error);
         }
+    }
 
-        // Initialize DOM element references
-        initializeElements() {
+    // Initialize DOM element references with error checking
+    initializeElements() {
+        const elements = {
             // Form elements
-            this.parlayForm = document.getElementById('parlayForm');
-            this.resultInput = document.getElementById('result');
-            this.playTypeInput = document.getElementById('playType');
-            this.amountWageredInput = document.getElementById('amountWagered');
-            this.amountWonLossInput = document.getElementById('amountWonLoss');
-            this.playerPropInputsContainer = document.getElementById('playerPropInputs');
-            this.addPlayerPropBtn = document.getElementById('addPlayerPropBtn');
-            this.submitBtn = document.getElementById('submitBtn');
-            this.clearAllBtn = document.getElementById('clearAllBtn');
+            parlayForm: 'parlayForm',
+            resultInput: 'result',
+            playTypeInput: 'playType',
+            amountWageredInput: 'amountWagered',
+            amountWonLossInput: 'amountWonLoss',
+            playerPropInputsContainer: 'playerPropInputs',
+            addPlayerPropBtn: 'addPlayerPropBtn',
+            submitBtn: 'submitBtn',
+            clearAllBtn: 'clearAllBtn',
 
             // Table and Card elements
-            this.parlayTableBody = document.getElementById('parlayTableBody');
-            this.parlayHistoryContainer = document.getElementById('parlayHistoryContainer');
-            this.noParlaysMessage = document.getElementById('noParlaysMessage');
+            parlayTableBody: 'parlayTableBody',
+            parlayHistoryContainer: 'parlayHistoryContainer',
+            noParlaysMessage: 'noParlaysMessage',
 
             // Summary elements
-            this.totalWageredSpan = document.getElementById('totalWagered');
-            this.netProfitLossSpan = document.getElementById('netProfitLoss');
-            this.totalWinsSpan = document.getElementById('totalWins');
-            this.totalLossesSpan = document.getElementById('totalLosses');
-            this.totalPushesSpan = document.getElementById('totalPushes');
-            this.totalParlaysSpan = document.getElementById('totalParlays');
-            this.successPercentageCalcSelect = document.getElementById('successPercentageCalc');
-            this.successPercentageSpan = document.getElementById('successPercentage');
+            totalWageredSpan: 'totalWagered',
+            netProfitLossSpan: 'netProfitLoss',
+            totalWinsSpan: 'totalWins',
+            totalLossesSpan: 'totalLosses',
+            totalPushesSpan: 'totalPushes',
+            totalParlaysSpan: 'totalParlays',
+            successPercentageCalcSelect: 'successPercentageCalc',
+            successPercentageSpan: 'successPercentage',
 
-            // Modal elements (Note: these specifically target the welcome modal content)
-            this.welcomeModal = document.getElementById('welcomeModal');
-            this.closeModalBtn = document.getElementById('closeModalBtn');
-        }
+            // Modal elements
+            welcomeModal: 'welcomeModal',
+            closeModalBtn: 'closeModalBtn'
+        };
 
-        // Attach all event listeners
-        attachEventListeners() {
-            // Input focus handlers and money input handlers
-            if (this.amountWageredInput) {
-                this.amountWageredInput.addEventListener('focus', this.handleInputFocus.bind(this));
-                this.amountWageredInput.addEventListener('input', this.sanitizeMoneyInput.bind(this));
-                this.amountWageredInput.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
-            } else {
-                console.error("amountWageredInput not found. Some event listeners might not be attached.");
+        // Assign elements to instance properties
+        Object.entries(elements).forEach(([property, id]) => {
+            this[property] = document.getElementById(id);
+            if (!this[property]) {
+                console.warn(`Element with ID '${id}' not found`);
             }
+        });
+    }
 
-            if (this.amountWonLossInput) {
-                this.amountWonLossInput.addEventListener('focus', this.handleInputFocus.bind(this));
-                this.amountWonLossInput.addEventListener('input', this.sanitizeMoneyInput.bind(this));
-                this.amountWonLossInput.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
-            } else {
-                console.error("amountWonLossInput not found. Some event listeners might not be attached.");
-            }
-
-            // Auto-calculation handlers
-            if (this.resultInput) {
-                this.resultInput.addEventListener('change', (event) => this.updateWonLossBasedOnResult(event));
-            } else {
-                console.error("resultInput not found. Cannot attach change listener for result.");
-            }
-            // Add listener to amountWageredInput for auto-calculation on input
-            if (this.amountWageredInput) {
-                this.amountWageredInput.addEventListener('input', (event) => this.updateWonLossBasedOnResult(event));
-            }
-
-
-            // Form and button handlers
-            if (this.parlayForm) {
-                this.parlayForm.addEventListener('submit', this.handleFormSubmit.bind(this));
-            } else {
-                console.error("parlayForm not found. Cannot attach submit listener.");
-            }
-
-            if (this.addPlayerPropBtn) {
-                this.addPlayerPropBtn.addEventListener('click', () => this.addPlayerPropRow());
-            } else {
-                console.error("addPlayerPropBtn not found. Cannot attach click listener.");
-            }
+    // Attach all event listeners with proper error handling
+    attachEventListeners() {
+        const listeners = [
+            // Money input handlers
+            { element: this.amountWageredInput, events: ['focus', 'input', 'blur'] },
+            { element: this.amountWonLossInput, events: ['focus', 'input', 'blur'] },
             
-            if (this.clearAllBtn) {
-                this.clearAllBtn.addEventListener('click', this.clearAllParlays.bind(this)); 
-            } else {
-                console.error("clearAllBtn not found. Cannot attach click listener.");
-            }
+            // Form handlers
+            { element: this.resultInput, events: ['change'] },
+            { element: this.parlayForm, events: ['submit'] },
+            { element: this.addPlayerPropBtn, events: ['click'] },
+            { element: this.clearAllBtn, events: ['click'] },
+            { element: this.successPercentageCalcSelect, events: ['change'] },
+            { element: this.closeModalBtn, events: ['click'] }
+        ];
 
-            if (this.successPercentageCalcSelect) {
-                this.successPercentageCalcSelect.addEventListener('change', this.handleSuccessCalcChange.bind(this));
-            } else {
-                console.error("successPercentageCalcSelect not found. Cannot attach change listener.");
-            }
+        listeners.forEach(({ element, events }) => {
+            if (!element) return;
 
-            if (this.closeModalBtn) {
-                this.closeModalBtn.addEventListener('click', this.closeWelcomeModal.bind(this));
-            } else {
-                console.error("closeModalBtn not found. Cannot attach click listener.");
-            }
-            
-            // --- KEYBOARD EVENT LISTENER --- //
-            document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
-        }
-
-        // Data persistence methods
-        loadData() {
-            try {
-                const storedParlays = localStorage.getItem('parlays');
-                if (storedParlays) {
-                    this.parlays = JSON.parse(storedParlays);
+            events.forEach(event => {
+                const handler = this.getEventHandler(element, event);
+                if (handler) {
+                    element.addEventListener(event, handler);
                 }
-                const storedCalcMethod = localStorage.getItem('successCalcMethod');
-                if (storedCalcMethod) {
-                    this.currentSuccessCalcMethod = storedCalcMethod;
-                    if (this.successPercentageCalcSelect) { // Added check
-                        this.successPercentageCalcSelect.value = storedCalcMethod;
-                    }
+            });
+        });
+
+        // Global keyboard shortcuts
+        document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
+    }
+
+    // Get appropriate event handler for element and event type
+    getEventHandler(element, event) {
+        const handlers = {
+            focus: this.handleInputFocus.bind(this),
+            input: (e) => {
+                this.sanitizeMoneyInput(e);
+                if (element === this.amountWageredInput || element === this.resultInput) { // Added resultInput to trigger on change
+                    this.updateWonLossBasedOnResult(e);
                 }
-            } catch (error) {
-                console.error("Error loading data from localStorage:", error);
-                this.parlays = [];
-            }
-        }
-
-        saveData() {
-            try {
-                localStorage.setItem('parlays', JSON.stringify(this.parlays));
-                localStorage.setItem('successCalcMethod', this.currentSuccessCalcMethod);
-            } catch (error) {
-                console.error("Error saving data to localStorage:", error);
-            }
-        }
-
-        // --- saveStateForUndo() METHOD --- //
-        saveStateForUndo() {
-            const currentState = {
-                parlays: JSON.parse(JSON.stringify(this.parlays)),
-            };
-            this.undoStack.push(currentState);
-            if (this.undoStack.length > this.MAX_UNDO_HISTORY) {
-                this.undoStack.shift();
-            }
-            console.log(`State saved for undo. Stack size: ${this.undoStack.length}`);
-        }
-
-        // Input handling methods
-        handleInputFocus(event) {
-            if (event.target.value === '0.00') {
-                event.target.select();
-            }
-        }
-
-        sanitizeMoneyInput(event) {
-            const input = event.target;
-            const originalValue = input.value;
-            const originalSelectionStart = input.selectionStart;
-            let cleanedValue = '';
-            let hasDecimal = false;
-            let hasNegative = false;
-            let charsRemovedBeforeCursor = 0;
-
-            for (let i = 0; i < originalValue.length; i++) {
-                const char = originalValue[i];
-                if (input.id === 'amountWonLoss' && char === '-' && i === 0 && !hasNegative) {
-                    cleanedValue += char;
-                    hasNegative = true;
-                } else if (char === '.' && !hasDecimal) {
-                    cleanedValue += char;
-                    hasDecimal = true;
-                } else if (/\d/.test(char)) {
-                    cleanedValue += char;
-                } else {
-                    if (i < originalSelectionStart) {
-                        charsRemovedBeforeCursor++;
-                    }
+            },
+            blur: this.formatCurrencyOnBlur.bind(this),
+            change: this.updateWonLossBasedOnResult.bind(this), // Keep this for immediate change updates
+            submit: this.handleFormSubmit.bind(this),
+            click: () => {
+                if (element === this.addPlayerPropBtn) {
+                    this.addPlayerPropRow();
+                } else if (element === this.clearAllBtn) {
+                    this.clearAllParlays();
+                } else if (element === this.closeModalBtn) {
+                    this.closeWelcomeModal();
                 }
             }
-            if (cleanedValue.length > 1 && cleanedValue[0] === '0' && cleanedValue[1] !== '.') {
-                cleanedValue = cleanedValue.substring(1);
-                if (originalSelectionStart > 0 && originalValue[0] === '0') {
+        };
+
+        return handlers[event];
+    }
+
+    // Data persistence methods
+    loadData() {
+        try {
+            const storedParlays = localStorage.getItem(ParlayTracker.STORAGE_KEYS.PARLAYS);
+            if (storedParlays) {
+                this.parlays = JSON.parse(storedParlays);
+            }
+            const storedCalcMethod = localStorage.getItem(ParlayTracker.STORAGE_KEYS.SUCCESS_CALC_METHOD);
+            if (storedCalcMethod) {
+                this.currentSuccessCalcMethod = storedCalcMethod;
+                if (this.successPercentageCalcSelect) {
+                    this.successPercentageCalcSelect.value = storedCalcMethod;
+                }
+            }
+        } catch (error) {
+            console.error("Error loading data from localStorage:", error);
+            this.parlays = [];
+        }
+    }
+
+    saveData() {
+        try {
+            localStorage.setItem(ParlayTracker.STORAGE_KEYS.PARLAYS, JSON.stringify(this.parlays));
+            localStorage.setItem(ParlayTracker.STORAGE_KEYS.SUCCESS_CALC_METHOD, this.currentSuccessCalcMethod);
+        } catch (error) {
+            console.error("Error saving data to localStorage:", error);
+        }
+    }
+
+    // Save state for undo functionality
+    saveStateForUndo() {
+        const currentState = {
+            parlays: JSON.parse(JSON.stringify(this.parlays)),
+        };
+        this.undoStack.push(currentState);
+        if (this.undoStack.length > ParlayTracker.MAX_UNDO_HISTORY) {
+            this.undoStack.shift();
+        }
+        console.log(`State saved for undo. Stack size: ${this.undoStack.length}`);
+    }
+
+    // Input handling methods
+    handleInputFocus(event) {
+        if (event.target.value === '0.00') {
+            event.target.select();
+        }
+    }
+
+    sanitizeMoneyInput(event) {
+        const input = event.target;
+        const originalValue = input.value;
+        const originalSelectionStart = input.selectionStart;
+        let cleanedValue = '';
+        let hasDecimal = false;
+        let hasNegative = false;
+        let charsRemovedBeforeCursor = 0;
+
+        for (let i = 0; i < originalValue.length; i++) {
+            const char = originalValue[i];
+            if (input.id === 'amountWonLoss' && char === '-' && i === 0 && !hasNegative) {
+                cleanedValue += char;
+                hasNegative = true;
+            } else if (char === '.' && !hasDecimal) {
+                cleanedValue += char;
+                hasDecimal = true;
+            } else if (/\d/.test(char)) {
+                cleanedValue += char;
+            } else {
+                if (i < originalSelectionStart) {
                     charsRemovedBeforeCursor++;
                 }
             }
-            if (originalValue !== cleanedValue) {
-                input.value = cleanedValue;
-                let newSelectionStart = originalSelectionStart - charsRemovedBeforeCursor;
-                newSelectionStart = Math.max(0, newSelectionStart);
-                newSelectionStart = Math.min(newSelectionStart, cleanedValue.length);
-                input.setSelectionRange(newSelectionStart, newSelectionStart);
+        }
+        if (cleanedValue.length > 1 && cleanedValue[0] === '0' && cleanedValue[1] !== '.') {
+            cleanedValue = cleanedValue.substring(1);
+            if (originalSelectionStart > 0 && originalValue[0] === '0') {
+                charsRemovedBeforeCursor++;
             }
         }
+        if (originalValue !== cleanedValue) {
+            input.value = cleanedValue;
+            let newSelectionStart = originalSelectionStart - charsRemovedBeforeCursor;
+            newSelectionStart = Math.max(0, newSelectionStart);
+            newSelectionStart = Math.min(newSelectionStart, cleanedValue.length);
+            input.setSelectionRange(newSelectionStart, newSelectionStart);
+        }
+    }
 
-        formatCurrencyOnBlur(event) {
-            const input = event.target;
-            const value = input.value.trim();
-            if (value === '') {
-                input.value = '';
-                return;
-            }
-            const numericValue = parseFloat(value.replace(/[^0-9.-]/g, ''));
-            if (isNaN(numericValue)) {
-                input.value = '';
-                return;
-            }
-            input.value = numericValue.toFixed(2);
+    formatCurrencyOnBlur(event) {
+        const input = event.target;
+        const value = input.value.trim();
+        if (value === '') {
+            input.value = '';
+            return;
+        }
+        const numericValue = parseFloat(value.replace(/[^0-9.-]/g, ''));
+        if (isNaN(numericValue)) {
+            input.value = '';
+            return;
+        }
+        input.value = numericValue.toFixed(2);
+    }
+
+    updateWonLossBasedOnResult(event) {
+        if (!this.resultInput || !this.amountWageredInput || !this.amountWonLossInput) {
+            console.error("One or more required input elements for updateWonLossBasedOnResult are missing.");
+            return;
+        }
+        const parlayResult = this.resultInput.value;
+        const wageredValue = parseFloat(this.amountWageredInput.value || '0');
+        const wonLossInput = this.amountWonLossInput;
+        
+        if (parlayResult === 'Win') {
+            wonLossInput.value = ''; // Clear if Win, as win amount will vary
+        } else if (parlayResult === 'Loss') {
+            wonLossInput.value = (-wageredValue).toFixed(2);
+        } else if (parlayResult === 'Push') {
+            wonLossInput.value = '0.00';
+        }
+    }
+
+    // Player prop management
+    addPlayerPropRow(player = '', prop = '', result = 'Win') {
+        if (!this.playerPropInputsContainer) {
+            console.error("playerPropInputsContainer not found. Cannot add player prop row.");
+            return;
+        }
+        const div = document.createElement('div');
+        div.className = 'player-prop-row';
+        div.innerHTML = `
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-0.5">Player/Team</label>
+                <input type="text" placeholder="e.g., Lakers" class="player-name mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-800" value="${player}" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-0.5">Prop Type</label>
+                <input type="text" placeholder="e.g., Over 25.5 Pts" class="prop-type mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-800" value="${prop}" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-0.5">Result</label>
+                <select class="prop-result mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-800">
+                    <option value="Win" ${result === 'Win' ? 'selected' : ''}>Win</option>
+                    <option value="Loss" ${result === 'Loss' ? 'selected' : ''}>Loss</option>
+                    <option value="Push" ${result === 'Push' ? 'selected' : ''}>Push</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="button" class="remove-prop-btn bg-gray-200 text-gray-800 w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-300 transition-all duration-200">-</button>
+            </div>
+        `;
+        this.playerPropInputsContainer.appendChild(div);
+
+        div.querySelector('.remove-prop-btn').addEventListener('click', () => {
+            div.classList.add('removing');
+            div.addEventListener('animationend', () => div.remove());
+        });
+    }
+    
+    clearPlayerPropRows() {
+        if (this.playerPropInputsContainer) {
+            this.playerPropInputsContainer.innerHTML = '';
+        }
+    }
+
+    // Form submission and data handling
+    handleFormSubmit(event) {
+        event.preventDefault();
+        this.saveStateForUndo(); // Save state before any potential modification
+
+        if (!this.resultInput || !this.playTypeInput || !this.amountWageredInput || !this.amountWonLossInput) {
+            console.error("Form submission aborted: Missing one or more required input elements.");
+            return;
         }
 
-        updateWonLossBasedOnResult(event) {
-            // Ensure input elements exist before accessing their values
-            if (!this.resultInput || !this.amountWageredInput || !this.amountWonLossInput) {
-                console.error("One or more required input elements for updateWonLossBasedOnResult are missing.");
-                return;
-            }
-            const parlayResult = this.resultInput.value;
-            const wageredValue = parseFloat(this.amountWageredInput.value || '0');
-            const wonLossInput = this.amountWonLossInput;
-            
-            if (parlayResult === 'Win') {
-                wonLossInput.value = '';
-            } else if (parlayResult === 'Loss') {
-                wonLossInput.value = (-wageredValue).toFixed(2);
-            } else if (parlayResult === 'Push') {
-                wonLossInput.value = '0.00';
-            }
-        }
+        const result = this.resultInput.value;
+        const playType = this.playTypeInput.value;
+        const amountWagered = parseFloat(this.amountWageredInput.value);
+        const amountWonLoss = parseFloat(this.amountWonLossInput.value);
+        const date = new Date().toISOString().split('T')[0]; //YYYY-MM-DD
 
-        // Player prop management
-        addPlayerPropRow(player = '', prop = '', result = 'Win') {
-            // Ensure container exists
-            if (!this.playerPropInputsContainer) {
-                console.error("playerPropInputsContainer not found. Cannot add player prop row.");
-                return;
-            }
-            const div = document.createElement('div');
-            div.className = 'player-prop-row';
-            div.innerHTML = `
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-0.5">Player/Team</label>
-                    <input type="text" placeholder="e.g., Lakers" class="player-name mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-800" value="${player}" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-0.5">Prop Type</label>
-                    <input type="text" placeholder="e.g., Over 25.5 Pts" class="prop-type mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-800" value="${prop}" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-0.5">Result</label>
-                    <select class="prop-result mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-800">
-                        <option value="Win" ${result === 'Win' ? 'selected' : ''}>Win</option>
-                        <option value="Loss" ${result === 'Loss' ? 'selected' : ''}>Loss</option>
-                        <option value="Push" ${result === 'Push' ? 'selected' : ''}>Push</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button type="button" class="remove-prop-btn bg-gray-200 text-gray-800 w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-300 transition-all duration-200">-</button>
-                </div>
-            `;
-            this.playerPropInputsContainer.appendChild(div);
-
-            div.querySelector('.remove-prop-btn').addEventListener('click', () => {
-                div.classList.add('removing');
-                div.addEventListener('animationend', () => div.remove());
+        const individualBets = [];
+        if (this.playerPropInputsContainer) {
+            const playerPropRows = this.playerPropInputsContainer.querySelectorAll('.player-prop-row');
+            playerPropRows.forEach(row => {
+                const player = row.querySelector('.player-name')?.value || '';
+                const prop = row.querySelector('.prop-type')?.value || '';
+                const propResult = row.querySelector('.prop-result')?.value || 'Win';
+                individualBets.push({ player, prop, result: propResult });
             });
         }
-        
-        removePlayerPropRow(event) {
-            const row = event.target.closest('.player-prop-row');
-            if (row) {
-                row.classList.add('removing');
-                row.addEventListener('animationend', () => {
-                    row.remove();
-                });
+
+        const newParlay = {
+            date,
+            result,
+            playType,
+            amountWagered,
+            amountWonLoss,
+            individualBets
+        };
+
+        if (this.editingIndex > -1) {
+            this.parlays[this.editingIndex] = newParlay;
+            this.editingIndex = -1;
+            if (this.submitBtn) {
+                this.submitBtn.textContent = 'Add Parlay Entry';
             }
+        } else {
+            this.parlays.unshift(newParlay); // Add to the beginning for newest first
         }
 
-        clearPlayerPropRows() {
-            if (this.playerPropInputsContainer) {
-                this.playerPropInputsContainer.innerHTML = '';
-            }
+        this.saveData();
+        this.renderParlays();
+        this.updateSummary();
+        this.resetForm();
+    }
+
+    resetForm() {
+        if (this.parlayForm) {
+            this.parlayForm.reset();
+        }
+        // Explicitly clear numerical input values as form.reset() might not clear them if they were set by JS
+        if (this.amountWageredInput) {
+            this.amountWageredInput.value = '';
+        }
+        if (this.amountWonLossInput) {
+            this.amountWonLossInput.value = '';
         }
 
-        // Form submission and data handling
-        handleFormSubmit(event) {
-            event.preventDefault();
-            this.saveStateForUndo(); // Save state before any potential modification
+        this.clearPlayerPropRows();
+        this.addPlayerPropRow(); // Add one empty row by default
+        this.editingIndex = -1;
+        if (this.submitBtn) {
+            this.submitBtn.textContent = 'Add Parlay Entry';
+        }
+        // Collapse the form after submission
+        const parlaySection = document.querySelector('.parlay-section');
+        if (parlaySection) {
+            parlaySection.open = false;
+        }
+    }
 
-            // Ensure all required elements are present before proceeding
-            if (!this.resultInput || !this.playTypeInput || !this.amountWageredInput || !this.amountWonLossInput) {
-                console.error("Form submission aborted: Missing one or more required input elements.");
-                return;
-            }
+    editParlay(index) {
+        const parlay = this.parlays[index];
+        this.editingIndex = index;
 
-            const result = this.resultInput.value;
-            const playType = this.playTypeInput.value;
-            const amountWagered = parseFloat(this.amountWageredInput.value);
-            const amountWonLoss = parseFloat(this.amountWonLossInput.value);
-            const date = new Date().toISOString().split('T')[0]; //YYYY-MM-DD
+        if (this.resultInput) {
+            this.resultInput.value = parlay.result;
+        }
+        if (this.playTypeInput) {
+            this.playTypeInput.value = parlay.playType;
+        }
+        if (this.amountWageredInput) {
+            this.amountWageredInput.value = parlay.amountWagered.toFixed(2);
+        }
+        if (this.amountWonLossInput) {
+            this.amountWonLossInput.value = parlay.amountWonLoss.toFixed(2);
+        }
 
-            const individualBets = [];
-            if (this.playerPropInputsContainer) {
-                const playerPropRows = this.playerPropInputsContainer.querySelectorAll('.player-prop-row');
-                playerPropRows.forEach(row => {
-                    const player = row.querySelector('.player-name')?.value || '';
-                    const prop = row.querySelector('.prop-type')?.value || '';
-                    const propResult = row.querySelector('.prop-result')?.value || 'Win';
-                    individualBets.push({ player, prop, result: propResult });
-                });
-            }
+        this.clearPlayerPropRows();
+        parlay.individualBets.forEach(bet => {
+            this.addPlayerPropRow(bet.player, bet.prop, bet.result);
+        });
 
-            const newParlay = {
-                date,
-                result,
-                playType,
-                amountWagered,
-                amountWonLoss,
-                individualBets
-            };
+        if (this.submitBtn) {
+            this.submitBtn.textContent = 'Update Parlay Entry';
+        }
+        const parlaySection = document.querySelector('.parlay-section');
+        if (parlaySection) {
+            parlaySection.open = true; // Expand form for editing
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
+    }
 
-            if (this.editingIndex > -1) {
-                this.parlays[this.editingIndex] = newParlay;
-                this.editingIndex = -1;
-                if (this.submitBtn) {
-                    this.submitBtn.textContent = 'Add Parlay Entry';
-                }
-            } else {
-                this.parlays.unshift(newParlay); // Add to the beginning for newest first
-            }
+    deleteParlay(index) {
+        this.saveStateForUndo(); // Save state before deletion
+        this.parlays.splice(index, 1);
+        this.saveData();
+        this.renderParlays();
+        this.updateSummary();
+    }
 
+    clearAllParlays() {
+        if (confirm('Are you sure you want to clear all parlay entries? This cannot be undone.')) {
+            this.saveStateForUndo(); // Save state before clearing
+            this.parlays = [];
             this.saveData();
             this.renderParlays();
             this.updateSummary();
             this.resetForm();
         }
+    }
 
-        resetForm() {
-            if (this.parlayForm) {
-                this.parlayForm.reset();
+    // Rendering methods
+    renderParlays() {
+        if (this.parlayTableBody) {
+            this.parlayTableBody.innerHTML = '';
+        }
+        if (this.parlayHistoryContainer) {
+            this.parlayHistoryContainer.innerHTML = '';
+        }
+
+        if (this.parlays.length === 0) {
+            if (this.noParlaysMessage) {
+                this.noParlaysMessage.classList.remove('hidden');
             }
-            this.clearPlayerPropRows();
-            this.addPlayerPropRow(); // Add one empty row by default
-            this.editingIndex = -1;
-            if (this.submitBtn) {
-                this.submitBtn.textContent = 'Add Parlay Entry';
-            }
-            if (this.amountWageredInput) {
-                this.amountWageredInput.value = ''; // Ensure these are truly empty
-            }
-            if (this.amountWonLossInput) {
-                this.amountWonLossInput.value = ''; // Ensure these are truly empty
-            }
-            // Collapse the form after submission
-            const parlaySection = document.querySelector('.parlay-section');
-            if (parlaySection) {
-                parlaySection.open = false;
+            return;
+        } else {
+            if (this.noParlaysMessage) {
+                this.noParlaysMessage.classList.add('hidden');
             }
         }
 
-        editParlay(index) {
-            const parlay = this.parlays[index];
-            this.editingIndex = index;
-
-            if (this.resultInput) {
-                this.resultInput.value = parlay.result;
-            }
-            if (this.playTypeInput) {
-                this.playTypeInput.value = parlay.playType;
-            }
-            if (this.amountWageredInput) {
-                this.amountWageredInput.value = parlay.amountWagered.toFixed(2);
-            }
-            if (this.amountWonLossInput) {
-                this.amountWonLossInput.value = parlay.amountWonLoss.toFixed(2);
-            }
-
-            this.clearPlayerPropRows();
-            parlay.individualBets.forEach(bet => {
-                this.addPlayerPropRow(bet.player, bet.prop, bet.result);
-            });
-
-            if (this.submitBtn) {
-                this.submitBtn.textContent = 'Update Parlay Entry';
-            }
-            const parlaySection = document.querySelector('.parlay-section');
-            if (parlaySection) {
-                parlaySection.open = true; // Expand form for editing
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
-        }
-
-        deleteParlay(index) {
-            this.saveStateForUndo(); // Save state before deletion
-            this.parlays.splice(index, 1);
-            this.saveData();
-            this.renderParlays();
-            this.updateSummary();
-        }
-
-        clearAllParlays() {
-            if (confirm('Are you sure you want to clear all parlay entries? This cannot be undone.')) {
-                this.saveStateForUndo(); // Save state before clearing
-                this.parlays = [];
-                this.saveData();
-                this.renderParlays();
-                this.updateSummary();
-                this.resetForm();
-            }
-        }
-
-        // Rendering methods
-        renderParlays() {
+        this.parlays.forEach((parlay, index) => {
+            // Render for Table View (Desktop)
+            // Removed background color based on parlay result
+            const tableRow = `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${parlay.result}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.playType}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${parlay.amountWagered.toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">$${parlay.amountWonLoss.toFixed(2)}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">
+                        ${parlay.individualBets.map(bet => `<div>${bet.player}: ${bet.prop} (<span class="${bet.result === 'Win' ? 'text-green-600' : bet.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${bet.result}</span>)</div>`).join('')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="tracker.editParlay(${index})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
+                        <button onclick="tracker.deleteParlay(${index})" class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                </tr>
+            `;
             if (this.parlayTableBody) {
-                this.parlayTableBody.innerHTML = '';
-            }
-            if (this.parlayHistoryContainer) {
-                this.parlayHistoryContainer.innerHTML = '';
+                this.parlayTableBody.insertAdjacentHTML('beforeend', tableRow);
             }
 
-            if (this.parlays.length === 0) {
-                if (this.noParlaysMessage) {
-                    this.noParlaysMessage.classList.remove('hidden');
-                }
-                return;
-            } else {
-                if (this.noParlaysMessage) {
-                    this.noParlaysMessage.classList.add('hidden');
-                }
-            }
-
-            this.parlays.forEach((parlay, index) => {
-                // Render for Table View (Desktop)
-                // Removed background color based on parlay result
-                const tableRow = `
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.date}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${parlay.result}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.playType}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${parlay.amountWagered.toFixed(2)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">$${parlay.amountWonLoss.toFixed(2)}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900">
-                            ${parlay.individualBets.map(bet => `<div>${bet.player}: ${bet.prop} (<span class="${bet.result === 'Win' ? 'text-green-600' : bet.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${bet.result}</span>)</div>`).join('')}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="tracker.editParlay(${index})" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</button>
-                            <button onclick="tracker.deleteParlay(${index})" class="text-red-600 hover:text-red-900">Delete</button>
-                        </td>
-                    </tr>
-                `;
-                if (this.parlayTableBody) {
-                    this.parlayTableBody.insertAdjacentHTML('beforeend', tableRow);
-                }
-
-                // Render for Card View (Mobile)
-                // Removed background and border colors based on parlay result
-                const cardHtml = `
-                    <div class="parlay-card border-gray-200 bg-white">
-                        <div class="parlay-card-summary" data-index="${index}">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-2">${parlay.date} - ${parlay.playType}</h3>
-                            <div class="parlay-card-detail">
-                                <span>Result:</span>
-                                <strong class="text-gray-800">${parlay.result}</strong>
-                            </div>
-                            <div class="parlay-card-detail">
-                                <span>Wagered:</span>
-                                <strong>$${parlay.amountWagered.toFixed(2)}</strong>
-                            </div>
-                            <div class="parlay-card-detail">
-                                <span>Profit/Loss:</span>
-                                <strong class="text-gray-800">$${parlay.amountWonLoss.toFixed(2)}</strong>
-                            </div>
+            // Render for Card View (Mobile)
+            // Removed background and border colors based on parlay result
+            const cardHtml = `
+                <div class="parlay-card border-gray-200 bg-white">
+                    <div class="parlay-card-summary" data-index="${index}">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">${parlay.date} - ${parlay.playType}</h3>
+                        <div class="parlay-card-detail">
+                            <span>Result:</span>
+                            <strong class="text-gray-800">${parlay.result}</strong>
                         </div>
-                        <div class="parlay-card-toggle-details hidden">
-                            <p class="text-sm font-medium text-gray-700 mb-1">Individual Bets:</p>
-                            <ul class="parlay-card-bets">
-                                ${parlay.individualBets.map(bet => `<li>${bet.player}: ${bet.prop} (<span class="${bet.result === 'Win' ? 'text-green-600' : bet.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${bet.result}</span>)</li>`).join('')}
-                            </ul>
+                        <div class="parlay-card-detail">
+                            <span>Wagered:</span>
+                            <strong>$${parlay.amountWagered.toFixed(2)}</strong>
                         </div>
-                        <div class="parlay-card-actions">
-                            <button onclick="tracker.editParlay(${index})" class="btn-primary bg-indigo-500 text-white text-sm py-1.5 px-4 rounded-md hover:bg-indigo-600">Edit</button>
-                            <button onclick="tracker.deleteParlay(${index})" class="btn-primary bg-red-500 text-white text-sm py-1.5 px-4 rounded-md hover:bg-red-600">Delete</button>
+                        <div class="parlay-card-detail">
+                            <span>Profit/Loss:</span>
+                            <strong class="text-gray-800">$${parlay.amountWonLoss.toFixed(2)}</strong>
                         </div>
                     </div>
-                `;
-                if (this.parlayHistoryContainer) {
-                    this.parlayHistoryContainer.insertAdjacentHTML('beforeend', cardHtml);
-                }
-
-            });
-
-            // Add event listeners for toggling card details
+                    <div class="parlay-card-toggle-details hidden">
+                        <p class="text-sm font-medium text-gray-700 mb-1">Individual Bets:</p>
+                        <ul class="parlay-card-bets">
+                            ${parlay.individualBets.map(bet => `<li>${bet.player}: ${bet.prop} (<span class="${bet.result === 'Win' ? 'text-green-600' : bet.result === 'Loss' ? 'text-red-600' : 'text-yellow-600'}">${bet.result}</span>)</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="parlay-card-actions">
+                        <button onclick="tracker.editParlay(${index})" class="btn-primary bg-indigo-500 text-white text-sm py-1.5 px-4 rounded-md hover:bg-indigo-600">Edit</button>
+                        <button onclick="tracker.deleteParlay(${index})" class="btn-primary bg-red-500 text-white text-sm py-1.5 px-4 rounded-md hover:bg-red-600">Delete</button>
+                    </div>
+                </div>
+            `;
             if (this.parlayHistoryContainer) {
-                this.parlayHistoryContainer.querySelectorAll('.parlay-card-summary').forEach(summaryDiv => {
-                    summaryDiv.addEventListener('click', (event) => {
-                        // Ensure the click didn't originate from a child element that is itself interactive
-                        if (event.target.tagName === 'BUTTON') return; // Don't toggle if a button inside was clicked
-                        
-                        const detailsDiv = summaryDiv.nextElementSibling;
-                        if (detailsDiv && detailsDiv.classList.contains('parlay-card-toggle-details')) {
-                            detailsDiv.classList.toggle('hidden');
-                            summaryDiv.classList.toggle('expanded'); // Toggle expanded class for potential arrow animation
-                        }
-                    });
-                });
+                this.parlayHistoryContainer.insertAdjacentHTML('beforeend', cardHtml);
             }
 
-            this.updateSummary();
-        }
+        });
 
-        // Summary calculations and updates
-        updateSummary() {
-            let totalWagered = 0;
-            let netProfitLoss = 0;
-            let totalWins = 0;
-            let totalLosses = 0;
-            let totalPushes = 0;
-            let totalIndividualProps = 0;
-            let individualPropWins = 0;
-
-            this.parlays.forEach(parlay => {
-                totalWagered += parlay.amountWagered;
-                netProfitLoss += parlay.amountWonLoss;
-                if (parlay.result === 'Win') {
-                    totalWins++;
-                } else if (parlay.result === 'Loss') {
-                    totalLosses++;
-                } else if (parlay.result === 'Push') {
-                    totalPushes++;
-                }
-
-                parlay.individualBets.forEach(bet => {
-                    totalIndividualProps++;
-                    if (bet.result === 'Win') {
-                        individualPropWins++;
+        // Add event listeners for toggling card details
+        if (this.parlayHistoryContainer) {
+            this.parlayHistoryContainer.querySelectorAll('.parlay-card-summary').forEach(summaryDiv => {
+                summaryDiv.addEventListener('click', (event) => {
+                    // Ensure the click didn't originate from a child element that is itself interactive
+                    if (event.target.tagName === 'BUTTON') return; // Don't toggle if a button inside was clicked
+                    
+                    const detailsDiv = summaryDiv.nextElementSibling;
+                    if (detailsDiv && detailsDiv.classList.contains('parlay-card-toggle-details')) {
+                        detailsDiv.classList.toggle('hidden');
+                        summaryDiv.classList.toggle('expanded'); // Toggle expanded class for potential arrow animation
                     }
                 });
             });
+        }
 
-            if (this.totalWageredSpan) {
-                this.totalWageredSpan.textContent = totalWagered.toFixed(2);
+        this.updateSummary();
+    }
+
+    // Summary calculations and updates
+    updateSummary() {
+        let totalWagered = 0;
+        let netProfitLoss = 0;
+        let totalWins = 0;
+        let totalLosses = 0;
+        let totalPushes = 0;
+        let totalIndividualProps = 0;
+        let individualPropWins = 0;
+
+        this.parlays.forEach(parlay => {
+            totalWagered += parlay.amountWagered;
+            netProfitLoss += parlay.amountWonLoss;
+            if (parlay.result === 'Win') {
+                totalWins++;
+            } else if (parlay.result === 'Loss') {
+                totalLosses++;
+            } else if (parlay.result === 'Push') {
+                totalPushes++;
             }
-            if (this.netProfitLossSpan) {
-                this.netProfitLossSpan.textContent = netProfitLoss.toFixed(2);
-                // Apply color to net profit/loss based on value
-                if (netProfitLoss > 0) {
-                    this.netProfitLossSpan.classList.remove('text-red-600');
-                    this.netProfitLossSpan.classList.add('text-green-600');
-                } else if (netProfitLoss < 0) {
-                    this.netProfitLossSpan.classList.remove('text-green-600');
-                    this.netProfitLossSpan.classList.add('text-red-600');
-                } else {
-                    this.netProfitLossSpan.classList.remove('text-green-600', 'text-red-600');
+
+            parlay.individualBets.forEach(bet => {
+                totalIndividualProps++;
+                if (bet.result === 'Win') {
+                    individualPropWins++;
                 }
-            }
+            });
+        });
 
-            if (this.totalWinsSpan) {
-                this.totalWinsSpan.textContent = totalWins;
-            }
-            if (this.totalLossesSpan) {
-                this.totalLossesSpan.textContent = totalLosses;
-            }
-            if (this.totalPushesSpan) {
-                this.totalPushesSpan.textContent = totalPushes;
-            }
-            if (this.totalParlaysSpan) {
-                this.totalParlaysSpan.textContent = this.parlays.length;
-            }
-
-            let successRate = 0;
-            if (this.currentSuccessCalcMethod === 'parlays') {
-                if (this.parlays.length > 0) {
-                    successRate = (totalWins / this.parlays.length) * 100;
-                }
-            } else { // 'props'
-                if (totalIndividualProps > 0) {
-                    successRate = (individualPropWins / totalIndividualProps) * 100;
-                }
-            }
-            if (this.successPercentageSpan) {
-                this.successPercentageSpan.textContent = successRate.toFixed(2);
-            }
+        if (this.totalWageredSpan) {
+            this.totalWageredSpan.textContent = totalWagered.toFixed(2);
         }
-
-        handleSuccessCalcChange(event) {
-            this.currentSuccessCalcMethod = event.target.value;
-            this.saveData();
-            this.updateSummary();
-        }
-
-        // Welcome Modal functionality
-        initializeUI() {
-            this.addPlayerPropRow(); // Ensure at least one prop row is present on load
-            this.renderParlays();
-            this.updateSummary();
-            this.showWelcomeModal();
-        }
-
-        showWelcomeModal() {
-            const hasVisited = localStorage.getItem('hasVisited');
-            if (!hasVisited) {
-                if (this.welcomeModal) {
-                    this.welcomeModal.classList.remove('hidden');
-                    // Use a timeout to allow the display: flex to apply before transitioning opacity
-                    setTimeout(() => {
-                        this.welcomeModal.classList.add('show');
-                    }, 10);
-                }
-            }
-        }
-
-        closeWelcomeModal() {
-            if (this.welcomeModal) {
-                this.welcomeModal.classList.remove('show');
-                this.welcomeModal.addEventListener('transitionend', () => {
-                    this.welcomeModal.classList.add('hidden');
-                }, { once: true });
-            }
-            localStorage.setItem('hasVisited', 'true');
-        }
-
-        // UNDO IMPLEMENTATION
-        undo() {
-            if (this.undoStack.length > 0) {
-                const prevState = this.undoStack.pop();
-                this.parlays = prevState.parlays;
-                // If other state needs to be undone:
-                // this.currentSuccessCalcMethod = prevState.currentSuccessCalcMethod;
-                // if (this.successPercentageCalcSelect) { // Added check
-                //     this.successPercentageCalcSelect.value = this.currentSuccessCalcMethod;
-                // }
-                this.saveData(); // Save the restored state
-                this.renderParlays();
-                this.updateSummary();
-                console.log(`Undo performed. Stack size: ${this.undoStack.length}`);
+        if (this.netProfitLossSpan) {
+            this.netProfitLossSpan.textContent = netProfitLoss.toFixed(2);
+            // Apply color to net profit/loss based on value
+            if (netProfitLoss > 0) {
+                this.netProfitLossSpan.classList.remove('text-red-600');
+                this.netProfitLossSpan.classList.add('text-green-600');
+            } else if (netProfitLoss < 0) {
+                this.netProfitLossSpan.classList.remove('text-green-600');
+                this.netProfitLossSpan.classList.add('text-red-600');
             } else {
-                console.log('Undo stack is empty. Nothing to undo.');
+                this.netProfitLossSpan.classList.remove('text-green-600', 'text-red-600');
             }
         }
 
-        handleKeyboardShortcuts(event) {
-            // Check for Ctrl+Z (Windows/Linux) or Cmd+Z (Mac) for undo
-            if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
-                event.preventDefault(); // Prevent default browser undo behavior
-                this.undo();
+        if (this.totalWinsSpan) {
+            this.totalWinsSpan.textContent = totalWins;
+        }
+        if (this.totalLossesSpan) {
+            this.totalLossesSpan.textContent = totalLosses;
+        }
+        if (this.totalPushesSpan) {
+            this.totalPushesSpan.textContent = totalPushes;
+        }
+        if (this.totalParlaysSpan) {
+            this.totalParlaysSpan.textContent = this.parlays.length;
+        }
+
+        let successRate = 0;
+        if (this.currentSuccessCalcMethod === 'parlays') {
+            if (this.parlays.length > 0) {
+                successRate = (totalWins / this.parlays.length) * 100;
+            }
+        } else { // 'props'
+            if (totalIndividualProps > 0) {
+                successRate = (individualPropWins / totalIndividualProps) * 100;
+            }
+        }
+        if (this.successPercentageSpan) {
+            this.successPercentageSpan.textContent = successRate.toFixed(2);
+        }
+    }
+
+    handleSuccessCalcChange(event) {
+        this.currentSuccessCalcMethod = event.target.value;
+        this.saveData();
+        this.updateSummary();
+    }
+
+    // Welcome Modal functionality
+    initializeUI() {
+        this.addPlayerPropRow(); // Ensure at least one prop row is present on load
+        this.renderParlays();
+        this.updateSummary();
+        this.showWelcomeModal();
+    }
+
+    showWelcomeModal() {
+        const hasVisited = localStorage.getItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED);
+        if (!hasVisited) {
+            if (this.welcomeModal) {
+                this.welcomeModal.classList.remove('hidden');
+                setTimeout(() => {
+                    this.welcomeModal.classList.add('show');
+                }, 10);
             }
         }
     }
 
-    // Instantiate the tracker when the DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', () => {
-        window.tracker = new ParlayTracker(); // Make it globally accessible for inline onclicks
-    });
-    </script>
+    closeWelcomeModal() {
+        if (this.welcomeModal) {
+            this.welcomeModal.classList.remove('show');
+            this.welcomeModal.addEventListener('transitionend', () => {
+                this.welcomeModal.classList.add('hidden');
+            }, { once: true });
+        }
+        localStorage.setItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED, 'true');
+    }
+
+    // UNDO IMPLEMENTATION
+    undo() {
+        if (this.undoStack.length > 0) {
+            const prevState = this.undoStack.pop();
+            this.parlays = prevState.parlays;
+            this.saveData();
+            this.renderParlays();
+            this.updateSummary();
+            console.log(`Undo performed. Stack size: ${this.undoStack.length}`);
+        } else {
+            console.log('Undo stack is empty. Nothing to undo.');
+        }
+    }
+
+    handleKeyboardShortcuts(event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
+            event.preventDefault();
+            this.undo();
+        }
+    }
+}
+
+// Instantiate the tracker when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.tracker = new ParlayTracker(); // Make it globally accessible for inline onclicks
+});
+</script>
 </body>
 </html>
