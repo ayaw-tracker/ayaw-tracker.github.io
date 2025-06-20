@@ -14,9 +14,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-100 p-4 sm:p-6 md:p-8 text-gray-800">
-    <div class="container bg-white">
+    <div class="container bg-white relative"> <!-- Added 'relative' to container for positioning theme toggle -->
         <!-- Header -->
         <header class="text-center mb-8">
+            <!-- Theme Toggle Button -->
+            <button id="themeToggle" class="absolute top-4 right-4 p-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300" aria-label="Toggle light and dark mode">
+                <i class="fas fa-sun text-xl"></i> <!-- Default to sun icon for light mode -->
+            </button>
+
             <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
                 Are You Actually Winning?
             </h1>
