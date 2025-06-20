@@ -297,7 +297,7 @@ body.dark .parlay-card-bets li::before {
    ========================================================================== */
 
 /* Summary Statistics section */
-body.dark section.bg-blue-50 {
+body.dark section.bg-blue-50 { /* This is the specific section using bg-blue-50 in light mode */
     background-color: #303640; /* Softer dark background for summary section */
 }
 body.dark section.bg-blue-50 h2 {
@@ -310,19 +310,32 @@ body.dark section.bg-blue-50 .bg-white { /* Individual stat cards background */
 body.dark section.bg-blue-50 .bg-white p {
     color: #cbd5e0; /* Slightly darker light text */
 }
-body.dark .text-blue-600 {
+body.dark .text-blue-600 { /* Used for "Total Wagered", "Net Profit/Loss", "Total Parlays" in light mode */
     color: #90cdf4; /* Adjust blue text for dark mode */
 }
-body.dark #netProfitLoss.text-green-600 { color: #68d391; } /* Dark mode green for profit */
-body.dark #netProfitLoss.text-red-600 { color: #fc8181; } /* Dark mode red for loss */
-body.dark #netProfitLoss.text-yellow-600 { color: #f6e05e; } /* Dark mode yellow for push */
+
+/* Specific color-coding for Wins/Losses/Pushes counts in dark mode */
+body.dark #netProfitLoss.text-green-600 { color: #8ce1a3; } /* Softer green for profit in dark mode */
+body.dark #netProfitLoss.text-red-600 { color: #ff9191; } /* Softer red for loss in dark mode */
+body.dark #netProfitLoss.text-yellow-600 { color: #ffe082; } /* Softer yellow for push in dark mode */
+
+body.dark .text-green-700 { /* Used for 'Wins' count in summary */
+    color: #8ce1a3; /* Softer green for dark mode Wins */
+}
+body.dark .text-red-700 { /* Used for 'Losses' count in summary */
+    color: #ff9191; /* Softer red for dark mode Losses */
+}
+body.dark .text-yellow-700 { /* Used for 'Pushes' count in summary */
+    color: #ffe082; /* Softer yellow for dark mode Pushes */
+}
+
 
 /* ==========================================================================
    PARLAY HISTORY
    ========================================================================== */
 
 /* Parlay History section */
-body.dark section.bg-white {
+body.dark section.bg-white { /* This is the specific section using bg-white in light mode */
     background-color: #303640; /* Softer dark background for history section */
 }
 body.dark section.bg-white h2 {
@@ -343,14 +356,15 @@ body.dark table tbody td {
 body.dark table tbody tr {
     background-color: #303640; /* Softer dark table row background */
 }
+/* Re-applying these to ensure they work in history table/cards for individual bets */
 body.dark .text-green-600 {
-    color: #68d391; /* Adjusted green for dark mode */
+    color: #8ce1a3; /* Adjusted green for dark mode */
 }
 body.dark .text-red-600 {
-    color: #fc8181; /* Adjusted red for dark mode */
+    color: #ff9191; /* Adjusted red for dark mode */
 }
 body.dark .text-yellow-600 {
-    color: #f6e05e; /* Adjusted yellow for dark mode */
+    color: #ffe082; /* Adjusted yellow for dark mode */
 }
 
 
