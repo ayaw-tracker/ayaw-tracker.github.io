@@ -1,44 +1,145 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AYAW Tracker</title>
-  <link href="/css/styles.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Are You Actually Winning?</title>
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet for Dark/Light Theme -->
+    <link href="css/styles.css" rel="stylesheet">
+    <!-- Your existing inline overrides -->
+    <style>
+        /* (Your existing inline CSS for component-specific overrides remains here) */
+    </style>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
 
-  <header class="flex items-center justify-between p-4 shadow">
-    <h1 class="text-xl font-bold">AYAW Tracker</h1>
-    <button id="theme-toggle" aria-label="Toggle theme">
-      <img id="theme-icon" src="/assets/icons/moon.svg" alt="toggle-theme" class="w-6 h-6" />
-    </button>
-  </header>
+<body class="bg-gray-100 p-4 sm:p-6 md:p-8 text-gray-800">
+    <div class="container bg-white">
+        <!-- Header with Theme Toggle -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="text-center">
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Are You Actually Winning?</h1>
+                <p class="text-gray-600">Track your parlay betting performance honestly</p>
+            </div>
+            <button id="theme-toggle" aria-label="Toggle theme">
+                <img id="theme-icon" src="assets/icons/moon.svg" alt="Toggle theme" class="w-6 h-6">
+            </button>
+        </header>
 
-  <main class="p-4 max-w-3xl mx-auto">
-    <!-- Add Parlay Form -->
-    <section id="form-section" class="mb-8">
-      <form id="parlay-form" class="space-y-4">
-        <!-- your existing inputs here -->
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Add Parlay</button>
-      </form>
-    </section>
+        <!-- Mission Statement -->
+        <section class="bg-gray-50 p-6 rounded-lg shadow-sm mb-8 text-center">
+            <p class="text-gray-700 text-lg font-medium">The truth is in the numbers. Let your data tell the story.</p>
+        </section>
 
-    <!-- History Table/Cards -->
-    <section id="history-section" class="mb-8">
-      <!-- will be populated by ui.js -->
-    </section>
+        <!-- Parlay Input Form -->
+        <details class="parlay-section bg-white p-6 rounded-lg shadow-sm mb-8">
+            <summary class="cursor-pointer flex justify-center items-center text-2xl font-semibold text-gray-700 mb-4">
+                <h3>Add New Parlay</h3>
+            </summary>
+            <div class="parlay-content">
+                <form id="parlayForm" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Date -->
+                        <div class="col-span-full flex justify-center">
+                            <div class="w-full sm:w-1/2 lg:w-1/3">
+                                <label for="date" class="block text-sm font-medium text-gray-700 mb-1 text-center">Date</label>
+                                <input type="date" id="date" name="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800" required>
+                            </div>
+                        </div>
+                        <!-- Result -->
+                        <div>
+                            <label for="result" class="block text-sm font-medium text-gray-700 mb-1">Parlay Result</label>
+                            <select id="result" name="result" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800">
+                                <option value="Win">Win</option>
+                                <option value="Loss">Loss</option>
+                                <option value="Push">Push</option>
+                            </select>
+                        </div>
+                        <!-- Type -->
+                        <div>
+                            <label for="playType" class="block text-sm font-medium text-gray-700 mb-1">Payout Type</label>
+                            <select id="playType" name="type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800">
+                                <option value="Power Play">Power Play</option>
+                                <option value="Flex Play">Flex Play</option>
+                            </select>
+                        </div>
+                        <!-- Wagered -->
+                        <div>
+                            <label for="amountWagered" class="block text-sm font-medium text-gray-700 mb-1">Amount Wagered ($)</label>
+                            <input type="number" id="amountWagered" name="wagered" step="0.01" min="0" placeholder="0.00" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800" required>
+                        </div>
+                        <!-- Net -->
+                        <div>
+                            <label for="amountWonLoss" class="block text-sm font-medium text-gray-700 mb-1">Amount Won/Loss ($)</label>
+                            <input type="number" id="amountWonLoss" name="net" step="0.01" placeholder="-5.00 or 10.00" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800" required>
+                        </div>
+                    </div>
+                    <!-- Individual Bets -->
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-700 mb-3">Individual Player/Team Bets</label>
+                        <div id="playerPropInputs" class="space-y-3 mb-4"></div>
+                        <button type="button" id="addPlayerPropBtn" class="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300">+ Add Player/Team Bet</button>
+                    </div>
+                    <!-- Submit -->
+                    <div class="flex justify-end">
+                        <button type="submit" id="submitBtn" class="bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700">Add Parlay Entry</button>
+                    </div>
+                </form>cha
+            </div>
+        </details>
 
-    <!-- Analytics Dashboard -->
-    <section id="analytics-section">
-      <canvas id="pl-chart" class="mb-6 w-full" height="200"></canvas>
-      <canvas id="winrate-chart" class="mb-6 w-full" height="200"></canvas>
-      <canvas id="avgnet-chart" class="w-full" height="200"></canvas>
-    </section>
-  </main>
+        <!-- Summary Statistics -->
+<section class="bg-blue-50 p-6 rounded-lg shadow-sm mb-8">
+    <h2 class="text-2xl font-semibold text-blue-800 mb-4">Summary Statistics</h2>
+    <!-- Statistics Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-blue-700 mb-6">
+        <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-blue-600 mb-1">Total Wagered</p>
+            <p class="text-2xl font-bold">$<span id="totalWagered">0.00</span></p>
+        </div>
+        <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-blue-600 mb-1">Net Profit/Loss</p>
+            <p class="text-2xl font-bold">$<span id="netProfitLoss">0.00</span></p>
+        </div>
+        <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-blue-600 mb-1">Total Parlays</p>
+            <p class="text-2xl font-bold"><span id="totalParlays">0</span></p>
+        </div>
+        <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-green-600 mb-1">Wins</p>
+            <p class="text-xl font-bold text-green-700"><span id="totalWins">0</span></p>
+        </div>
+        <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-red-600 mb-1">Losses</p>
+            <p class="text-xl font-bold text-red-700"><span id="totalLosses">0</span></p>
+        </div>
+        <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-yellow-600 mb-1">Pushes</p>
+            <p class="text-xl font-bold text-yellow-700"><span id="totalPushes">0</span></p>
+        </div>
+    </div>
+    <!-- Success Rate -->
+    <div class="bg-white p-4 rounded-lg mb-6">
+        <label for="successPercentageCalc" class="block text-sm font-medium text-blue-700 mb-2">Success Rate</label>
+        <div class="flex items-center space-x-3">
+            <select id="successPercentageCalc" class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800">
+                <option value="parlays">Parlays</option>
+                <option value="props">Individual Props</option>
+            </select>
+            <p class="text-2xl font-bold text-blue-900"><span id="successPercentage">0.00</span>%</p>
+        </div>
+    </div>
+    <!-- Clear All Button -->
+    <div class="text-center">
+        <button id="clearAllBtn" class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out">Clear All Entries</button>
+    </div>
+</section>
 
-  <script type="module" src="/js/data.js"></script>
-  <script type="module" src="/js/ui.js"></script>
-  <!--<script type="module" src="/js/analytics.js"></script>  add when ready to put charts -->
-</body>
-</html>
+<!-- Parlay History -->
+        <section id="history-section" class="bg-white p-6 rounded-lg shadow-sm mb-8">
+            <!-- Rendered by JS: history entries with Reflection buttons -->
+        </section>
+    </div>
