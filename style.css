@@ -1,0 +1,264 @@
+/* ==========================================================================
+   PARLAY BETTING APP STYLES
+   ========================================================================== */
+
+/* ==========================================================================
+   BASE STYLES
+   ========================================================================== */
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+}
+
+/* ==========================================================================
+   LAYOUT COMPONENTS
+   ========================================================================== */
+
+.container {
+    max-width: 1024px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   FORM COMPONENTS
+   ========================================================================== */
+
+/* Player Prop Form Rows */
+.player-prop-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) auto;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    align-items: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: slideIn 0.3s ease forwards;
+}
+
+.player-prop-row.removing {
+    animation: slideOut 0.3s ease forwards;
+}
+
+/* ==========================================================================
+   BUTTON COMPONENTS
+   ========================================================================== */
+
+.btn-primary {
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* ==========================================================================
+   CARD COMPONENTS
+   ========================================================================== */
+
+/* Card Grid Layout */
+.parlay-card-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* Individual Cards */
+.parlay-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Card Summary Section */
+.parlay-card-summary {
+    cursor: pointer;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px dashed #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Arrow icon for mobile card summary */
+.parlay-card-summary::after {
+    content: '\f078'; /* Font Awesome chevron-down icon */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900; /* Required for solid icon */
+    position: absolute;
+    right: 0.75rem;
+    top: 1rem;
+    font-size: 1.2rem;
+    color: #6b7280;
+    transition: transform 0.2s ease;
+}
+
+.parlay-card-summary.expanded::after {
+    transform: rotate(180deg);
+}
+
+/* Card Details */
+.parlay-card-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.parlay-card-detail strong {
+    color: #4b5563;
+}
+
+/* Card Actions */
+.parlay-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+
+/* Card Bets List */
+.parlay-card-bets ul {
+    margin-top: 0.5rem;
+    list-style: none;
+    padding-left: 0;
+}
+
+.parlay-card-bets li {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    padding-left: 1.25rem;
+    position: relative;
+}
+
+.parlay-card-bets li::before {
+    content: '•';
+    color: #6b7280;
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/* Card Toggle Details */
+.parlay-card-toggle-details.hidden {
+    display: none;
+}
+
+/* ==========================================================================
+   MODAL COMPONENTS
+   ========================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e5e7eb;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease-in-out;
+    color: #1f2937;
+}
+
+.modal-content h3 {
+    color: #1f2937;
+}
+
+.modal-content p {
+    color: #4b5563;
+}
+
+.modal-overlay.show .modal-content {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   COLLAPSIBLE SECTION COMPONENTS
+   ========================================================================== */
+
+.parlay-section summary {
+    list-style: none;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: font-weight 0.2s ease-in-out;
+    touch-action: manipulation;
+}
+
+.parlay-section summary::-webkit-details-marker,
+.parlay-section summary::marker {
+    display: none;
+}
+
+.parlay-section summary h3 {
+    margin-bottom: 0 !important;
+    font-weight: 600;
+}
+
+.parlay-section summary:hover h3 {
+    font-weight: 800;
+}
+
+.parlay-section .parlay-content {
+    padding-top: 1rem;
+    border-top: 1px dashed #e5e7eb;
+    margin-top: 1rem;
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
