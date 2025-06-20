@@ -5,7 +5,8 @@ class ParlayTracker {
     static STORAGE_KEYS = {
         PARLAYS: 'parlays',
         SUCCESS_CALC_METHOD: 'successCalcMethod',
-        HAS_VISITED: 'hasVisited'
+        HAS_VISITED: 'hasVisited',
+        THEME: 'theme' // Added new storage key for theme
     };
 
     constructor() {
@@ -28,6 +29,9 @@ class ParlayTracker {
         this.amountWonLossErrorSpan = null;
         this.individualBetsErrorSpan = null;
 
+        // Theme toggle element
+        this.themeToggle = null; // Added reference for theme toggle button
+
         this.init();
     }
 
@@ -37,7 +41,7 @@ class ParlayTracker {
             this.initializeElements();
             this.attachEventListeners();
             this.loadData();
-            this.initializeUI();
+            this.initializeUI(); // Initialize UI, including theme
         } catch (error) {
             console.error('Failed to initialize ParlayTracker:', error);
         }
@@ -82,6 +86,9 @@ class ParlayTracker {
             cancelClearBtn: 'cancelClearBtn',
             confirmClearBtn: 'confirmClearBtn',
             welcomeModalTitle: 'welcomeModalTitle', // For ARIA
+
+            // Theme toggle element
+            themeToggle: 'themeToggle' // Added theme toggle button
         };
 
         // Assign elements to instance properties
@@ -129,6 +136,9 @@ class ParlayTracker {
         this.cancelClearBtn?.addEventListener('click', this.hideConfirmationModal.bind(this));
         this.confirmClearBtn?.addEventListener('click', this.handleConfirmationClick.bind(this));
         
+        // Theme toggle button
+        this.themeToggle?.addEventListener('click', this.toggleTheme.bind(this)); // New event listener
+
         // Global keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
 
@@ -140,7 +150,6 @@ class ParlayTracker {
         });
 
         // Event delegation for Edit/Delete buttons in history table/cards
-        // Attaching to document.body makes sure this catches clicks on dynamically added elements
         document.body.addEventListener('click', (event) => {
             const target = event.target;
             if (target.classList.contains('edit-parlay-btn')) {
@@ -181,6 +190,7 @@ class ParlayTracker {
         try {
             localStorage.setItem(ParlayTracker.STORAGE_KEYS.PARLAYS, JSON.stringify(this.parlays));
             localStorage.setItem(ParlayTracker.STORAGE_KEYS.SUCCESS_CALC_METHOD, this.currentSuccessCalcMethod);
+            // Theme preference is saved in toggleTheme method
         } catch (error) {
             console.error("Error saving data to localStorage:", error);
         }
@@ -398,6 +408,7 @@ class ParlayTracker {
                 // Validate individual bet fields
                 if (!playerInput?.value.trim() || !propInput?.value.trim()) {
                     allPropsValid = false;
+                    // This would be harder to show per-row error, but overall message is fine for now
                 }
                 individualBets.push({ 
                     player: playerInput?.value || '', 
@@ -726,7 +737,6 @@ class ParlayTracker {
             this.parlayHistoryContainer.querySelectorAll('.parlay-card-summary').forEach(summaryDiv => {
                 summaryDiv.addEventListener('click', (event) => {
                     // Prevent toggling if a button within the card summary was clicked directly
-                    // (buttons now have stopPropagation on their click handlers, but this is a fallback)
                     if (!event.target.closest('.parlay-card-actions')) {
                         const detailsDiv = summaryDiv.nextElementSibling;
                         if (detailsDiv && detailsDiv.classList.contains('parlay-card-toggle-details')) {
@@ -824,6 +834,25 @@ class ParlayTracker {
         this.updateSummary(); // Recalculate and display summary
     }
 
+    // Theme Toggle Functionality
+    toggleTheme() {
+        document.body.classList.toggle('dark');
+        const isDarkMode = document.body.classList.contains('dark');
+        localStorage.setItem(ParlayTracker.STORAGE_KEYS.THEME, isDarkMode ? 'dark' : 'light'); // Save preference
+
+        // Update the icon based on the current theme
+        const icon = this.themeToggle?.querySelector('i');
+        if (icon) {
+            if (isDarkMode) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+    }
+
     // Welcome Modal functionality
     initializeUI() {
         this.addPlayerPropRow(); // Ensure at least one prop row is present on initial load
@@ -833,6 +862,26 @@ class ParlayTracker {
         // Set default date input value to today's date
         if (this.dateInput) {
             this.dateInput.valueAsDate = new Date();
+        }
+
+        // Apply saved theme on initial UI load
+        const savedTheme = localStorage.getItem(ParlayTracker.STORAGE_KEYS.THEME);
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark');
+            // Ensure the moon icon is shown initially if dark mode is active
+            const icon = this.themeToggle?.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        } else {
+            // Ensure the sun icon is shown initially if light mode or no preference
+            // This handles cases where user clears localStorage or no preference is set
+            const icon = this.themeToggle?.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
         }
 
         // Set initial aria-expanded state for the details/summary element for accessibility
