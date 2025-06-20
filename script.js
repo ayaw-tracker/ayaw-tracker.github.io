@@ -15,19 +15,47 @@ class ParlayTracker {
         this.editingIndex = -1;
         this.undoStack = [];
         
+        // Initialize all element properties to null initially
+        this.parlayForm = null;
+        this.dateInput = null;
+        this.resultInput = null;
+        this.playTypeInput = null;
+        this.amountWageredInput = null;
+        this.amountWonLossInput = null;
+        this.playerPropInputsContainer = null;
+        this.addPlayerPropBtn = null;
+        this.submitBtn = null;
+        this.clearAllBtn = null;
+        this.parlayTableBody = null;
+        this.parlayHistoryContainer = null;
+        this.noParlaysMessage = null;
+        this.totalWageredSpan = null;
+        this.netProfitLossSpan = null;
+        this.totalWinsSpan = null;
+        this.totalLossesSpan = null;
+        this.totalPushesSpan = null;
+        this.totalParlaysSpan = null;
+        this.successPercentageCalcSelect = null;
+        this.successPercentageSpan = null;
+        this.welcomeModal = null;
+        this.closeModalBtn = null;
         this.confirmationModal = null;
         this.confirmationModalTitle = null;
         this.confirmationModalMessage = null;
         this.cancelClearBtn = null;
         this.confirmClearBtn = null;
-        this.pendingAction = null; 
-
+        this.welcomeModalTitle = null;
+        this.themeToggle = null; 
+        
         this.dateErrorSpan = null;
         this.amountWageredErrorSpan = null;
         this.amountWonLossErrorSpan = null;
         this.individualBetsErrorSpan = null;
 
-        this.themeToggle = null; 
+        this.parlaySectionDetails = null;
+        this.parlayFormSummary = null;
+
+        this.pendingAction = null; 
 
         this.init();
     }
@@ -46,7 +74,7 @@ class ParlayTracker {
 
     // Initialize DOM element references with error checking
     initializeElements() {
-        const elements = {
+        const elementsMap = {
             parlayForm: 'parlayForm',
             dateInput: 'date',
             resultInput: 'result',
@@ -79,44 +107,90 @@ class ParlayTracker {
             themeToggle: 'themeToggle' 
         };
 
-        Object.entries(elements).forEach(([property, id]) => {
-            this[property] = document.getElementById(id); 
-            if (!this[property]) {
-                console.warn(`Element with ID '${id}' not found`);
+        Object.entries(elementsMap).forEach(([propertyName, id]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                this[propertyName] = element;
+            } else {
+                // Log an error if a critical element is not found
+                console.error(`ERROR: Element with ID '${id}' for property '${propertyName}' not found. Functionality relying on this element may be broken.`);
+                this[propertyName] = null; // Ensure the property is explicitly null
             }
         });
 
-        this.dateErrorSpan = document.getElementById('dateError');
-        this.amountWageredErrorSpan = document.getElementById('amountWageredError');
-        this.amountWonLossErrorSpan = document.getElementById('amountWonLossError');
-        this.individualBetsErrorSpan = document.getElementById('individualBetsError');
+        // Specific element references for error spans (outside main map for clarity)
+        const errorSpanElements = {
+            dateErrorSpan: 'dateError',
+            amountWageredErrorSpan: 'amountWageredError',
+            amountWonLossErrorSpan: 'amountWonLossError',
+            individualBetsErrorSpan: 'individualBetsError'
+        };
+
+        Object.entries(errorSpanElements).forEach(([propertyName, id]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                this[propertyName] = element;
+            } else {
+                console.warn(`WARNING: Error span with ID '${id}' for property '${propertyName}' not found. Validation messages may not display.`);
+                this[propertyName] = null;
+            }
+        });
         
+        // Query selectors for details/summary
         this.parlaySectionDetails = document.querySelector('.parlay-section');
-        this.parlayFormSummary = this.parlaySectionDetails?.querySelector('summary');
+        if (!this.parlaySectionDetails) {
+            console.error("ERROR: Element with class '.parlay-section' not found. Add New Parlay section may not function.");
+        }
+        this.parlayFormSummary = this.parlaySectionDetails ? this.parlaySectionDetails.querySelector('summary') : null;
+        if (this.parlaySectionDetails && !this.parlayFormSummary) {
+             console.error("ERROR: Summary element within '.parlay-section' not found. Form toggle may not function.");
+        }
     }
 
     attachEventListeners() {
-        this.amountWageredInput?.addEventListener('focus', this.handleInputFocus.bind(this));
-        this.amountWageredInput?.addEventListener('input', (e) => {
-            this.sanitizeMoneyInput(e);
-            this.updateWonLossBasedOnResult();
-        });
-        this.amountWageredInput?.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
+        // Use explicit null checks before adding event listeners
+        if (this.amountWageredInput) {
+            this.amountWageredInput.addEventListener('focus', this.handleInputFocus.bind(this));
+            this.amountWageredInput.addEventListener('input', (e) => {
+                this.sanitizeMoneyInput(e);
+                this.updateWonLossBasedOnResult();
+            });
+            this.amountWageredInput.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
+        }
 
-        this.amountWonLossInput?.addEventListener('focus', this.handleInputFocus.bind(this));
-        this.amountWonLossInput?.addEventListener('input', this.sanitizeMoneyInput.bind(this));
-        this.amountWonLossInput?.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
+        if (this.amountWonLossInput) {
+            this.amountWonLossInput.addEventListener('focus', this.handleInputFocus.bind(this));
+            this.amountWonLossInput.addEventListener('input', this.sanitizeMoneyInput.bind(this));
+            this.amountWonLossInput.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
+        }
         
-        this.resultInput?.addEventListener('change', this.updateWonLossBasedOnResult.bind(this));
-        this.parlayForm?.addEventListener('submit', this.handleFormSubmit.bind(this));
-        this.addPlayerPropBtn?.addEventListener('click', () => this.addPlayerPropRow());
-        this.clearAllBtn?.addEventListener('click', this.promptClearAll.bind(this));
-        this.successPercentageCalcSelect?.addEventListener('change', this.handleSuccessCalcChange.bind(this));
-        this.closeModalBtn?.addEventListener('click', this.closeWelcomeModal.bind(this));
+        if (this.resultInput) {
+            this.resultInput.addEventListener('change', this.updateWonLossBasedOnResult.bind(this));
+        }
+        if (this.parlayForm) {
+            this.parlayForm.addEventListener('submit', this.handleFormSubmit.bind(this));
+        }
+        if (this.addPlayerPropBtn) {
+            this.addPlayerPropBtn.addEventListener('click', () => this.addPlayerPropRow());
+        }
+        if (this.clearAllBtn) {
+            this.clearAllBtn.addEventListener('click', this.promptClearAll.bind(this));
+        }
+        if (this.successPercentageCalcSelect) {
+            this.successPercentageCalcSelect.addEventListener('change', this.handleSuccessCalcChange.bind(this));
+        }
+        if (this.closeModalBtn) {
+            this.closeModalBtn.addEventListener('click', this.closeWelcomeModal.bind(this));
+        }
 
-        this.cancelClearBtn?.addEventListener('click', this.hideConfirmationModal.bind(this));
-        this.confirmClearBtn?.addEventListener('click', this.handleConfirmationClick.bind(this));
+        if (this.cancelClearBtn) {
+            this.cancelClearBtn.addEventListener('click', this.hideConfirmationModal.bind(this));
+        }
+        if (this.confirmClearBtn) {
+            this.confirmClearBtn.addEventListener('click', this.handleConfirmationClick.bind(this));
+        }
         
+        // Theme toggle button
         if (this.themeToggle) { 
             this.themeToggle.addEventListener('click', this.toggleTheme.bind(this)); 
         } else {
@@ -125,21 +199,25 @@ class ParlayTracker {
 
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
 
-        this.parlaySectionDetails?.addEventListener('toggle', () => {
-            if (this.parlayFormSummary) {
+        // Event listener for details element to toggle aria-expanded
+        if (this.parlaySectionDetails && this.parlayFormSummary) {
+            this.parlaySectionDetails.addEventListener('toggle', () => {
                 this.parlayFormSummary.setAttribute('aria-expanded', this.parlaySectionDetails.open);
-            }
-        });
+            });
+        }
 
         document.body.addEventListener('click', (event) => {
             const target = event.target;
-            if (target.classList.contains('edit-parlay-btn')) {
-                const index = parseInt(target.dataset.index);
+            // Use .closest to check if the clicked element or its parent has the class
+            if (target.closest('.edit-parlay-btn')) {
+                const button = target.closest('.edit-parlay-btn');
+                const index = parseInt(button.dataset.index);
                 if (!isNaN(index)) {
                     this.editParlay(index);
                 }
-            } else if (target.classList.contains('delete-parlay-btn')) {
-                const index = parseInt(target.dataset.index);
+            } else if (target.closest('.delete-parlay-btn')) {
+                const button = target.closest('.delete-parlay-btn');
+                const index = parseInt(button.dataset.index);
                 if (!isNaN(index)) {
                     this.promptDeleteParlay(index);
                 }
@@ -187,13 +265,14 @@ class ParlayTracker {
     }
 
     handleInputFocus(event) {
-        if (event.target.value === '0.00' || event.target.value === '0') {
+        if (event.target && (event.target.value === '0.00' || event.target.value === '0')) {
             event.target.select();
         }
     }
 
     sanitizeMoneyInput(event) {
         const input = event.target;
+        if (!input) return; // Defensive check
         const originalValue = input.value;
         let cleanedValue = originalValue.replace(/[^0-9.-]/g, ''); 
     
@@ -218,12 +297,15 @@ class ParlayTracker {
         if (originalValue !== cleanedValue) {
             const cursorPosition = input.selectionStart;
             input.value = cleanedValue;
-            input.setSelectionRange(cursorPosition, cursorPosition);
+            if (input.setSelectionRange) { // Ensure method exists
+                input.setSelectionRange(cursorPosition, cursorPosition);
+            }
         }
     }
     
     formatCurrencyOnBlur(event) {
         const input = event.target;
+        if (!input) return; // Defensive check
         const value = input.value.trim();
         if (value === '') {
             input.value = '';
@@ -280,6 +362,7 @@ class ParlayTracker {
     clearAllValidationErrors() {
         this.clearValidationError(this.dateInput, this.dateErrorSpan);
         this.clearValidationError(this.amountWageredInput, this.amountWageredErrorSpan);
+        this.clearValidationError(this.amountWonLossInput, this.amountWonLossErrorSpan);
         this.clearValidationError(null, this.individualBetsErrorSpan); 
     }
 
@@ -313,13 +396,17 @@ class ParlayTracker {
         `;
         this.playerPropInputsContainer.appendChild(div);
 
-        div.querySelector('.remove-prop-btn').addEventListener('click', (e) => {
-            const row = e.target.closest('.player-prop-row');
-            if (row) {
-                row.classList.add('removing');
-                row.addEventListener('animationend', () => row.remove());
-            }
-        });
+        // Ensure the remove button exists before adding listener
+        const removeButton = div.querySelector('.remove-prop-btn');
+        if (removeButton) {
+            removeButton.addEventListener('click', (e) => {
+                const row = e.target.closest('.player-prop-row');
+                if (row) {
+                    row.classList.add('removing');
+                    row.addEventListener('animationend', () => row.remove());
+                }
+            });
+        }
     }
     
     clearPlayerPropRows() {
@@ -334,11 +421,12 @@ class ParlayTracker {
 
         let isValid = true;
 
-        const date = this.dateInput?.value;
-        const amountWagered = parseFloat(this.amountWageredInput?.value || '0');
-        const amountWonLoss = parseFloat(this.amountWonLossInput?.value || '0');
-        const result = this.resultInput?.value;
-        const playType = this.playTypeInput?.value;
+        // Use explicit checks before accessing .value
+        const date = this.dateInput ? this.dateInput.value : '';
+        const amountWagered = this.amountWageredInput ? parseFloat(this.amountWageredInput.value || '0') : 0;
+        const amountWonLoss = this.amountWonLossInput ? parseFloat(this.amountWonLossInput.value || '0') : 0;
+        const result = this.resultInput ? this.resultInput.value : '';
+        const playType = this.playTypeInput ? this.playTypeInput.value : '';
 
 
         if (!date) {
@@ -364,13 +452,14 @@ class ParlayTracker {
                 const propInput = row.querySelector('.prop-type');
                 const propResultInput = row.querySelector('.prop-result');
 
-                if (!playerInput?.value.trim() || !propInput?.value.trim()) {
+                // Check if inputs exist and have values before accessing .value.trim()
+                if (!playerInput || !playerInput.value.trim() || !propInput || !propInput.value.trim()) {
                     allPropsValid = false;
                 }
                 individualBets.push({ 
-                    player: playerInput?.value || '', 
-                    prop: propInput?.value || '', 
-                    result: propResultInput?.value || 'Win' 
+                    player: playerInput ? playerInput.value || '' : '', 
+                    prop: propInput ? propInput.value || '' : '', 
+                    result: propResultInput ? propResultInput.value || 'Win' : 'Win'
                 });
             });
 
@@ -412,55 +501,55 @@ class ParlayTracker {
         this.saveData();
         this.renderParlays();
         this.updateSummary();
-        this.resetForm(); // This call is essential for clearing the form after successful submission.
+        this.resetForm(); 
     }
 
     resetForm() {
         if (this.parlayForm) {
             this.parlayForm.reset();
         }
-        // Explicitly clear numerical input values as form.reset() might not clear them if they were set by JS
+        
         if (this.amountWageredInput) {
             this.amountWageredInput.value = '';
-            console.log('resetForm: amountWageredInput value set to empty string'); // Debug log
+            console.log('resetForm: amountWageredInput value set to empty string'); 
         }
         if (this.amountWonLossInput) {
             this.amountWonLossInput.value = '';
             this.amountWonLossInput.placeholder = '0.00';
-            console.log('resetForm: amountWonLossInput value set to empty string and placeholder reset'); // Debug log
+            console.log('resetForm: amountWonLossInput value set to empty string and placeholder reset'); 
         }
         // Set the date input to today's date upon reset
         if (this.dateInput) {
             const today = new Date();
             const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const month = String(today.getMonth() + 1).padStart(2, '0'); 
             const day = String(today.getDate()).padStart(2, '0');
             this.dateInput.value = `${year}-${month}-${day}`;
-            console.log(`resetForm: dateInput value set to ${this.dateInput.value}`); // Debug log
+            console.log(`resetForm: dateInput value set to ${this.dateInput.value}`); 
         }
 
-        // Clear all dynamically added player prop rows and add one fresh one
         this.clearPlayerPropRows();
         this.addPlayerPropRow();
-        console.log('resetForm: Player prop rows cleared and one new row added'); // Debug log
+        console.log('resetForm: Player prop rows cleared and one new row added'); 
         this.editingIndex = -1;
         if (this.submitBtn) {
             this.submitBtn.textContent = 'Add Parlay Entry';
-            console.log('resetForm: Submit button text reset'); // Debug log
+            console.log('resetForm: Submit button text reset'); 
         }
         // Collapse the form after submission
-        const parlaySection = document.querySelector('.parlay-section');
-        if (parlaySection) {
-            parlaySection.open = false;
-            console.log('resetForm: Parlay section collapsed'); // Debug log
+        if (this.parlaySectionDetails) { // Check if element exists
+            this.parlaySectionDetails.open = false;
+            console.log('resetForm: Parlay section collapsed'); 
         }
         this.clearAllValidationErrors();
-        console.log('resetForm: All validation errors cleared'); // Debug log
+        console.log('resetForm: All validation errors cleared'); 
     }
 
     editParlay(index) {
+        const parlay = this.parlays[index]; // Parlay should always exist if index is valid
+        if (!parlay) return; // Defensive check
+
         this.clearAllValidationErrors();
-        const parlay = this.parlays[index];
         this.editingIndex = index;
 
         if (this.dateInput) {
@@ -488,9 +577,8 @@ class ParlayTracker {
         if (this.submitBtn) {
             this.submitBtn.textContent = 'Update Parlay Entry';
         }
-        const parlaySection = document.querySelector('.parlay-section');
-        if (parlaySection) {
-            parlaySection.open = true;
+        if (this.parlaySectionDetails) { // Check if element exists
+            this.parlaySectionDetails.open = true;
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -506,32 +594,34 @@ class ParlayTracker {
     }
 
     showConfirmationModal(title, message, type = 'confirm') {
-        if (this.confirmationModal && this.confirmationModalTitle && this.confirmationModalMessage) {
-            this.confirmationModalTitle.textContent = title;
-            this.confirmationModalMessage.textContent = message;
-            
-            if (type === 'info') {
-                if (this.cancelClearBtn) this.cancelClearBtn.classList.add('hidden');
-                if (this.confirmClearBtn) {
-                    this.confirmClearBtn.textContent = 'OK';
-                    this.confirmClearBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
-                    this.confirmClearBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                }
-            } else {
-                if (this.cancelClearBtn) this.cancelClearBtn.classList.remove('hidden');
-                if (this.confirmClearBtn) {
-                    this.confirmClearBtn.textContent = 'Confirm';
-                    this.confirmClearBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                    this.confirmClearBtn.classList.add('bg-red-500', 'hover:bg-red-600');
-                }
-            }
-
-            this.confirmationModal.classList.remove('hidden');
-            setTimeout(() => {
-                this.confirmationModal.classList.add('show');
-            }, 10);
-            this.confirmClearBtn?.focus();
+        if (!this.confirmationModal || !this.confirmationModalTitle || !this.confirmationModalMessage) {
+            console.error("Confirmation modal elements not found. Cannot show modal.");
+            return;
         }
+        this.confirmationModalTitle.textContent = title;
+        this.confirmationModalMessage.textContent = message;
+        
+        if (type === 'info') {
+            if (this.cancelClearBtn) this.cancelClearBtn.classList.add('hidden');
+            if (this.confirmClearBtn) {
+                this.confirmClearBtn.textContent = 'OK';
+                this.confirmClearBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                this.confirmClearBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+        } else {
+            if (this.cancelClearBtn) this.cancelClearBtn.classList.remove('hidden');
+            if (this.confirmClearBtn) {
+                this.confirmClearBtn.textContent = 'Confirm';
+                this.confirmClearBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                this.confirmClearBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+            }
+        }
+
+        this.confirmationModal.classList.remove('hidden');
+        setTimeout(() => {
+            this.confirmationModal.classList.add('show');
+        }, 10);
+        this.confirmClearBtn?.focus(); // Use optional chaining here
     }
 
     showInfoModal(title, message) {
@@ -540,18 +630,19 @@ class ParlayTracker {
     }
 
     hideConfirmationModal() {
-        if (this.confirmationModal) {
-            this.confirmationModal.classList.remove('show');
-            this.confirmationModal.addEventListener('transitionend', () => {
-                this.confirmationModal.classList.add('hidden');
-                if (this.cancelClearBtn) this.cancelClearBtn.classList.remove('hidden');
-                if (this.confirmClearBtn) {
-                    this.confirmClearBtn.textContent = 'Confirm';
-                    this.confirmClearBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                    this.confirmClearBtn.classList.add('bg-red-500', 'hover:bg-red-600');
-                }
-            }, { once: true });
-        }
+        if (!this.confirmationModal) return; // Defensive check
+
+        this.confirmationModal.classList.remove('show');
+        this.confirmationModal.addEventListener('transitionend', () => {
+            this.confirmationModal.classList.add('hidden');
+            // Reset button styles when hidden, only if buttons exist
+            if (this.cancelClearBtn) this.cancelClearBtn.classList.remove('hidden');
+            if (this.confirmClearBtn) {
+                this.confirmClearBtn.textContent = 'Confirm';
+                this.confirmClearBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                this.confirmClearBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+            }
+        }, { once: true });
     }
 
     handleConfirmationClick() {
@@ -564,6 +655,7 @@ class ParlayTracker {
             } else if (action.type === 'delete' && typeof action.index === 'number') {
                 this.executeDeleteParlay(action.index);
             } else if (action.type === 'info') {
+                // For info modals, just hiding is the action.
             }
             this.pendingAction = null;
         }
@@ -587,12 +679,14 @@ class ParlayTracker {
     }
 
     renderParlays() {
-        if (this.parlayTableBody) {
-            this.parlayTableBody.innerHTML = '';
+        // Ensure containers exist before manipulating them
+        if (!this.parlayTableBody || !this.parlayHistoryContainer) {
+            console.error("Parlay history containers not found. Cannot render parlays.");
+            return;
         }
-        if (this.parlayHistoryContainer) {
-            this.parlayHistoryContainer.innerHTML = '';
-        }
+
+        this.parlayTableBody.innerHTML = '';
+        this.parlayHistoryContainer.innerHTML = '';
 
         if (this.parlays.length === 0) {
             if (this.noParlaysMessage) {
@@ -636,9 +730,7 @@ class ParlayTracker {
                     </td>
                 </tr>
             `;
-            if (this.parlayTableBody) {
-                this.parlayTableBody.insertAdjacentHTML('beforeend', tableRow);
-            }
+            this.parlayTableBody.insertAdjacentHTML('beforeend', tableRow);
 
             const cardHtml = `
                 <div class="parlay-card border-gray-200 bg-white" data-index="${index}">
@@ -669,11 +761,11 @@ class ParlayTracker {
                     </div>
                 </div>
             `;
-            if (this.parlayHistoryContainer) {
-                this.parlayHistoryContainer.insertAdjacentHTML('beforeend', cardHtml);
-            }
+            this.parlayHistoryContainer.insertAdjacentHTML('beforeend', cardHtml);
         });
 
+        // Add event listeners for toggling card details for mobile view
+        // Ensure parlayHistoryContainer exists before querying its children
         if (this.parlayHistoryContainer) {
             this.parlayHistoryContainer.querySelectorAll('.parlay-card-summary').forEach(summaryDiv => {
                 summaryDiv.addEventListener('click', (event) => {
@@ -763,6 +855,7 @@ class ParlayTracker {
     }
 
     handleSuccessCalcChange(event) {
+        if (!event.target) return; // Defensive check
         this.currentSuccessCalcMethod = event.target.value;
         this.saveData();
         this.updateSummary();
@@ -773,7 +866,7 @@ class ParlayTracker {
         const isDarkMode = document.body.classList.contains('dark');
         localStorage.setItem(ParlayTracker.STORAGE_KEYS.THEME, isDarkMode ? 'dark' : 'light');
 
-        const icon = this.themeToggle?.querySelector('i');
+        const icon = this.themeToggle?.querySelector('i'); // Use optional chaining here
         if (icon) {
             if (isDarkMode) {
                 icon.classList.remove('fa-sun');
@@ -795,28 +888,29 @@ class ParlayTracker {
         if (this.dateInput) {
             const today = new Date();
             const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const month = String(today.getMonth() + 1).padStart(2, '0'); 
             const day = String(today.getDate()).padStart(2, '0');
             this.dateInput.value = `${year}-${month}-${day}`;
-            console.log(`initializeUI: dateInput value set to ${this.dateInput.value}`); // Debug log
+            console.log(`initializeUI: dateInput value set to ${this.dateInput.value}`); 
         }
 
         const savedTheme = localStorage.getItem(ParlayTracker.STORAGE_KEYS.THEME);
         if (savedTheme === 'dark') {
             document.body.classList.add('dark');
-            const icon = this.themeToggle?.querySelector('i');
+            const icon = this.themeToggle?.querySelector('i'); // Use optional chaining here
             if (icon) {
                 icon.classList.remove('fa-sun');
                 icon.classList.add('fa-moon');
             }
         } else {
-            const icon = this.themeToggle?.querySelector('i');
+            const icon = this.themeToggle?.querySelector('i'); // Use optional chaining here
             if (icon) {
                 icon.classList.remove('fa-moon');
                 icon.classList.add('fa-sun');
             }
         }
 
+        // Set initial aria-expanded state for the details/summary element for accessibility
         if (this.parlayFormSummary && this.parlaySectionDetails) {
             this.parlayFormSummary.setAttribute('aria-expanded', this.parlaySectionDetails.open);
         }
@@ -830,18 +924,18 @@ class ParlayTracker {
                 setTimeout(() => {
                     this.welcomeModal.classList.add('show');
                 }, 10);
-                this.closeModalBtn?.focus();
+                this.closeModalBtn?.focus(); // Use optional chaining here
             }
         }
     }
 
     closeWelcomeModal() {
-        if (this.welcomeModal) {
-            this.welcomeModal.classList.remove('show');
-            this.welcomeModal.addEventListener('transitionend', () => {
-                this.welcomeModal.classList.add('hidden');
-            }, { once: true });
-        }
+        if (!this.welcomeModal) return; // Defensive check
+
+        this.welcomeModal.classList.remove('show');
+        this.welcomeModal.addEventListener('transitionend', () => {
+            this.welcomeModal.classList.add('hidden');
+        }, { once: true });
         localStorage.setItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED, 'true');
     }
 
