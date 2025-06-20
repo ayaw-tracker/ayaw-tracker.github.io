@@ -117,8 +117,7 @@ class ParlayTracker {
         this.cancelClearBtn?.addEventListener('click', this.hideConfirmationModal.bind(this));
         this.confirmClearBtn?.addEventListener('click', this.handleConfirmationClick.bind(this));
         
-        // Theme toggle button - ENSURING IT'S ATTACHED TO THE FOUND ELEMENT
-        if (this.themeToggle) { // Check if themeToggle was successfully found
+        if (this.themeToggle) { 
             this.themeToggle.addEventListener('click', this.toggleTheme.bind(this)); 
         } else {
             console.warn("Theme toggle button not found, theme toggle functionality will not work.");
@@ -281,7 +280,6 @@ class ParlayTracker {
     clearAllValidationErrors() {
         this.clearValidationError(this.dateInput, this.dateErrorSpan);
         this.clearValidationError(this.amountWageredInput, this.amountWageredErrorSpan);
-        this.clearValidationError(this.amountWonLossInput, this.amountWonLossErrorSpan);
         this.clearValidationError(null, this.individualBetsErrorSpan); 
     }
 
@@ -414,13 +412,14 @@ class ParlayTracker {
         this.saveData();
         this.renderParlays();
         this.updateSummary();
-        this.resetForm();
+        this.resetForm(); // This call is essential for clearing the form after successful submission.
     }
 
     resetForm() {
         if (this.parlayForm) {
             this.parlayForm.reset();
         }
+        // Explicitly clear numerical input values as form.reset() might not clear them if they were set by JS
         if (this.amountWageredInput) {
             this.amountWageredInput.value = '';
         }
@@ -437,13 +436,14 @@ class ParlayTracker {
             this.dateInput.value = `${year}-${month}-${day}`;
         }
 
-
+        // Clear all dynamically added player prop rows and add one fresh one
         this.clearPlayerPropRows();
         this.addPlayerPropRow();
         this.editingIndex = -1;
         if (this.submitBtn) {
             this.submitBtn.textContent = 'Add Parlay Entry';
         }
+        // Collapse the form after submission
         const parlaySection = document.querySelector('.parlay-section');
         if (parlaySection) {
             parlaySection.open = false;
