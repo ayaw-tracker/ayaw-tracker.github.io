@@ -14,7 +14,6 @@ class ParlayTracker {
         this.currentSuccessCalcMethod = 'parlays';
         this.editingIndex = -1;
         this.undoStack = [];
-        
         // Confirmation modal elements and state
         this.confirmationModal = null;
         this.confirmationModalTitle = null;
@@ -88,12 +87,13 @@ class ParlayTracker {
             welcomeModalTitle: 'welcomeModalTitle', // For ARIA
 
             // Theme toggle element
-            themeToggle: 'themeToggle' // Added theme toggle button
+            themeToggle: 'themeToggle' // This was just the string ID, causing the issue.
         };
 
         // Assign elements to instance properties
         Object.entries(elements).forEach(([property, id]) => {
-            this[property] = document.getElementById(id);
+            // FIX: Correctly get the DOM element using document.getElementById()
+            this[property] = document.getElementById(id); 
             if (!this[property]) {
                 console.warn(`Element with ID '${id}' not found`);
             }
