@@ -6,7 +6,7 @@ class ParlayTracker {
         PARLAYS: 'parlays',
         SUCCESS_CALC_METHOD: 'successCalcMethod',
         HAS_VISITED: 'hasVisited',
-        THEME: 'theme' // Added new storage key for theme
+        THEME: 'theme' 
     };
 
     constructor() {
@@ -14,22 +14,20 @@ class ParlayTracker {
         this.currentSuccessCalcMethod = 'parlays';
         this.editingIndex = -1;
         this.undoStack = [];
-        // Confirmation modal elements and state
+        
         this.confirmationModal = null;
         this.confirmationModalTitle = null;
         this.confirmationModalMessage = null;
         this.cancelClearBtn = null;
         this.confirmClearBtn = null;
-        this.pendingAction = null; // { type: 'clear' } or { type: 'delete', index: number } or { type: 'info' }
+        this.pendingAction = null; 
 
-        // Validation error elements
         this.dateErrorSpan = null;
         this.amountWageredErrorSpan = null;
         this.amountWonLossErrorSpan = null;
         this.individualBetsErrorSpan = null;
 
-        // Theme toggle element
-        this.themeToggle = null; // Added reference for theme toggle button
+        this.themeToggle = null; 
 
         this.init();
     }
@@ -40,7 +38,7 @@ class ParlayTracker {
             this.initializeElements();
             this.attachEventListeners();
             this.loadData();
-            this.initializeUI(); // Initialize UI, including theme
+            this.initializeUI(); 
         } catch (error) {
             console.error('Failed to initialize ParlayTracker:', error);
         }
@@ -49,7 +47,6 @@ class ParlayTracker {
     // Initialize DOM element references with error checking
     initializeElements() {
         const elements = {
-            // Form elements
             parlayForm: 'parlayForm',
             dateInput: 'date',
             resultInput: 'result',
@@ -60,13 +57,9 @@ class ParlayTracker {
             addPlayerPropBtn: 'addPlayerPropBtn',
             submitBtn: 'submitBtn',
             clearAllBtn: 'clearAllBtn',
-
-            // Table and Card elements
             parlayTableBody: 'parlayTableBody',
             parlayHistoryContainer: 'parlayHistoryContainer',
             noParlaysMessage: 'noParlaysMessage',
-
-            // Summary elements
             totalWageredSpan: 'totalWagered',
             netProfitLossSpan: 'netProfitLoss',
             totalWinsSpan: 'totalWins',
@@ -75,8 +68,6 @@ class ParlayTracker {
             totalParlaysSpan: 'totalParlays',
             successPercentageCalcSelect: 'successPercentageCalc',
             successPercentageSpan: 'successPercentage',
-
-            // Modal elements
             welcomeModal: 'welcomeModal',
             closeModalBtn: 'closeModalBtn',
             confirmationModal: 'confirmationModal',
@@ -84,35 +75,27 @@ class ParlayTracker {
             confirmationModalMessage: 'confirmationModalMessage',
             cancelClearBtn: 'cancelClearBtn',
             confirmClearBtn: 'confirmClearBtn',
-            welcomeModalTitle: 'welcomeModalTitle', // For ARIA
-
-            // Theme toggle element
-            themeToggle: 'themeToggle' // This was just the string ID, causing the issue.
+            welcomeModalTitle: 'welcomeModalTitle', 
+            themeToggle: 'themeToggle' 
         };
 
-        // Assign elements to instance properties
         Object.entries(elements).forEach(([property, id]) => {
-            // FIX: Correctly get the DOM element using document.getElementById()
             this[property] = document.getElementById(id); 
             if (!this[property]) {
                 console.warn(`Element with ID '${id}' not found`);
             }
         });
 
-        // Get references for validation error spans
         this.dateErrorSpan = document.getElementById('dateError');
         this.amountWageredErrorSpan = document.getElementById('amountWageredError');
         this.amountWonLossErrorSpan = document.getElementById('amountWonLossError');
         this.individualBetsErrorSpan = document.getElementById('individualBetsError');
         
-        // For ARIA attributes on details/summary
         this.parlaySectionDetails = document.querySelector('.parlay-section');
         this.parlayFormSummary = this.parlaySectionDetails?.querySelector('summary');
     }
 
-    // Attach all event listeners directly
     attachEventListeners() {
-        // Input focus and money input handlers
         this.amountWageredInput?.addEventListener('focus', this.handleInputFocus.bind(this));
         this.amountWageredInput?.addEventListener('input', (e) => {
             this.sanitizeMoneyInput(e);
@@ -124,7 +107,6 @@ class ParlayTracker {
         this.amountWonLossInput?.addEventListener('input', this.sanitizeMoneyInput.bind(this));
         this.amountWonLossInput?.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
         
-        // Form and button handlers
         this.resultInput?.addEventListener('change', this.updateWonLossBasedOnResult.bind(this));
         this.parlayForm?.addEventListener('submit', this.handleFormSubmit.bind(this));
         this.addPlayerPropBtn?.addEventListener('click', () => this.addPlayerPropRow());
@@ -132,24 +114,24 @@ class ParlayTracker {
         this.successPercentageCalcSelect?.addEventListener('change', this.handleSuccessCalcChange.bind(this));
         this.closeModalBtn?.addEventListener('click', this.closeWelcomeModal.bind(this));
 
-        // Confirmation modal buttons
         this.cancelClearBtn?.addEventListener('click', this.hideConfirmationModal.bind(this));
         this.confirmClearBtn?.addEventListener('click', this.handleConfirmationClick.bind(this));
         
-        // Theme toggle button
-        this.themeToggle?.addEventListener('click', this.toggleTheme.bind(this)); // New event listener
+        // Theme toggle button - ENSURING IT'S ATTACHED TO THE FOUND ELEMENT
+        if (this.themeToggle) { // Check if themeToggle was successfully found
+            this.themeToggle.addEventListener('click', this.toggleTheme.bind(this)); 
+        } else {
+            console.warn("Theme toggle button not found, theme toggle functionality will not work.");
+        }
 
-        // Global keyboard shortcuts
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
 
-        // Event listener for details element to toggle aria-expanded
         this.parlaySectionDetails?.addEventListener('toggle', () => {
             if (this.parlayFormSummary) {
                 this.parlayFormSummary.setAttribute('aria-expanded', this.parlaySectionDetails.open);
             }
         });
 
-        // Event delegation for Edit/Delete buttons in history table/cards
         document.body.addEventListener('click', (event) => {
             const target = event.target;
             if (target.classList.contains('edit-parlay-btn')) {
@@ -166,7 +148,6 @@ class ParlayTracker {
         });
     }
 
-    // Data persistence methods
     loadData() {
         try {
             const storedParlays = localStorage.getItem(ParlayTracker.STORAGE_KEYS.PARLAYS);
@@ -182,7 +163,7 @@ class ParlayTracker {
             }
         } catch (error) {
             console.error("Error loading data from localStorage:", error);
-            this.parlays = []; // Reset parlays if loading fails
+            this.parlays = []; 
         }
     }
 
@@ -190,27 +171,23 @@ class ParlayTracker {
         try {
             localStorage.setItem(ParlayTracker.STORAGE_KEYS.PARLAYS, JSON.stringify(this.parlays));
             localStorage.setItem(ParlayTracker.STORAGE_KEYS.SUCCESS_CALC_METHOD, this.currentSuccessCalcMethod);
-            // Theme preference is saved in toggleTheme method
         } catch (error) {
             console.error("Error saving data to localStorage:", error);
         }
     }
 
-    // Save state for undo functionality
     saveStateForUndo() {
         const currentState = {
-            parlays: JSON.parse(JSON.stringify(this.parlays)), // Deep copy to avoid reference issues
+            parlays: JSON.parse(JSON.stringify(this.parlays)), 
         };
         this.undoStack.push(currentState);
         if (this.undoStack.length > ParlayTracker.MAX_UNDO_HISTORY) {
-            this.undoStack.shift(); // Remove the oldest state if history limit is reached
+            this.undoStack.shift(); 
         }
         console.log(`State saved for undo. Stack size: ${this.undoStack.length}`);
     }
 
-    // Input handling methods
     handleInputFocus(event) {
-        // Select content if it's '0.00' or '0' to make typing easier
         if (event.target.value === '0.00' || event.target.value === '0') {
             event.target.select();
         }
@@ -219,34 +196,29 @@ class ParlayTracker {
     sanitizeMoneyInput(event) {
         const input = event.target;
         const originalValue = input.value;
-        let cleanedValue = originalValue.replace(/[^0-9.-]/g, ''); // Allow digits, decimal, and negative sign
+        let cleanedValue = originalValue.replace(/[^0-9.-]/g, ''); 
     
-        // Handle multiple decimals
         const parts = cleanedValue.split('.');
         if (parts.length > 2) {
             cleanedValue = parts[0] + '.' + parts.slice(1).join('');
         }
     
-        // Ensure only one negative sign and it's at the beginning
         if (cleanedValue.indexOf('-') > 0) {
-            cleanedValue = cleanedValue.replace(/-/g, ''); // Remove all hyphens if not at start
+            cleanedValue = cleanedValue.replace(/-/g, '');
         }
         if (input.id === 'amountWonLoss' && originalValue.startsWith('-') && !cleanedValue.startsWith('-')) {
             cleanedValue = '-' + cleanedValue;
         } else if (input.id !== 'amountWonLoss' && cleanedValue.startsWith('-')) {
-            cleanedValue = cleanedValue.substring(1); // Remove negative sign if not allowed (e.g., wagered amount)
+            cleanedValue = cleanedValue.substring(1); 
         }
 
-        // Remove leading zeros, unless it's "0" or "0."
         if (cleanedValue.length > 1 && cleanedValue[0] === '0' && cleanedValue[1] !== '.') {
             cleanedValue = cleanedValue.substring(1);
         }
         
-        // Update value only if it changed to prevent cursor jump
         if (originalValue !== cleanedValue) {
             const cursorPosition = input.selectionStart;
             input.value = cleanedValue;
-            // Restore cursor position as best as possible after sanitization
             input.setSelectionRange(cursorPosition, cursorPosition);
         }
     }
@@ -255,16 +227,15 @@ class ParlayTracker {
         const input = event.target;
         const value = input.value.trim();
         if (value === '') {
-            input.value = ''; // Keep empty if cleared by user
+            input.value = '';
             return;
         }
-        // Use parseFloat on the already sanitized value
         const numericValue = parseFloat(value);
         if (isNaN(numericValue)) {
-            input.value = ''; // Clear if it's still not a valid number after blur
+            input.value = '';
             return;
         }
-        input.value = numericValue.toFixed(2); // Format to two decimal places
+        input.value = numericValue.toFixed(2);
     }
 
     updateWonLossBasedOnResult() {
@@ -276,12 +247,10 @@ class ParlayTracker {
         const wageredValue = parseFloat(this.amountWageredInput.value || '0');
         const wonLossInput = this.amountWonLossInput;
         
-        // Update placeholder and auto-calculate based on result
         if (parlayResult === 'Win') {
-            wonLossInput.placeholder = "Enter win amount"; // Guide user to manually enter
-            // Do not clear value automatically if user has already entered something for win
+            wonLossInput.placeholder = "Enter win amount"; 
         } else if (parlayResult === 'Loss') {
-            wonLossInput.value = (-Math.abs(wageredValue)).toFixed(2); // Ensure loss is negative
+            wonLossInput.value = (-Math.abs(wageredValue)).toFixed(2);
             wonLossInput.placeholder = "Auto-calculated";
         } else if (parlayResult === 'Push') {
             wonLossInput.value = '0.00';
@@ -289,24 +258,23 @@ class ParlayTracker {
         }
     }
 
-    // Validation feedback methods
     showValidationError(element, message, errorSpan) {
         if (element) {
-            element.classList.add('border-red-500', 'ring-red-500'); // Add visual cue to input
+            element.classList.add('border-red-500', 'ring-red-500');
         }
         if (errorSpan) {
             errorSpan.textContent = message;
-            errorSpan.classList.remove('hidden'); // Show error message
+            errorSpan.classList.remove('hidden');
         }
     }
 
     clearValidationError(element, errorSpan) {
         if (element) {
-            element.classList.remove('border-red-500', 'ring-red-500'); // Remove visual cue
+            element.classList.remove('border-red-500', 'ring-red-500');
         }
         if (errorSpan) {
             errorSpan.textContent = '';
-            errorSpan.classList.add('hidden'); // Hide error message
+            errorSpan.classList.add('hidden');
         }
     }
 
@@ -314,10 +282,9 @@ class ParlayTracker {
         this.clearValidationError(this.dateInput, this.dateErrorSpan);
         this.clearValidationError(this.amountWageredInput, this.amountWageredErrorSpan);
         this.clearValidationError(this.amountWonLossInput, this.amountWonLossErrorSpan);
-        this.clearValidationError(null, this.individualBetsErrorSpan); // This one has no direct input element
+        this.clearValidationError(null, this.individualBetsErrorSpan); 
     }
 
-    // Player prop management
     addPlayerPropRow(player = '', prop = '', result = 'Win') {
         if (!this.playerPropInputsContainer) {
             console.error("playerPropInputsContainer not found. Cannot add player prop row.");
@@ -348,7 +315,6 @@ class ParlayTracker {
         `;
         this.playerPropInputsContainer.appendChild(div);
 
-        // Attach event listener for the remove button
         div.querySelector('.remove-prop-btn').addEventListener('click', (e) => {
             const row = e.target.closest('.player-prop-row');
             if (row) {
@@ -364,14 +330,12 @@ class ParlayTracker {
         }
     }
 
-    // Form submission and data handling
     handleFormSubmit(event) {
         event.preventDefault();
-        this.clearAllValidationErrors(); // Clear previous errors visually
+        this.clearAllValidationErrors(); 
 
-        let isValid = true; // Flag to track overall form validity
+        let isValid = true;
 
-        // Input Validation for main form fields
         const date = this.dateInput?.value;
         const amountWagered = parseFloat(this.amountWageredInput?.value || '0');
         const amountWonLoss = parseFloat(this.amountWonLossInput?.value || '0');
@@ -384,17 +348,14 @@ class ParlayTracker {
             isValid = false;
         }
 
-        if (isNaN(amountWagered) || amountWagered <= 0) { // Wagered amount must be positive
+        if (isNaN(amountWagered) || amountWagered <= 0) {
             this.showValidationError(this.amountWageredInput, 'Enter a positive amount.', this.amountWageredErrorSpan);
             isValid = false;
         }
-        if (isNaN(amountWonLoss)) { // Won/Loss can be negative, but must be a number
+        if (isNaN(amountWonLoss)) {
             this.showValidationError(this.amountWonLossInput, 'Enter a valid number.', this.amountWonLossErrorSpan);
             isValid = false;
         }
-        // Result and PlayType are dropdowns with default selections, so they should always have values.
-        // No explicit validation needed for them unless empty option is added later.
-
 
         const individualBets = [];
         if (this.playerPropInputsContainer) {
@@ -405,10 +366,8 @@ class ParlayTracker {
                 const propInput = row.querySelector('.prop-type');
                 const propResultInput = row.querySelector('.prop-result');
 
-                // Validate individual bet fields
                 if (!playerInput?.value.trim() || !propInput?.value.trim()) {
                     allPropsValid = false;
-                    // This would be harder to show per-row error, but overall message is fine for now
                 }
                 individualBets.push({ 
                     player: playerInput?.value || '', 
@@ -417,23 +376,21 @@ class ParlayTracker {
                 });
             });
 
-            if (!allPropsValid && playerPropRows.length > 0) { // Only show if there are rows but some are invalid
+            if (!allPropsValid && playerPropRows.length > 0) {
                 this.showValidationError(null, 'Fill all Player/Team & Prop Type fields in individual bets.', this.individualBetsErrorSpan);
                 isValid = false;
             }
         }
 
         if (!isValid) {
-            // Scroll to the first visible error message for user guidance
             const firstErrorElement = document.querySelector('.text-red-500:not(.hidden)');
             if (firstErrorElement) {
                 firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            return; // Stop form submission if validation fails
+            return;
         }
 
-        // If form is valid, proceed with saving and updating
-        this.saveStateForUndo(); // Save current state before modifying parlays
+        this.saveStateForUndo(); 
 
         const newParlay = {
             date,
@@ -445,58 +402,59 @@ class ParlayTracker {
         };
 
         if (this.editingIndex > -1) {
-            // Update existing parlay if in editing mode
             this.parlays[this.editingIndex] = newParlay;
-            this.editingIndex = -1; // Exit editing mode
+            this.editingIndex = -1;
             if (this.submitBtn) {
-                this.submitBtn.textContent = 'Add Parlay Entry'; // Reset button text
+                this.submitBtn.textContent = 'Add Parlay Entry';
             }
         } else {
-            // Add new parlay to the beginning of the array (newest first)
             this.parlays.unshift(newParlay);
         }
 
-        this.saveData(); // Persist changes to localStorage
-        this.renderParlays(); // Re-render the history
-        this.updateSummary(); // Update summary statistics
-        this.resetForm(); // Clear and reset the form
+        this.saveData();
+        this.renderParlays();
+        this.updateSummary();
+        this.resetForm();
     }
 
     resetForm() {
         if (this.parlayForm) {
             this.parlayForm.reset();
         }
-        // Explicitly clear numerical input values as form.reset() might not clear them if they were set by JS
         if (this.amountWageredInput) {
             this.amountWageredInput.value = '';
         }
         if (this.amountWonLossInput) {
             this.amountWonLossInput.value = '';
-            this.amountWonLossInput.placeholder = '0.00'; // Reset placeholder to default
+            this.amountWonLossInput.placeholder = '0.00';
         }
         // Set the date input to today's date upon reset
         if (this.dateInput) {
-            this.dateInput.valueAsDate = new Date();
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(today.getDate()).padStart(2, '0');
+            this.dateInput.value = `${year}-${month}-${day}`;
         }
 
+
         this.clearPlayerPropRows();
-        this.addPlayerPropRow(); // Ensure at least one empty prop row is present
-        this.editingIndex = -1; // Reset editing index
+        this.addPlayerPropRow();
+        this.editingIndex = -1;
         if (this.submitBtn) {
-            this.submitBtn.textContent = 'Add Parlay Entry'; // Reset button text
+            this.submitBtn.textContent = 'Add Parlay Entry';
         }
-        // Collapse the form after submission
         const parlaySection = document.querySelector('.parlay-section');
         if (parlaySection) {
             parlaySection.open = false;
         }
-        this.clearAllValidationErrors(); // Clear any validation errors that might be visible
+        this.clearAllValidationErrors();
     }
 
     editParlay(index) {
-        this.clearAllValidationErrors(); // Clear any validation errors before populating for edit
+        this.clearAllValidationErrors();
         const parlay = this.parlays[index];
-        this.editingIndex = index; // Set editing index
+        this.editingIndex = index;
 
         if (this.dateInput) {
             this.dateInput.value = parlay.date;
@@ -512,44 +470,39 @@ class ParlayTracker {
         }
         if (this.amountWonLossInput) {
             this.amountWonLossInput.value = parlay.amountWonLoss.toFixed(2);
-            this.updateWonLossBasedOnResult(); // Update placeholder based on the loaded result
+            this.updateWonLossBasedOnResult();
         }
 
-        this.clearPlayerPropRows(); // Clear existing prop rows
+        this.clearPlayerPropRows();
         parlay.individualBets.forEach(bet => {
-            this.addPlayerPropRow(bet.player, bet.prop, bet.result); // Add rows with existing data
+            this.addPlayerPropRow(bet.player, bet.prop, bet.result);
         });
 
         if (this.submitBtn) {
-            this.submitBtn.textContent = 'Update Parlay Entry'; // Change button text to indicate editing
+            this.submitBtn.textContent = 'Update Parlay Entry';
         }
         const parlaySection = document.querySelector('.parlay-section');
         if (parlaySection) {
-            parlaySection.open = true; // Expand form for editing
+            parlaySection.open = true;
         }
-        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top for easy editing
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Prompts for clearing all parlays
     promptClearAll() {
         this.pendingAction = { type: 'clear' };
         this.showConfirmationModal('Confirm Clear All', 'Are you sure you want to clear all parlay entries? This action cannot be undone.');
     }
 
-    // Prompts for deleting a single parlay
     promptDeleteParlay(index) {
         this.pendingAction = { type: 'delete', index: index };
         this.showConfirmationModal('Confirm Delete', 'Are you sure you want to delete this parlay entry? This action cannot be undone.');
     }
 
-    // Shows the generic confirmation modal with dynamic content
-    // type: 'confirm' (default, with Cancel/Confirm buttons) or 'info' (with only OK button)
     showConfirmationModal(title, message, type = 'confirm') {
         if (this.confirmationModal && this.confirmationModalTitle && this.confirmationModalMessage) {
             this.confirmationModalTitle.textContent = title;
             this.confirmationModalMessage.textContent = message;
             
-            // Show/hide buttons based on type
             if (type === 'info') {
                 if (this.cancelClearBtn) this.cancelClearBtn.classList.add('hidden');
                 if (this.confirmClearBtn) {
@@ -557,7 +510,7 @@ class ParlayTracker {
                     this.confirmClearBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
                     this.confirmClearBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
                 }
-            } else { // type === 'confirm'
+            } else {
                 if (this.cancelClearBtn) this.cancelClearBtn.classList.remove('hidden');
                 if (this.confirmClearBtn) {
                     this.confirmClearBtn.textContent = 'Confirm';
@@ -570,75 +523,63 @@ class ParlayTracker {
             setTimeout(() => {
                 this.confirmationModal.classList.add('show');
             }, 10);
-            // Set focus to the confirm button for accessibility
             this.confirmClearBtn?.focus();
         }
     }
 
-    // A dedicated modal for showing information/alerts (no undo)
     showInfoModal(title, message) {
-        this.pendingAction = { type: 'info' }; // Set pending action type to info
+        this.pendingAction = { type: 'info' };
         this.showConfirmationModal(title, message, 'info');
     }
 
-    // Hides the generic confirmation modal
     hideConfirmationModal() {
         if (this.confirmationModal) {
             this.confirmationModal.classList.remove('show');
-            // Add a transitionend listener to truly hide the modal after animation
             this.confirmationModal.addEventListener('transitionend', () => {
                 this.confirmationModal.classList.add('hidden');
-                // Reset button styles when hidden
                 if (this.cancelClearBtn) this.cancelClearBtn.classList.remove('hidden');
                 if (this.confirmClearBtn) {
-                    this.confirmClearBtn.textContent = 'Confirm'; // Reset text
-                    this.confirmClearBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700'); // Reset colors
+                    this.confirmClearBtn.textContent = 'Confirm';
+                    this.confirmClearBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                     this.confirmClearBtn.classList.add('bg-red-500', 'hover:bg-red-600');
                 }
-            }, { once: true }); // Ensure the listener runs only once
+            }, { once: true });
         }
     }
 
-    // Handles the click on the generic confirmation modal's confirm button
     handleConfirmationClick() {
         const action = this.pendingAction;
-        this.hideConfirmationModal(); // Hide the modal first
+        this.hideConfirmationModal();
         
-        // Process the action after the modal starts hiding
         if (action) {
             if (action.type === 'clear') {
                 this.executeClearAllParlays();
             } else if (action.type === 'delete' && typeof action.index === 'number') {
                 this.executeDeleteParlay(action.index);
             } else if (action.type === 'info') {
-                // For info modals, just hide the modal. No further action needed.
             }
-            this.pendingAction = null; // Reset pending action
+            this.pendingAction = null;
         }
     }
 
-    // Executes clearing all parlays (formerly content of clearAllParlays)
     executeClearAllParlays() {
-        this.saveStateForUndo(); // Save state for undo
-        this.parlays = []; // Clear all parlays
-        this.saveData(); // Persist change
-        this.renderParlays(); // Update UI
-        this.updateSummary(); // Update summary
-        this.resetForm(); // Reset form state
+        this.saveStateForUndo();
+        this.parlays = [];
+        this.saveData();
+        this.renderParlays();
+        this.updateSummary();
+        this.resetForm();
     }
 
-    // Executes deleting a single parlay (formerly content of deleteParlay)
     executeDeleteParlay(index) {
-        this.saveStateForUndo(); // Save state for undo
-        this.parlays.splice(index, 1); // Remove parlay at specified index
-        this.saveData(); // Persist change
-        this.renderParlays(); // Update UI
-        this.updateSummary(); // Update summary
+        this.saveStateForUndo();
+        this.parlays.splice(index, 1);
+        this.saveData();
+        this.renderParlays();
+        this.updateSummary();
     }
 
-    // Rendering methods
     renderParlays() {
-        // Clear existing content in both table and card containers
         if (this.parlayTableBody) {
             this.parlayTableBody.innerHTML = '';
         }
@@ -646,7 +587,6 @@ class ParlayTracker {
             this.parlayHistoryContainer.innerHTML = '';
         }
 
-        // Show/hide the "No parlays" message based on data existence
         if (this.parlays.length === 0) {
             if (this.noParlaysMessage) {
                 this.noParlaysMessage.classList.remove('hidden');
@@ -658,17 +598,14 @@ class ParlayTracker {
             }
         }
 
-        // Iterate through parlays and render them
         this.parlays.forEach((parlay, index) => {
-            // Helper function to get text color based on result (Win, Loss, Push)
             const getResultTextColor = (result) => {
                 if (result === 'Win') return 'text-green-600';
                 if (result === 'Loss') return 'text-red-600';
                 if (result === 'Push') return 'text-yellow-600';
-                return ''; // Default or no color
+                return '';
             };
 
-            // Format date for display consistently (to avoid timezone issues)
             const formattedDate = new Date(parlay.date + 'T00:00:00').toLocaleDateString('en-US', { 
                 year: 'numeric',
                 month: 'long',
@@ -676,7 +613,6 @@ class ParlayTracker {
             });
 
 
-            // HTML for Table View (Desktop)
             const tableRow = `
                 <tr data-index="${index}">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formattedDate}</td>
@@ -697,7 +633,6 @@ class ParlayTracker {
                 this.parlayTableBody.insertAdjacentHTML('beforeend', tableRow);
             }
 
-            // HTML for Card View (Mobile)
             const cardHtml = `
                 <div class="parlay-card border-gray-200 bg-white" data-index="${index}">
                     <div class="parlay-card-summary">
@@ -732,26 +667,23 @@ class ParlayTracker {
             }
         });
 
-        // Add event listeners for toggling card details for mobile view
         if (this.parlayHistoryContainer) {
             this.parlayHistoryContainer.querySelectorAll('.parlay-card-summary').forEach(summaryDiv => {
                 summaryDiv.addEventListener('click', (event) => {
-                    // Prevent toggling if a button within the card summary was clicked directly
                     if (!event.target.closest('.parlay-card-actions')) {
                         const detailsDiv = summaryDiv.nextElementSibling;
                         if (detailsDiv && detailsDiv.classList.contains('parlay-card-toggle-details')) {
                             detailsDiv.classList.toggle('hidden');
-                            summaryDiv.classList.toggle('expanded'); // Toggle expanded class for visual arrow animation
+                            summaryDiv.classList.toggle('expanded');
                         }
                     }
                 });
             });
         }
 
-        this.updateSummary(); // Ensure summary statistics are up-to-date
+        this.updateSummary();
     }
 
-    // Summary calculations and updates
     updateSummary() {
         let totalWagered = 0;
         let netProfitLoss = 0;
@@ -761,7 +693,6 @@ class ParlayTracker {
         let totalIndividualProps = 0;
         let individualPropWins = 0;
 
-        // Iterate through all parlays to calculate summary statistics
         this.parlays.forEach(parlay => {
             totalWagered += parlay.amountWagered;
             netProfitLoss += parlay.amountWonLoss;
@@ -773,7 +704,6 @@ class ParlayTracker {
                 totalPushes++;
             }
 
-            // Also calculate statistics for individual bets (props)
             parlay.individualBets.forEach(bet => {
                 totalIndividualProps++;
                 if (bet.result === 'Win') {
@@ -782,20 +712,18 @@ class ParlayTracker {
             });
         });
 
-        // Update DOM elements with calculated values
         if (this.totalWageredSpan) {
             this.totalWageredSpan.textContent = totalWagered.toFixed(2);
         }
         if (this.netProfitLossSpan) {
             this.netProfitLossSpan.textContent = netProfitLoss.toFixed(2);
-            // Apply color based on net profit/loss value
-            this.netProfitLossSpan.classList.remove('text-green-600', 'text-red-600', 'text-yellow-600'); // Remove all first
+            this.netProfitLossSpan.classList.remove('text-green-600', 'text-red-600', 'text-yellow-600');
             if (netProfitLoss > 0) {
                 this.netProfitLossSpan.classList.add('text-green-600');
             } else if (netProfitLoss < 0) {
                 this.netProfitLossSpan.classList.add('text-red-600');
             } else {
-                this.netProfitLossSpan.classList.add('text-yellow-600'); // Neutral color for zero profit/loss
+                this.netProfitLossSpan.classList.add('text-yellow-600');
             }
         }
 
@@ -812,13 +740,12 @@ class ParlayTracker {
             this.totalParlaysSpan.textContent = this.parlays.length;
         }
 
-        // Calculate and display success rate based on selected method (Parlays vs. Individual Props)
         let successRate = 0;
         if (this.currentSuccessCalcMethod === 'parlays') {
             if (this.parlays.length > 0) {
                 successRate = (totalWins / this.parlays.length) * 100;
             }
-        } else { // 'props'
+        } else {
             if (totalIndividualProps > 0) {
                 successRate = (individualPropWins / totalIndividualProps) * 100;
             }
@@ -830,17 +757,15 @@ class ParlayTracker {
 
     handleSuccessCalcChange(event) {
         this.currentSuccessCalcMethod = event.target.value;
-        this.saveData(); // Save selected method to localStorage
-        this.updateSummary(); // Recalculate and display summary
+        this.saveData();
+        this.updateSummary();
     }
 
-    // Theme Toggle Functionality
     toggleTheme() {
         document.body.classList.toggle('dark');
         const isDarkMode = document.body.classList.contains('dark');
-        localStorage.setItem(ParlayTracker.STORAGE_KEYS.THEME, isDarkMode ? 'dark' : 'light'); // Save preference
+        localStorage.setItem(ParlayTracker.STORAGE_KEYS.THEME, isDarkMode ? 'dark' : 'light');
 
-        // Update the icon based on the current theme
         const icon = this.themeToggle?.querySelector('i');
         if (icon) {
             if (isDarkMode) {
@@ -853,30 +778,30 @@ class ParlayTracker {
         }
     }
 
-    // Welcome Modal functionality
     initializeUI() {
-        this.addPlayerPropRow(); // Ensure at least one prop row is present on initial load
-        this.renderParlays(); // Render any existing parlays from storage
-        this.updateSummary(); // Update summary statistics based on loaded data
-        this.showWelcomeModal(); // Show welcome modal if it's the first visit
+        this.addPlayerPropRow();
+        this.renderParlays();
+        this.updateSummary();
+        this.showWelcomeModal();
+        
         // Set default date input value to today's date
         if (this.dateInput) {
-            this.dateInput.valueAsDate = new Date();
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(today.getDate()).padStart(2, '0');
+            this.dateInput.value = `${year}-${month}-${day}`;
         }
 
-        // Apply saved theme on initial UI load
         const savedTheme = localStorage.getItem(ParlayTracker.STORAGE_KEYS.THEME);
         if (savedTheme === 'dark') {
             document.body.classList.add('dark');
-            // Ensure the moon icon is shown initially if dark mode is active
             const icon = this.themeToggle?.querySelector('i');
             if (icon) {
                 icon.classList.remove('fa-sun');
                 icon.classList.add('fa-moon');
             }
         } else {
-            // Ensure the sun icon is shown initially if light mode or no preference
-            // This handles cases where user clears localStorage or no preference is set
             const icon = this.themeToggle?.querySelector('i');
             if (icon) {
                 icon.classList.remove('fa-moon');
@@ -884,7 +809,6 @@ class ParlayTracker {
             }
         }
 
-        // Set initial aria-expanded state for the details/summary element for accessibility
         if (this.parlayFormSummary && this.parlaySectionDetails) {
             this.parlayFormSummary.setAttribute('aria-expanded', this.parlaySectionDetails.open);
         }
@@ -892,13 +816,12 @@ class ParlayTracker {
 
     showWelcomeModal() {
         const hasVisited = localStorage.getItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED);
-        if (!hasVisited) { // Only show if user hasn't visited before
+        if (!hasVisited) {
             if (this.welcomeModal) {
                 this.welcomeModal.classList.remove('hidden');
                 setTimeout(() => {
                     this.welcomeModal.classList.add('show');
-                }, 10); // Small delay for CSS transition
-                // Set initial focus for accessibility
+                }, 10);
                 this.closeModalBtn?.focus();
             }
         }
@@ -909,19 +832,18 @@ class ParlayTracker {
             this.welcomeModal.classList.remove('show');
             this.welcomeModal.addEventListener('transitionend', () => {
                 this.welcomeModal.classList.add('hidden');
-            }, { once: true }); // Ensure listener runs only once
+            }, { once: true });
         }
-        localStorage.setItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED, 'true'); // Mark as visited
+        localStorage.setItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED, 'true');
     }
 
-    // UNDO IMPLEMENTATION (Ctrl/Cmd + Z)
     undo() {
         if (this.undoStack.length > 0) {
-            const prevState = this.undoStack.pop(); // Get the last saved state
-            this.parlays = prevState.parlays; // Revert parlays to previous state
-            this.saveData(); // Persist the reverted state
-            this.renderParlays(); // Update UI to reflect undo
-            this.updateSummary(); // Update summary statistics
+            const prevState = this.undoStack.pop();
+            this.parlays = prevState.parlays;
+            this.saveData();
+            this.renderParlays();
+            this.updateSummary();
             console.log(`Undo performed. Stack size: ${this.undoStack.length}`);
         } else {
             console.log('Undo stack is empty. Nothing to undo.');
@@ -930,14 +852,12 @@ class ParlayTracker {
 
     handleKeyboardShortcuts(event) {
         if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
-            event.preventDefault(); // Prevent default browser undo behavior
-            this.undo(); // Call custom undo logic
+            event.preventDefault();
+            this.undo();
         }
     }
 }
 
-// Instantiate the tracker when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Make the tracker instance globally accessible for event delegation and easier debugging
     window.tracker = new ParlayTracker(); 
 });
