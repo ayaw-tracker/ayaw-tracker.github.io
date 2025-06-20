@@ -6,6 +6,13 @@
    BASE STYLES
    ========================================================================== */
 
+html, body {
+    height: 100%; /* Ensure HTML and Body take full viewport height */
+    min-height: 100vh; /* Ensure minimum viewport height */
+    margin: 0; /* Remove default body margin */
+    padding: 0; /* Remove default body padding */
+}
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f3f4f6; /* Light mode default background */
@@ -371,6 +378,43 @@ body.dark .text-yellow-600 {
 /* ==========================================================================
    MODAL COMPONENTS
    ========================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0; /* Ensures full width */
+    bottom: 0; /* Ensures full height */
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e5e7eb;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease-in-out;
+    color: #1f2937;
+}
 
 body.dark .modal-content {
     background-color: #303640; /* Softer dark modal background */
