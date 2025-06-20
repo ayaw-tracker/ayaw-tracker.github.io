@@ -95,17 +95,18 @@ body {
     position: relative;
 }
 
-/* Arrow icon for mobile card summary */
+/* Arrow icon for mobile card summary - NOW HIDDEN */
 .parlay-card-summary::after {
-    content: '\f078'; /* Font Awesome chevron-down icon */
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900; /* Required for solid icon */
-    position: absolute;
-    right: 0.75rem;
-    top: 1rem;
-    font-size: 1.2rem;
-    color: #6b7280;
-    transition: transform 0.2s ease;
+    /* content: '\f078'; */ /* Removed icon content */
+    /* font-family: 'Font Awesome 6 Free'; */
+    /* font-weight: 900; */
+    /* position: absolute; */
+    /* right: 0.75rem; */
+    /* top: 1rem; */
+    /* font-size: 1.2rem; */
+    /* color: #6b7280; */
+    /* transition: transform 0.2s ease; */
+    display: none; /* This line hides the arrow */
 }
 
 .parlay-card-summary.expanded::after {
