@@ -422,10 +422,12 @@ class ParlayTracker {
         // Explicitly clear numerical input values as form.reset() might not clear them if they were set by JS
         if (this.amountWageredInput) {
             this.amountWageredInput.value = '';
+            console.log('resetForm: amountWageredInput value set to empty string'); // Debug log
         }
         if (this.amountWonLossInput) {
             this.amountWonLossInput.value = '';
             this.amountWonLossInput.placeholder = '0.00';
+            console.log('resetForm: amountWonLossInput value set to empty string and placeholder reset'); // Debug log
         }
         // Set the date input to today's date upon reset
         if (this.dateInput) {
@@ -434,21 +436,26 @@ class ParlayTracker {
             const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
             const day = String(today.getDate()).padStart(2, '0');
             this.dateInput.value = `${year}-${month}-${day}`;
+            console.log(`resetForm: dateInput value set to ${this.dateInput.value}`); // Debug log
         }
 
         // Clear all dynamically added player prop rows and add one fresh one
         this.clearPlayerPropRows();
         this.addPlayerPropRow();
+        console.log('resetForm: Player prop rows cleared and one new row added'); // Debug log
         this.editingIndex = -1;
         if (this.submitBtn) {
             this.submitBtn.textContent = 'Add Parlay Entry';
+            console.log('resetForm: Submit button text reset'); // Debug log
         }
         // Collapse the form after submission
         const parlaySection = document.querySelector('.parlay-section');
         if (parlaySection) {
             parlaySection.open = false;
+            console.log('resetForm: Parlay section collapsed'); // Debug log
         }
         this.clearAllValidationErrors();
+        console.log('resetForm: All validation errors cleared'); // Debug log
     }
 
     editParlay(index) {
@@ -791,6 +798,7 @@ class ParlayTracker {
             const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
             const day = String(today.getDate()).padStart(2, '0');
             this.dateInput.value = `${year}-${month}-${day}`;
+            console.log(`initializeUI: dateInput value set to ${this.dateInput.value}`); // Debug log
         }
 
         const savedTheme = localStorage.getItem(ParlayTracker.STORAGE_KEYS.THEME);
