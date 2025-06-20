@@ -297,17 +297,17 @@ body.dark .parlay-card-bets li::before {
    ========================================================================== */
 
 /* Summary Statistics section */
-body.dark section.bg-blue-50 { /* This is the specific section using bg-blue-50 in light mode */
+body.dark section.bg-blue-100 { /* TARGETING bg-blue-100 for dark mode */
     background-color: #303640; /* Softer dark background for summary section */
 }
-body.dark section.bg-blue-50 h2 {
+body.dark section.bg-blue-100 h2 { /* TARGETING bg-blue-100 for dark mode */
     color: #90cdf4; /* Lighter blue for heading */
 }
-body.dark section.bg-blue-50 .bg-white { /* Individual stat cards background */
+body.dark section.bg-blue-100 .bg-white { /* TARGETING bg-blue-100 for dark mode */
     background-color: #4a505b; /* Softer dark background for stat cards */
     color: #e2e8f0; /* Light text */
 }
-body.dark section.bg-blue-50 .bg-white p {
+body.dark section.bg-blue-100 .bg-white p { /* TARGETING bg-blue-100 for dark mode */
     color: #cbd5e0; /* Slightly darker light text */
 }
 body.dark .text-blue-600 { /* Used for "Total Wagered", "Net Profit/Loss", "Total Parlays" in light mode */
