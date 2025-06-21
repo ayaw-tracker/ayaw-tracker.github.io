@@ -1,10 +1,10 @@
 /* ==========================================================================
-    PARLAY BETTING APP STYLES
-    ========================================================================== */
+   PARLAY BETTING APP STYLES
+   ========================================================================== */
 
 /* ==========================================================================
-    BASE STYLES
-    ========================================================================== */
+   BASE STYLES
+   ========================================================================== */
 
 html, body {
     height: 100%; /* Ensure HTML and Body take full viewport height */
@@ -26,8 +26,8 @@ body.dark {
 }
 
 /* ==========================================================================
-    LAYOUT COMPONENTS
-    ========================================================================== */
+   LAYOUT COMPONENTS
+   ========================================================================== */
 
 .container {
     max-width: 1024px;
@@ -60,10 +60,17 @@ body.dark section.bg-gray-50 p {
 }
 
 /* ==========================================================================
-    FORM COMPONENTS
-    ========================================================================== */
+   FORM COMPONENTS
+   ========================================================================== */
 
 /* Parlay Input Form section */
+.parlay-section {
+    background-color: #ffffff; /* Light mode default */
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 body.dark .parlay-section {
     background-color: #303640; /* Softer dark background for form section */
 }
@@ -137,8 +144,8 @@ body.dark .remove-prop-btn:hover {
 }
 
 /* ==========================================================================
-    BUTTON COMPONENTS
-    ========================================================================== */
+   BUTTON COMPONENTS
+   ========================================================================== */
 
 .btn-primary {
     transition: all 0.2s ease;
@@ -177,8 +184,8 @@ body.dark #clearAllBtn:hover {
 }
 
 /* ==========================================================================
-    CARD COMPONENTS
-    ========================================================================== */
+   CARD COMPONENTS
+   ========================================================================== */
 
 /* Card Grid Layout */
 .parlay-card-grid {
@@ -302,8 +309,8 @@ body.dark .parlay-card-bets li::before {
 }
 
 /* ==========================================================================
-    SUMMARY STATISTICS
-    ========================================================================== */
+   SUMMARY STATISTICS
+   ========================================================================== */
 
 /* Summary Statistics section */
 body.dark section.bg-blue-100 { /* TARGETING bg-blue-100 for dark mode */
@@ -332,7 +339,7 @@ body.dark .text-green-700 { /* Used for 'Wins' count in summary */
     color: #8ce1a3; /* Softer green for dark mode Wins */
 }
 body.dark .text-red-700 { /* Used for 'Losses' count in summary */
-    color: #ff9191; /* Softer red for dark mode Losses */
+    color: #ff9190; /* Softer red for dark mode Losses */
 }
 body.dark .text-yellow-700 { /* Used for 'Pushes' count in summary */
     color: #ffe082; /* Softer yellow for dark mode Pushes */
@@ -340,8 +347,8 @@ body.dark .text-yellow-700 { /* Used for 'Pushes' count in summary */
 
 
 /* ==========================================================================
-    PARLAY HISTORY
-    ========================================================================== */
+   PARLAY HISTORY
+   ========================================================================== */
 
 /* Parlay History section */
 body.dark section.bg-white { /* This is the specific section using bg-white in light mode */
@@ -378,8 +385,8 @@ body.dark .text-yellow-600 {
 
 
 /* ==========================================================================
-    MODAL COMPONENTS
-    ========================================================================== */
+   MODAL COMPONENTS
+   ========================================================================= */
 
 .modal-overlay {
     position: fixed;
@@ -452,8 +459,64 @@ body.dark #confirmClearBtn.bg-blue-600:hover {
 }
 
 /* ==========================================================================
-    ANIMATIONS
-    ========================================================================== */
+   FEATURE TOUR (GUIDANCE BUBBLES)
+   ========================================================================= */
+
+#tourOverlay {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#tourBubble {
+    /* Base styling inherited from HTML - Tailwind */
+    position: absolute;
+    transform: translate(-50%, -100%); /* Default to top-center positioning, adjust with JS */
+    pointer-events: auto; /* Allow clicks on the bubble */
+    z-index: 1000;
+}
+
+#tourBubbleArrow {
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    background-color: inherit; /* Inherit color from parent bubble */
+    z-index: -1; /* Behind the bubble content */
+    top: 100%; /* Position at the bottom of the bubble */
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg); /* Center and rotate */
+    transform-origin: center;
+}
+
+#tourBubble.position-top #tourBubbleArrow {
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+#tourBubble.position-bottom #tourBubbleArrow {
+    top: -0.5rem; /* Adjust to sit above the bubble */
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg); /* Points upwards */
+}
+
+#tourBubble.position-left #tourBubbleArrow {
+    top: 50%;
+    left: 100%;
+    transform: translate(-50%, -50%) rotate(45deg); /* Points left */
+}
+
+#tourBubble.position-right #tourBubbleArrow {
+    top: 50%;
+    left: -0.5rem; /* Adjust to sit left of the bubble */
+    transform: translate(-50%, -50%) rotate(45deg); /* Points right */
+}
+
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
 
 @keyframes slideIn {
     to {
