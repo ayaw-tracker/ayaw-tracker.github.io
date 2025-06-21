@@ -1,10 +1,10 @@
 /* ==========================================================================
-   PARLAY BETTING APP STYLES
-   ========================================================================== */
+    PARLAY BETTING APP STYLES
+    ========================================================================== */
 
 /* ==========================================================================
-   BASE STYLES
-   ========================================================================== */
+    BASE STYLES
+    ========================================================================== */
 
 html, body {
     height: 100%; /* Ensure HTML and Body take full viewport height */
@@ -26,8 +26,8 @@ body.dark {
 }
 
 /* ==========================================================================
-   LAYOUT COMPONENTS
-   ========================================================================== */
+    LAYOUT COMPONENTS
+    ========================================================================== */
 
 .container {
     max-width: 1024px;
@@ -60,8 +60,8 @@ body.dark section.bg-gray-50 p {
 }
 
 /* ==========================================================================
-   FORM COMPONENTS
-   ========================================================================== */
+    FORM COMPONENTS
+    ========================================================================== */
 
 /* Parlay Input Form section */
 body.dark .parlay-section {
@@ -137,8 +137,8 @@ body.dark .remove-prop-btn:hover {
 }
 
 /* ==========================================================================
-   BUTTON COMPONENTS
-   ========================================================================== */
+    BUTTON COMPONENTS
+    ========================================================================== */
 
 .btn-primary {
     transition: all 0.2s ease;
@@ -177,8 +177,8 @@ body.dark #clearAllBtn:hover {
 }
 
 /* ==========================================================================
-   CARD COMPONENTS
-   ========================================================================== */
+    CARD COMPONENTS
+    ========================================================================== */
 
 /* Card Grid Layout */
 .parlay-card-grid {
@@ -281,17 +281,19 @@ body.dark .parlay-card-actions .delete-parlay-btn:hover {
 
 .parlay-card-bets li::before {
     content: '•';
-    color: #6b7280;
+    /* Original: color: #6b7280; in light mode */
     position: absolute;
     left: 0;
     font-weight: bold;
 }
 
 body.dark .parlay-card-bets li {
-    color: #cbd5e0; /* Light text for list items */
+    /* Original: color: #cbd5e0; */
+    color: #e2e8f0; /* Changed for better contrast in dark mode */
 }
 body.dark .parlay-card-bets li::before {
-    color: #a0aec0; /* Lighter bullet color */
+    /* Original: color: #a0aec0; */
+    color: #e2e8f0; /* Changed for better contrast in dark mode (match text) */
 }
 
 /* Card Toggle Details */
@@ -300,8 +302,8 @@ body.dark .parlay-card-bets li::before {
 }
 
 /* ==========================================================================
-   SUMMARY STATISTICS
-   ========================================================================== */
+    SUMMARY STATISTICS
+    ========================================================================== */
 
 /* Summary Statistics section */
 body.dark section.bg-blue-100 { /* TARGETING bg-blue-100 for dark mode */
@@ -338,8 +340,8 @@ body.dark .text-yellow-700 { /* Used for 'Pushes' count in summary */
 
 
 /* ==========================================================================
-   PARLAY HISTORY
-   ========================================================================== */
+    PARLAY HISTORY
+    ========================================================================== */
 
 /* Parlay History section */
 body.dark section.bg-white { /* This is the specific section using bg-white in light mode */
@@ -376,8 +378,8 @@ body.dark .text-yellow-600 {
 
 
 /* ==========================================================================
-   MODAL COMPONENTS
-   ========================================================================== */
+    MODAL COMPONENTS
+    ========================================================================== */
 
 .modal-overlay {
     position: fixed;
@@ -450,8 +452,8 @@ body.dark #confirmClearBtn.bg-blue-600:hover {
 }
 
 /* ==========================================================================
-   ANIMATIONS
-   ========================================================================== */
+    ANIMATIONS
+    ========================================================================== */
 
 @keyframes slideIn {
     to {
