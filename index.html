@@ -10,16 +10,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Custom Stylesheet -->
+    
+    <!-- Custom Stylesheet Link -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-100 p-4 sm:p-6 md:p-8 text-gray-800">
-    <div class="container bg-white relative"> <!-- Added 'relative' to container for positioning theme toggle -->
+    <div class="container bg-white relative">
         <!-- Header -->
         <header class="text-center mb-8">
             <!-- Theme Toggle Button -->
             <button id="themeToggle" class="absolute top-4 right-4 p-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300" aria-label="Toggle light and dark mode">
-                <i class="fas fa-sun text-xl"></i> <!-- Default to sun icon for light mode -->
+                <i class="fas fa-sun text-xl"></i>
             </button>
 
             <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
@@ -50,7 +51,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <!-- Date (middle top) -->
                         <div class="col-span-full flex justify-center">
-                            <div class="w-full sm:w-1/2 lg:w-1/3"> <!-- Limit width for centering -->
+                            <div class="w-full sm:w-1/2 lg:w-1/3">
                                 <label for="date" class="block text-sm font-medium text-gray-700 mb-1 text-center">
                                     Date
                                 </label>
@@ -93,11 +94,11 @@
                                 Amount Wagered ($)
                             </label>
                             <input type="number" 
-                                   id="amountWagered" 
-                                   step="0.01" 
-                                   min="0" 
-                                   placeholder="0.00" 
-                                   class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
+                                       id="amountWagered" 
+                                       step="0.01" 
+                                       min="0" 
+                                       placeholder="0.00" 
+                                       class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
                             <span class="text-red-500 text-xs mt-1 hidden" id="amountWageredError"></span>
                         </div>
                         
@@ -107,10 +108,10 @@
                                 Amount Won/Loss ($)
                             </label>
                             <input type="number" 
-                                   id="amountWonLoss" 
-                                   step="0.01" 
-                                   placeholder="0.00" 
-                                   class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
+                                       id="amountWonLoss" 
+                                       step="0.01" 
+                                       placeholder="0.00" 
+                                       class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
                             <span class="text-red-500 text-xs mt-1 hidden" id="amountWonLossError"></span>
                         </div>
                     </div>
@@ -144,11 +145,39 @@
         </details>
 
         <!-- Summary Statistics -->
-        <section class="bg-blue-100 p-6 rounded-lg shadow-sm mb-8"> <!-- Changed from bg-blue-50 to bg-blue-100 -->
+        <section class="bg-blue-100 p-6 rounded-lg shadow-sm mb-8">
             <h2 class="text-2xl font-semibold text-blue-800 mb-4">
                 Summary Statistics
             </h2>
             
+            <!-- Timeline Filters (Collapsible) -->
+            <details id="timelineDetails" class="parlay-section bg-white p-4 rounded-lg mb-6 shadow-sm">
+                <summary class="cursor-pointer flex justify-between items-center text-lg font-semibold text-gray-700">
+                    <span>Timeline</span>
+                    <span id="currentTimelineDisplay" class="text-sm font-normal text-gray-500 ml-2">All Time</span>
+                </summary>
+                
+                <div class="timeline-content mt-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0 mb-4">
+                        <div class="flex-1">
+                            <label for="filterFromDate" class="block text-sm font-medium text-gray-700 mb-1">From Date:</label>
+                            <input type="date" id="filterFromDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
+                            <span class="text-red-500 text-xs mt-1 hidden" id="dateFilterError"></span>
+                        </div>
+                        <div class="flex-1">
+                            <label for="filterToDate" class="block text-sm font-medium text-gray-700 mb-1">To Date:</label>
+                            <input type="date" id="filterToDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Quick Views:</h3>
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        <button id="filterLast7Days" class="bg-blue-200 text-blue-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-300 transition-colors duration-200">Last 7 Days</button>
+                        <button id="filterLast30Days" class="bg-blue-200 text-blue-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-300 transition-colors duration-200">Last 30 Days</button>
+                        <button id="clearDateFilterBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition-colors duration-200">Clear Custom Dates</button>
+                    </div>
+                </div>
+            </details>
+
             <!-- Statistics Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-blue-700 mb-6">
                 <div class="bg-white p-4 rounded-lg">
@@ -190,7 +219,7 @@
                 <!-- Added flex-wrap for better mobile responsiveness -->
                 <div class="flex items-center space-x-3 flex-wrap"> 
                     <select id="successPercentageCalc" 
-                                 class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800">
+                                     class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800">
                         <option value="parlays">Parlays</option>
                         <option value="props">Individual Props</option>
                     </select>
@@ -203,7 +232,7 @@
             <!-- Clear All Button -->
             <div class="text-center">
                 <button id="clearAllBtn" 
-                                 class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                                     class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out">
                     Clear All Entries
                 </button>
             </div>
@@ -277,22 +306,44 @@
     <!-- Welcome Modal -->
     <div id="welcomeModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
         <div class="modal-content">
-            <h3 id="welcomeModalTitle" class="text-2xl font-bold mb-4">Welcome to AYAW!</h3>
+            <h3 id="welcomeModalTitle" class="text-2xl font-bold mb-4">"Are You Actually Winning?" - Your Reality Check</h3>
             <p class="mb-6">
-                This simple tracker helps you <strong>honestly monitor your parlay betting performance</strong> over time.
-                Enter your parlay details, including individual prop outcomes, and see your overall profit/loss and success rate.
-                All data is saved directly in your browser, so it's always there for you!
+                Most betting apps show you what you <strong>want</strong> to see. This one shows you what you <strong>need</strong> to see. "Are You Actually Winning?" is <strong>not a sharp tool, but a blunt object</strong> built for <strong>honest reflection</strong>.
+                We provide a space to cut through confirmation bias by providing a clear, unbiased view of your performance:
             </p>
-            <div class="text-center">
-                <button id="closeModalBtn" 
-                                 class="bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
-                    Got It!
+            <ul class="text-left text-gray-700 mb-6 space-y-2 list-disc list-inside">
+                <li>Track every parlay, win or lose, to reveal your true net profit/loss.</li>
+                <li>Break down individual bet outcomes within parlays to pinpoint strengths and weaknesses.</li>
+                <li>Empower yourself with real data to make smarter decisions.</li>
+            </ul>
+            <p class="text-sm text-gray-600 mb-6">
+                This application uses anonymous data for personal research to support a Google Analytics certification. You'll see a consent form soon with more details about data usage.
+            </p>
+            <div class="flex justify-center space-x-4">
+                <button id="startTrackingBtn" class="bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                    Start Tracking My Bets
+                </button>
+                <button id="guideMeBtn" class="bg-gray-200 text-gray-800 py-2 px-6 rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out">
+                    Guide Me
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Custom JavaScript -->
-    <script src="script.js" defer></script>
+    <!-- Feature Tour/Guidance Bubbles -->
+    <div id="tourOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-[999] hidden"></div>
+    <div id="tourBubble" class="absolute bg-blue-600 text-white p-4 rounded-lg shadow-xl z-[1000] max-w-xs transition-all duration-300 ease-in-out hidden">
+        <p id="tourBubbleText" class="mb-3"></p>
+        <div class="flex justify-between items-center">
+            <button id="tourSkipBtn" class="text-white text-sm opacity-75 hover:opacity-100 transition-opacity">Skip Tour</button>
+            <button id="tourNextBtn" class="bg-white text-blue-600 px-4 py-1.5 rounded-md text-sm font-semibold hover:bg-gray-100 transition-colors duration-200">Next &rarr;</button>
+            <button id="tourFinishBtn" class="bg-white text-blue-600 px-4 py-1.5 rounded-md text-sm font-semibold hover:bg-gray-100 transition-colors duration-200 hidden">Finish</button>
+        </div>
+        <div class="absolute w-4 h-4 bg-blue-600 rotate-45" id="tourBubbleArrow"></div>
+    </div>
+
+
+    <!-- Custom JavaScript Link -->
+    <script src="script.js"></script>
 </body>
 </html>
