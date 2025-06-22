@@ -84,7 +84,8 @@ class ParlayTracker {
 
         // New Import/Export Elements
         this.importDataBtn = null;
-        this.exportDataBtn = null;
+        this.exportCsvBtn = null; // Changed to CSV specific export
+        this.exportJsonBtn = null; // Added for JSON export
         this.importFileInput = null;
 
         // Tour elements
@@ -158,7 +159,8 @@ class ParlayTracker {
 
             // New Import/Export Elements
             importDataBtn: 'importDataBtn',
-            exportDataBtn: 'exportDataBtn',
+            exportCsvBtn: 'exportCsvBtn', // Renamed from exportDataBtn
+            exportJsonBtn: 'exportJsonBtn', // Added new element
             importFileInput: 'importFileInput',
 
             // Tour elements
@@ -322,8 +324,11 @@ class ParlayTracker {
         }
 
         // Import/Export Button Event Listeners
-        if (this.exportDataBtn) {
-            this.exportDataBtn.addEventListener('click', this.exportParlayData.bind(this));
+        if (this.exportCsvBtn) {
+            this.exportCsvBtn.addEventListener('click', this.exportParlayDataAsCsv.bind(this));
+        }
+        if (this.exportJsonBtn) {
+            this.exportJsonBtn.addEventListener('click', this.exportParlayDataAsJson.bind(this));
         }
         if (this.importDataBtn) {
             this.importDataBtn.addEventListener('click', () => this.importFileInput.click()); // Trigger hidden file input click
@@ -434,10 +439,6 @@ class ParlayTracker {
         if (input.id === 'amountWonLoss' && originalValue.startsWith('-') && !cleanedValue.startsWith('-')) {
             cleanedValue = '-' + cleanedValue;
         } else if (input.id !== 'amountWonLoss' && cleanedValue.startsWith('-')) {
-            cleanedValue = cleanedValue.substring(1);
-        }
-
-        if (cleanedValue.length > 1 && cleanedValue[0] === '0' && cleanedValue[1] !== '.') {
             cleanedValue = cleanedValue.substring(1);
         }
 
@@ -789,13 +790,71 @@ class ParlayTracker {
     }
 
     /**
-     * Exports the current parlay data as a JSON file.
+     * Exports the current parlay data as a CSV file.
      */
-    exportParlayData() {
+    exportParlayDataAsCsv() {
         if (this.parlays.length === 0) {
             this.showInfoModal('No Data to Export', 'There is no parlay data to export yet. Add some entries first!');
             return;
         }
+
+        const headers = [
+            "Date", "Result", "Play Type", "Amount Wagered", "Amount Won/Loss",
+            "Individual Bet 1 Player", "Individual Bet 1 Prop", "Individual Bet 1 Result",
+            "Individual Bet 2 Player", "Individual Bet 2 Prop", "Individual Bet 2 Result",
+            "Individual Bet 3 Player", "Individual Bet 3 Prop", "Individual Bet 3 Result",
+            "Individual Bet 4 Player", "Individual Bet 4 Prop", "Individual Bet 4 Result",
+            "Individual Bet 5 Player", "Individual Bet 5 Prop", "Individual Bet 5 Result"
+        ]; // Max 5 individual bets to keep headers reasonable
+
+        let csvContent = headers.join(',') + '\n';
+
+        this.parlays.forEach(parlay => {
+            let row = [
+                parlay.date,
+                parlay.result,
+                parlay.playType,
+                parlay.amountWagered.toFixed(2),
+                parlay.amountWonLoss.toFixed(2)
+            ];
+
+            // Add individual bets dynamically, up to the defined max
+            for (let i = 0; i < 5; i++) { // Limit to 5 for now, corresponding to headers
+                const bet = parlay.individualBets[i];
+                if (bet) {
+                    // Escape commas and double quotes within string fields
+                    row.push(`"${bet.player.replace(/"/g, '""')}"`);
+                    row.push(`"${bet.prop.replace(/"/g, '""')}"`);
+                    row.push(`"${bet.result.replace(/"/g, '""')}"`);
+                } else {
+                    row.push('', '', ''); // Empty for missing bets
+                }
+            }
+            csvContent += row.join(',') + '\n';
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'parlay_history.csv'; // Change extension to .csv
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // Clean up
+        this.showInfoModal('Export Successful', 'Your parlay data has been exported as "parlay_history.csv". You can now import this file into Google Sheets.');
+    }
+
+    /**
+     * Exports the current parlay data as a JSON file.
+     */
+    exportParlayDataAsJson() {
+        if (this.parlays.length === 0) {
+            this.showInfoModal('No Data to Export', 'There is no parlay data to export yet. Add some entries first!');
+            return;
+        }
+
         const dataStr = JSON.stringify(this.parlays, null, 2); // Pretty print JSON
 
         const blob = new Blob([dataStr], { type: 'application/json' });
@@ -803,7 +862,7 @@ class ParlayTracker {
 
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'parlay_history.json'; // Suggested filename
+        a.download = 'parlay_history.json'; // Keep extension as .json
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1146,9 +1205,18 @@ class ParlayTracker {
 
         if (this.filterFromDate) {
             fromDateObj = new Date(this.filterFromDate + 'T00:00:00');
+            filteredParlays = filteredParlays.filter(parlay => {
+                const parlayDate = new Date(parlay.date + 'T00:00:00');
+                return parlayDate >= fromDateObj;
+            });
         }
+
         if (this.filterToDate) {
             toDateObj = new Date(this.filterToDate + 'T00:00:00');
+            filteredParlays = filteredParlays.filter(parlay => {
+                const parlayDate = new Date(parlay.date + 'T00:00:00');
+                return parlayDate <= toDateObj;
+            });
         }
 
         if (fromDateObj && toDateObj && fromDateObj > toDateObj) {
@@ -1160,7 +1228,6 @@ class ParlayTracker {
             if (this.filterFromDate === '' && this.filterToDate === '') {
                 this.currentTimelineSummaryText = 'All Time';
             } else {
-                // Format dates for display as Month/Day/Year
                 const options = { month: 'numeric', day: 'numeric', year: 'numeric' };
                 let formattedFrom = this.filterFromDate ? new Date(this.filterFromDate + 'T00:00:00').toLocaleDateString('en-US', options) : '';
                 let formattedTo = this.filterToDate ? new Date(this.filterToDate + 'T00:00:00').toLocaleDateString('en-US', options) : '';
@@ -1174,13 +1241,9 @@ class ParlayTracker {
                 }
             }
             this.currentTimelineDisplay.textContent = this.currentTimelineSummaryText;
-        } else {
-            // If range is invalid, but previously valid dates were set,
-            // keep the previous valid display text. The renderParlays will show no data.
         }
-
         this.saveData();
-        this.renderParlays(); // Re-renders and updates summary based on the current filters
+        this.renderParlays();
     }
 
     /**
@@ -1188,7 +1251,7 @@ class ParlayTracker {
      * @param {string} presetType - 'last7Days', 'last30Days', 'clear'
      */
     applyPresetFilter(presetType) {
-        this.clearAllValidationErrors(); // Clear any date range errors
+        this.clearAllValidationErrors();
 
         const today = new Date();
         let from = '';
@@ -1206,21 +1269,21 @@ class ParlayTracker {
             case 'clear':
                 from = '';
                 to = '';
-                displayString = 'All Time'; // Set display string directly
+                displayString = 'All Time';
                 break;
             case 'last7Days':
                 const sevenDaysAgo = new Date(today);
-                sevenDaysAgo.setDate(today.getDate() - 6); // -6 to include today
+                sevenDaysAgo.setDate(today.getDate() - 6);
                 from = formatDate(sevenDaysAgo);
                 to = formatDate(today);
-                displayString = 'Last 7 Days'; // Set display string directly
+                displayString = 'Last 7 Days';
                 break;
             case 'last30Days':
                 const thirtyDaysAgo = new Date(today);
-                thirtyDaysAgo.setDate(today.getDate() - 29); // -29 to include today
+                thirtyDaysAgo.setDate(today.getDate() - 29);
                 from = formatDate(thirtyDaysAgo);
                 to = formatDate(today);
-                displayString = 'Last 30 Days'; // Set display string directly
+                displayString = 'Last 30 Days';
                 break;
             default:
                 console.warn("Unknown preset type:", presetType);
@@ -1236,24 +1299,21 @@ class ParlayTracker {
             this.filterToDate = to;
         }
 
-        this.currentTimelineSummaryText = displayString; // Update the summary text property
+        this.currentTimelineSummaryText = displayString;
         if (this.currentTimelineDisplay) {
-            this.currentTimelineDisplay.textContent = this.currentTimelineSummaryText; // Update the UI element
+            this.currentTimelineDisplay.textContent = this.currentTimelineSummaryText;
         }
         this.saveData();
-        this.renderParlays(); // This will trigger updateSummary too
+        this.renderParlays();
     }
 
     initializeUI() {
-        // Order matters here: load filters first, then set up UI based on loaded data
-        this.applySavedTheme(); // Apply theme first
+        this.applySavedTheme();
         
-        // Load the stored date filter values and summary text
         this.filterFromDate = localStorage.getItem(ParlayTracker.STORAGE_KEYS.DATE_FILTER_FROM) || '';
         this.filterToDate = localStorage.getItem(ParlayTracker.STORAGE_KEYS.DATE_FILTER_TO) || '';
         this.currentTimelineSummaryText = localStorage.getItem(ParlayTracker.STORAGE_KEYS.TIMELINE_SUMMARY_TEXT) || 'All Time';
 
-        // Update the date input fields
         if (this.filterFromDateInput) {
             this.filterFromDateInput.value = this.filterFromDate;
         }
@@ -1261,14 +1321,12 @@ class ParlayTracker {
             this.filterToDateInput.value = this.filterToDate;
         }
 
-        // Update the timeline display text based on loaded state
         if (this.currentTimelineDisplay) {
             if (this.filterFromDate === '' && this.filterToDate === '') {
                 this.currentTimelineSummaryText = 'All Time';
             } else if (this.currentTimelineSummaryText === 'Last 7 Days' || this.currentTimelineSummaryText === 'Last 30 Days') {
                 // If it's a preset, retain the label
             } else {
-                // For custom date ranges, re-format the dates to M/D/YYYY
                 const options = { month: 'numeric', day: 'numeric', year: 'numeric' };
                 let formattedFrom = this.filterFromDate ? new Date(this.filterFromDate + 'T00:00:00').toLocaleDateString('en-US', options) : '';
                 let formattedTo = this.filterToDate ? new Date(this.filterToDate + 'T00:00:00').toLocaleDateString('en-US', options) : '';
@@ -1284,9 +1342,9 @@ class ParlayTracker {
             this.currentTimelineDisplay.textContent = this.currentTimelineSummaryText;
         }
         
-        this.renderParlays(); // Renders with initial/loaded filters
-        this.updateSummary(); // Updates summary with initial/loaded filters
-        this.resetForm(); // Sets the form date
+        this.renderParlays();
+        this.updateSummary();
+        this.resetForm();
         this.checkAndShowWelcomeModal();
     }
 
