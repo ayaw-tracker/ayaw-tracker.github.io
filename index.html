@@ -10,8 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <!-- Custom Stylesheet Link -->
+    <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-100 p-4 sm:p-6 md:p-8 text-gray-800">
@@ -219,7 +218,7 @@
                 <!-- Added flex-wrap for better mobile responsiveness -->
                 <div class="flex items-center space-x-3 flex-wrap"> 
                     <select id="successPercentageCalc" 
-                                     class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800">
+                                   class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800">
                         <option value="parlays">Parlays</option>
                         <option value="props">Individual Props</option>
                     </select>
@@ -232,7 +231,7 @@
             <!-- Clear All Button -->
             <div class="text-center">
                 <button id="clearAllBtn" 
-                                     class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                                   class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out">
                     Clear All Entries
                 </button>
             </div>
@@ -240,10 +239,24 @@
 
         <!-- Parlay History -->
         <section class="bg-white p-6 rounded-lg shadow-sm">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-4">
-                Parlay History
-            </h2>
+            <!-- New div for Parlay History header and buttons -->
+            <div class="parlay-history-header">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4 md:mb-0">
+                    Parlay History
+                </h2>
+                <div class="parlay-actions">
+                    <button id="importDataBtn" class="action-btn">
+                        <i class="fas fa-upload mr-2"></i>Import
+                    </button>
+                    <button id="exportDataBtn" class="action-btn">
+                        <i class="fas fa-download mr-2"></i>Export
+                    </button>
+                </div>
+            </div>
             
+            <!-- Hidden file input for import functionality -->
+            <input type="file" id="importFileInput" accept=".json" class="hidden">
+
             <!-- Desktop Table View -->
             <div class="overflow-x-auto hidden md:block">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -343,7 +356,6 @@
     </div>
 
 
-    <!-- Custom JavaScript Link -->
     <script src="script.js"></script>
 </body>
 </html>
