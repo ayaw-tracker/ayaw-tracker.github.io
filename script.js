@@ -70,7 +70,7 @@ class ParlayTracker {
         this.parlaySectionDetails = null;
         this.parlayFormSummary = null;
 
-        this.pendingAction = null;
+        this.pendingAction = null; // To store action details for confirmation modal
 
         // New date filter elements
         this.timelineDetails = null; // Reference to the new <details> element for timeline
@@ -82,6 +82,10 @@ class ParlayTracker {
         this.clearDateFilterBtn = null;
         this.dateFilterError = null;
 
+        // New Import/Export Elements
+        this.importDataBtn = null;
+        this.exportDataBtn = null;
+        this.importFileInput = null;
 
         // Tour elements
         this.tourOverlay = null;
@@ -151,6 +155,11 @@ class ParlayTracker {
             filterLast30DaysBtn: 'filterLast30Days',
             clearDateFilterBtn: 'clearDateFilterBtn',
             dateFilterError: 'dateFilterError', // For date range validation message
+
+            // New Import/Export Elements
+            importDataBtn: 'importDataBtn',
+            exportDataBtn: 'exportDataBtn',
+            importFileInput: 'importFileInput',
 
             // Tour elements
             tourOverlay: 'tourOverlay',
@@ -239,7 +248,6 @@ class ParlayTracker {
             this.guideMeBtn.addEventListener('click', this.startTour.bind(this));
         }
 
-
         if (this.cancelClearBtn) {
             this.cancelClearBtn.addEventListener('click', this.hideConfirmationModal.bind(this));
         }
@@ -313,6 +321,16 @@ class ParlayTracker {
             });
         }
 
+        // Import/Export Button Event Listeners
+        if (this.exportDataBtn) {
+            this.exportDataBtn.addEventListener('click', this.exportParlayData.bind(this));
+        }
+        if (this.importDataBtn) {
+            this.importDataBtn.addEventListener('click', () => this.importFileInput.click()); // Trigger hidden file input click
+        }
+        if (this.importFileInput) {
+            this.importFileInput.addEventListener('change', this.handleImportFileSelect.bind(this));
+        }
 
         // Tour navigation buttons
         if (this.tourNextBtn) {
@@ -353,7 +371,6 @@ class ParlayTracker {
             this.filterToDate = localStorage.getItem(ParlayTracker.STORAGE_KEYS.DATE_FILTER_TO) || '';
             this.currentTimelineSummaryText = localStorage.getItem(ParlayTracker.STORAGE_KEYS.TIMELINE_SUMMARY_TEXT) || 'All Time';
 
-
             if (this.filterFromDateInput) {
                 this.filterFromDateInput.value = this.filterFromDate;
             }
@@ -363,7 +380,6 @@ class ParlayTracker {
             if (this.currentTimelineDisplay) {
                 this.currentTimelineDisplay.textContent = this.currentTimelineSummaryText;
             }
-
 
         } catch (error) {
             console.error("Error loading data from localStorage:", error);
@@ -517,15 +533,15 @@ class ParlayTracker {
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-0.5">Result</label>
                 <select class="prop-result mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-800">
-                    <option value="Win" ${result === 'Win' ? 'selected' : ''}>Win</option>
-                    <option value="Loss" ${result === 'Loss' ? 'selected' : ''}>Loss</option>
-                    <option value="Push" ${result === 'Push' ? 'selected' : ''}>Push</option>
-                </select>
-            </div>
-            <div class="flex items-end">
-                <button type="button" class="remove-prop-btn bg-gray-200 text-gray-800 w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-300 transition-all duration-200" aria-label="Remove player/team bet">-</button>
-            </div>
-        `;
+                            <option value="Win" ${result === 'Win' ? 'selected' : ''}>Win</option>
+                            <option value="Loss" ${result === 'Loss' ? 'selected' : ''}>Loss</option>
+                            <option value="Push" ${result === 'Push' ? 'selected' : ''}>Push</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" class="remove-prop-btn bg-gray-200 text-gray-800 w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-300 transition-all duration-200" aria-label="Remove player/team bet">-</button>
+                    </div>
+                `;
         this.playerPropInputsContainer.appendChild(div);
 
         const removeButton = div.querySelector('.remove-prop-btn');
@@ -713,6 +729,88 @@ class ParlayTracker {
         this.showConfirmationModal('Confirm Delete', 'Are you sure you want to delete this parlay entry? This action cannot be undone.');
     }
 
+    /**
+     * Handles the selection of a file for import.
+     * Reads the file content and prompts for confirmation before importing.
+     * @param {Event} event - The change event from the file input.
+     */
+    handleImportFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            return;
+        }
+
+        if (file.type !== 'application/json') {
+            this.showInfoModal('Invalid File Type', 'Please select a JSON file.');
+            event.target.value = ''; // Clear the input
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                // Validate if it looks like parlay data
+                if (!Array.isArray(importedData) || !importedData.every(item => 'date' in item && 'amountWagered' in item)) {
+                    this.showInfoModal('Invalid Data Format', 'The JSON file does not appear to contain valid parlay data. Please ensure it follows the expected structure.');
+                    event.target.value = ''; // Clear the input
+                    return;
+                }
+
+                this.pendingAction = { type: 'import', data: importedData };
+                this.showConfirmationModal(
+                    'Confirm Data Import',
+                    'Importing data will REPLACE all your current parlay entries. Are you sure you want to proceed?',
+                    'confirm'
+                );
+            } catch (error) {
+                console.error('Error parsing JSON file:', error);
+                this.showInfoModal('File Read Error', 'Could not read the JSON file. It might be corrupted or not valid JSON.');
+            } finally {
+                event.target.value = ''; // Clear the input after processing
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    /**
+     * Executes the import of parlay data.
+     * Replaces existing data with imported data.
+     * @param {Array} data - The array of parlay objects to import.
+     */
+    executeImportParlayData(data) {
+        this.saveStateForUndo(); // Save current state before overwriting
+        this.parlays = data;
+        this.saveData();
+        this.renderParlays();
+        this.updateSummary();
+        this.resetForm();
+        this.showInfoModal('Import Successful', 'Parlay data has been successfully imported and replaced your existing data.');
+    }
+
+    /**
+     * Exports the current parlay data as a JSON file.
+     */
+    exportParlayData() {
+        if (this.parlays.length === 0) {
+            this.showInfoModal('No Data to Export', 'There is no parlay data to export yet. Add some entries first!');
+            return;
+        }
+        const dataStr = JSON.stringify(this.parlays, null, 2); // Pretty print JSON
+
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'parlay_history.json'; // Suggested filename
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // Clean up
+        this.showInfoModal('Export Successful', 'Your parlay data has been exported as "parlay_history.json".');
+    }
+
     showConfirmationModal(title, message, type = 'confirm') {
         if (!this.confirmationModal || !this.confirmationModalTitle || !this.confirmationModalMessage) {
             console.error("Confirmation modal elements not found. Cannot show modal.");
@@ -745,7 +843,7 @@ class ParlayTracker {
     }
 
     showInfoModal(title, message) {
-        this.pendingAction = { type: 'info' };
+        this.pendingAction = { type: 'info' }; // Set pending action to info
         this.showConfirmationModal(title, message, 'info');
     }
 
@@ -755,29 +853,36 @@ class ParlayTracker {
         this.confirmationModal.classList.remove('show');
         this.confirmationModal.addEventListener('transitionend', () => {
             this.confirmationModal.classList.add('hidden');
+            // Reset button states for future confirmations
             if (this.cancelClearBtn) this.cancelClearBtn.classList.remove('hidden');
             if (this.confirmClearBtn) {
                 this.confirmClearBtn.textContent = 'Confirm';
                 this.confirmClearBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
                 this.confirmClearBtn.classList.add('bg-red-500', 'hover:bg-red-600');
             }
+            this.pendingAction = null; // Clear pending action after modal hides
         }, { once: true });
     }
 
     handleConfirmationClick() {
         const action = this.pendingAction;
-        this.hideConfirmationModal();
+        this.hideConfirmationModal(); // Hide modal first
 
-        if (action) {
-            if (action.type === 'clear') {
-                this.executeClearAllParlays();
-            } else if (action.type === 'delete' && typeof action.index === 'number') {
-                this.executeDeleteParlay(action.index);
-            } else if (action.type === 'info') {
-                // For info modals, just hiding is the action.
+        // Add a slight delay to allow modal to hide visually before executing
+        setTimeout(() => {
+            if (action) {
+                if (action.type === 'clear') {
+                    this.executeClearAllParlays();
+                } else if (action.type === 'delete' && typeof action.index === 'number') {
+                    this.executeDeleteParlay(action.index);
+                } else if (action.type === 'import' && action.data) {
+                    this.executeImportParlayData(action.data);
+                } else if (action.type === 'info') {
+                    // For info modals, just hiding is the action. No further execution needed.
+                }
             }
-            this.pendingAction = null;
-        }
+            this.pendingAction = null; // Clear pending action
+        }, 300); // Adjust delay as needed
     }
 
     executeClearAllParlays() {
@@ -1285,6 +1390,11 @@ class ParlayTracker {
                 element: this.themeToggle,
                 text: "Easily switch between light and dark modes here to suit your preference.",
                 position: 'left' // Position to the left of the button
+            },
+            {
+                element: this.importDataBtn,
+                text: "Use these buttons to import or export your parlay data as a JSON file, so you can back up your progress or move it to another device.",
+                position: 'bottom'
             }
         ].filter(step => step.element !== null); // Filter out steps where element might not be found
 
@@ -1403,28 +1513,47 @@ class ParlayTracker {
                 bubbleElement.classList.add('position-bottom');
         }
 
-        bubbleElement.style.top = `${top}px`;
-        bubbleElement.style.left = `${left}px`;
-        bubbleElement.style.transform = `translate(-50%, -50%)`; // Center bubble on its own calculated position
-        // Adjust for edge cases - ensure bubble stays on screen
-        if (left < 0) {
-            bubbleElement.style.left = `0px`;
-            bubbleElement.style.transform = `translate(0, -50%)`;
-            arrow.style.left = `${targetRect.left + targetRect.width / 2 - window.scrollX}px`; // Adjust arrow to point to center of target
+        // Adjust bubble position to try and keep it on screen
+        const bubbleFinalLeft = left - (bubbleRect.width / 2); // Calculate true left position of bubble's center
+        const bubbleFinalTop = top - (bubbleRect.height / 2); // Calculate true top position of bubble's center
+
+        // Clamp left to screen boundaries
+        let newLeft = Math.max(0, Math.min(bubbleFinalLeft, window.innerWidth - bubbleRect.width));
+
+        // Clamp top to screen boundaries
+        let newTop = Math.max(window.scrollY, Math.min(bubbleFinalTop, window.scrollY + window.innerHeight - bubbleRect.height));
+
+        bubbleElement.style.left = `${newLeft}px`;
+        bubbleElement.style.top = `${newTop}px`;
+        bubbleElement.style.transform = `none`; // Reset transform as we're setting absolute positions
+
+        // Re-position arrow based on where the bubble ended up relative to target
+        const arrowOffsetLeft = (targetRect.left + targetRect.width / 2) - newLeft;
+        const arrowOffsetTop = (targetRect.top + targetRect.height / 2) - newTop;
+
+        switch (position) {
+            case 'bottom': // Arrow on top of bubble, points down to target
+                arrow.style.top = `0`;
+                arrow.style.left = `${arrowOffsetLeft}px`;
+                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
+                break;
+            case 'top': // Arrow on bottom of bubble, points up to target
+                arrow.style.top = `${bubbleRect.height}px`;
+                arrow.style.left = `${arrowOffsetLeft}px`;
+                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
+                break;
+            case 'left': // Arrow on right of bubble, points left to target
+                arrow.style.top = `${arrowOffsetTop}px`;
+                arrow.style.left = `${bubbleRect.width}px`;
+                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
+                break;
+            case 'right': // Arrow on left of bubble, points right to target
+                arrow.style.top = `${arrowOffsetTop}px`;
+                arrow.style.left = `0`;
+                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
+                break;
         }
-        if (left + bubbleRect.width > window.innerWidth) {
-            bubbleElement.style.left = `${window.innerWidth - bubbleRect.width}px`;
-            bubbleElement.style.transform = `translate(0, -50%)`;
-            arrow.style.left = `${targetRect.left + targetRect.width / 2 - (window.innerWidth - bubbleRect.width)}px`;
-        }
-        if (top < window.scrollY) {
-                bubbleElement.style.top = `${window.scrollY}px`;
-                bubbleElement.style.transform = `translate(-50%, 0)`;
-        }
-        if (top + bubbleRect.height > window.innerHeight + window.scrollY) {
-            bubbleElement.style.top = `${window.innerHeight + window.scrollY - bubbleRect.height}px`;
-            bubbleElement.style.transform = `translate(-50%, 0)`;
-        }
+
     }
 
 
