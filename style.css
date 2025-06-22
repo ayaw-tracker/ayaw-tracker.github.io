@@ -1,10 +1,10 @@
 /* ==========================================================================
-   PARLAY BETTING APP STYLES
-   ========================================================================== */
+    PARLAY BETTING APP STYLES
+    ========================================================================== */
 
 /* ==========================================================================
-   BASE STYLES
-   ========================================================================== */
+    BASE STYLES
+    ========================================================================== */
 
 html, body {
     height: 100%; /* Ensure HTML and Body take full viewport height */
@@ -26,8 +26,8 @@ body.dark {
 }
 
 /* ==========================================================================
-   LAYOUT COMPONENTS
-   ========================================================================== */
+    LAYOUT COMPONENTS
+    ========================================================================== */
 
 .container {
     max-width: 1024px;
@@ -60,8 +60,8 @@ body.dark section.bg-gray-50 p {
 }
 
 /* ==========================================================================
-   FORM COMPONENTS
-   ========================================================================== */
+    FORM COMPONENTS
+    ========================================================================== */
 
 /* Parlay Input Form section */
 .parlay-section {
@@ -144,8 +144,8 @@ body.dark .remove-prop-btn:hover {
 }
 
 /* ==========================================================================
-   BUTTON COMPONENTS
-   ========================================================================== */
+    BUTTON COMPONENTS
+    ========================================================================== */
 
 .btn-primary {
     transition: all 0.2s ease;
@@ -183,9 +183,43 @@ body.dark #clearAllBtn:hover {
     background-color: #dc2626;
 }
 
+/* New styles for import/export buttons */
+.action-btn {
+    background-color: #3b82f6; /* A nice blue, matching other primary actions */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 0.375rem; /* Equivalent to Tailwind's rounded-md */
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500; /* Medium font weight */
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    display: flex; /* Allow icon and text to sit side-by-side */
+    align-items: center; /* Vertically center icon and text */
+    gap: 0.5rem; /* Space between icon and text */
+}
+
+.action-btn:hover {
+    background-color: #2563eb; /* Darker blue on hover */
+    transform: translateY(-1px); /* Slight lift effect */
+    box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2); /* Subtle shadow on hover */
+}
+
+/* Dark mode specific styles for action buttons */
+body.dark .action-btn {
+    background-color: #63b3ed; /* Lighter blue for dark mode */
+    color: #1a202c; /* Darker text for contrast */
+}
+
+body.dark .action-btn:hover {
+    background-color: #4299e1; /* Even lighter blue on hover */
+    box-shadow: 0 2px 5px rgba(99, 179, 237, 0.3);
+}
+
+
 /* ==========================================================================
-   CARD COMPONENTS
-   ========================================================================== */
+    CARD COMPONENTS
+    ========================================================================== */
 
 /* Card Grid Layout */
 .parlay-card-grid {
@@ -309,8 +343,8 @@ body.dark .parlay-card-bets li::before {
 }
 
 /* ==========================================================================
-   SUMMARY STATISTICS
-   ========================================================================== */
+    SUMMARY STATISTICS
+    ========================================================================== */
 
 /* Summary Statistics section */
 body.dark section.bg-blue-100 { /* TARGETING bg-blue-100 for dark mode */
@@ -347,8 +381,32 @@ body.dark .text-yellow-700 { /* Used for 'Pushes' count in summary */
 
 
 /* ==========================================================================
-   PARLAY HISTORY
-   ========================================================================== */
+    PARLAY HISTORY
+    ========================================================================== */
+
+/* Parlay History section header for import/export buttons */
+.parlay-history-header {
+    display: flex; /* Enables Flexbox */
+    justify-content: space-between; /* Pushes content to the ends: title left, buttons right */
+    align-items: center; /* Vertically centers items */
+    margin-bottom: 1.5rem; /* Space between header and table/cards */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 1rem; /* Space between title and buttons if they wrap */
+}
+
+.parlay-history-header h2 {
+    margin: 0; /* Remove default margin */
+    /* On small screens, keep the h2 above the buttons if needed */
+    /* For medium screens and up, Tailwind's md:mb-0 handles top margin */
+}
+
+.parlay-actions {
+    display: flex; /* Arrange buttons side-by-side */
+    gap: 0.75rem; /* Space between the buttons */
+    /* Ensures buttons are aligned to the right, even when wrapped */
+    margin-left: auto; 
+}
+
 
 /* Parlay History section */
 body.dark section.bg-white { /* This is the specific section using bg-white in light mode */
@@ -385,8 +443,8 @@ body.dark .text-yellow-600 {
 
 
 /* ==========================================================================
-   MODAL COMPONENTS
-   ========================================================================= */
+    MODAL COMPONENTS
+    ========================================================================= */
 
 .modal-overlay {
     position: fixed;
@@ -459,8 +517,8 @@ body.dark #confirmClearBtn.bg-blue-600:hover {
 }
 
 /* ==========================================================================
-   FEATURE TOUR (GUIDANCE BUBBLES)
-   ========================================================================= */
+    FEATURE TOUR (GUIDANCE BUBBLES)
+    ========================================================================= */
 
 #tourOverlay {
     top: 0;
@@ -515,8 +573,8 @@ body.dark #confirmClearBtn.bg-blue-600:hover {
 
 
 /* ==========================================================================
-   ANIMATIONS
-   ========================================================================== */
+    ANIMATIONS
+    ========================================================================== */
 
 @keyframes slideIn {
     to {
