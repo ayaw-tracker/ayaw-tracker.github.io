@@ -77,6 +77,9 @@ body.dark .parlay-section {
 body.dark .parlay-section summary {
     color: #e2e8f0; /* Light text for summary */
 }
+body.dark .parlay-section h3 { /* Added for improved visibility of h3 elements in dark mode parlay sections */
+    color: #e2e8f0; /* Light text for headings within dark form sections */
+}
 body.dark .parlay-section summary h3 {
     color: #e2e8f0; /* Light text for summary heading */
 }
