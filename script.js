@@ -1000,7 +1000,8 @@ class ParlayTracker {
             totalCountForSuccess = totalWins + totalLosses + totalPushes;
             successfulCount = totalWins;
         } else if (this.currentSuccessCalcMethod === 'individualBets') {
-            totalCountForSuccess = individualBetWins + individualBetLosses + individualBetPushes;
+            // For individual props, typically success rate excludes pushes from the total considered
+            totalCountForSuccess = individualBetWins + individualBetLosses;
             successfulCount = individualBetWins;
         }
 
@@ -1008,7 +1009,8 @@ class ParlayTracker {
         if (totalCountForSuccess > 0) {
             successPercentage = (successfulCount / totalCountForSuccess) * 100;
         }
-        this.successPercentageSpan.textContent = `${successPercentage.toFixed(2)}%`;
+        // Removed the '%' as it's already in the HTML
+        this.successPercentageSpan.textContent = `${successPercentage.toFixed(2)}`;
     }
 
     handleSuccessCalcChange() {
