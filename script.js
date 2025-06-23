@@ -9,7 +9,8 @@ class ParlayTracker {
         THEME: 'theme',
         DATE_FILTER_FROM: 'dateFilterFrom',
         DATE_FILTER_TO: 'dateFilterTo',
-        TIMELINE_SUMMARY_TEXT: 'timelineSummaryText' // New key for timeline summary
+        TIMELINE_SUMMARY_TEXT: 'timelineSummaryText',
+        USER_CONSENT: 'userConsent' // <-- Added this line as requested
     };
 
     constructor() {
@@ -97,6 +98,10 @@ class ParlayTracker {
         this.tourFinishBtn = null;
         this.tourBubbleArrow = null;
 
+        // Consent buttons
+        this.keepLocalBtn = null;    // Initialized to null here
+        this.participateBtn = null;  // Initialized to null here
+
         this.init();
     }
 
@@ -170,7 +175,11 @@ class ParlayTracker {
             tourNextBtn: 'tourNextBtn',
             tourSkipBtn: 'tourSkipBtn',
             tourFinishBtn: 'tourFinishBtn',
-            tourBubbleArrow: 'tourBubbleArrow'
+            tourBubbleArrow: 'tourBubbleArrow',
+
+            // Consent buttons (added as requested)
+            keepLocalBtn: 'keepLocalBtn',
+            participateBtn: 'participateBtn',
         };
 
         Object.entries(elementsMap).forEach(([propertyName, id]) => {
@@ -248,6 +257,13 @@ class ParlayTracker {
         }
         if (this.guideMeBtn) {
             this.guideMeBtn.addEventListener('click', this.startTour.bind(this));
+        }
+        // Consent buttons event listeners (added as requested)
+        if (this.keepLocalBtn) {
+            this.keepLocalBtn.addEventListener('click', () => this.handleConsent('local'));
+        }
+        if (this.participateBtn) {
+            this.participateBtn.addEventListener('click', () => this.handleConsent('participate'));
         }
 
         if (this.cancelClearBtn) {
@@ -534,15 +550,15 @@ class ParlayTracker {
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-0.5">Result</label>
                 <select class="prop-result mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-800">
-                            <option value="Win" ${result === 'Win' ? 'selected' : ''}>Win</option>
-                            <option value="Loss" ${result === 'Loss' ? 'selected' : ''}>Loss</option>
-                            <option value="Push" ${result === 'Push' ? 'selected' : ''}>Push</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button type="button" class="remove-prop-btn bg-gray-200 text-gray-800 w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-300 transition-all duration-200" aria-label="Remove player/team bet">-</button>
-                    </div>
-                `;
+                                <option value="Win" ${result === 'Win' ? 'selected' : ''}>Win</option>
+                                <option value="Loss" ${result === 'Loss' ? 'selected' : ''}>Loss</option>
+                                <option value="Push" ${result === 'Push' ? 'selected' : ''}>Push</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button type="button" class="remove-prop-btn bg-gray-200 text-gray-800 w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-300 transition-all duration-200" aria-label="Remove player/team bet">-</button>
+                        </div>
+                    `;
         this.playerPropInputsContainer.appendChild(div);
 
         const removeButton = div.querySelector('.remove-prop-btn');
@@ -1358,13 +1374,15 @@ class ParlayTracker {
             console.warn("Welcome modal element not found, welcome modal functionality skipped.");
             return;
         }
-        const hasVisited = localStorage.getItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED);
-        if (!hasVisited) {
+        // Only show if user consent has not been recorded yet
+        const hasUserConsent = localStorage.getItem(ParlayTracker.STORAGE_KEYS.USER_CONSENT);
+        if (!hasUserConsent) {
             this.welcomeModal.classList.remove('hidden');
             setTimeout(() => {
                 this.welcomeModal.classList.add('show');
             }, 10);
-            localStorage.setItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED, 'true');
+            // Do NOT set HAS_VISITED here, as user hasn't made a choice yet.
+            // HAS_VISITED should be set after they interact with the welcome modal.
         }
     }
 
@@ -1373,6 +1391,8 @@ class ParlayTracker {
         this.welcomeModal.classList.remove('show');
         this.welcomeModal.addEventListener('transitionend', () => {
             this.welcomeModal.classList.add('hidden');
+            // Set HAS_VISITED only after the modal is closed, indicating interaction.
+            localStorage.setItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED, 'true');
         }, { once: true });
     }
 
@@ -1607,6 +1627,25 @@ class ParlayTracker {
         if (this.tourBubble) this.tourBubble.classList.add('hidden');
         if (this.tourNextBtn) this.tourNextBtn.classList.remove('hidden'); // Reset for next time
         if (this.tourFinishBtn) this.tourFinishBtn.classList.add('hidden'); // Reset for next time
+    }
+
+    // Add the consent handler method to your ParlayTracker class:
+    handleConsent(type) {
+        localStorage.setItem(ParlayTracker.STORAGE_KEYS.USER_CONSENT, type);
+        this.closeWelcomeModal();
+        if (type === 'participate') {
+            // Initialize Firebase or trigger data sharing here
+            this.enableFirebaseAnalytics();
+        }
+        // If 'local', nothing else is needed
+    }
+
+    // Placeholder for Firebase logic (implement your Firebase integration here)
+    enableFirebaseAnalytics() {
+        // TODO: Add your Firebase analytics integration here
+        // Example: firebase.analytics().logEvent('user_participated');
+        // You can initialize Firebase SDK here if not already initialized.
+        console.log("Firebase analytics enabled (placeholder).");
     }
 }
 
