@@ -1,364 +1,605 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Are You Actually Winning?</title>
-    <!-- Tailwind CSS CDN for utility classes -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Custom Stylesheet -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="bg-gray-100 p-4 sm:p-6 md:p-8 text-gray-800">
-    <div class="container bg-white relative">
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <!-- Theme Toggle Button -->
-            <button id="themeToggle" class="absolute top-4 right-4 p-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300" aria-label="Toggle light and dark mode">
-                <i class="fas fa-sun text-xl"></i>
-            </button>
+/* ==========================================================================
+   PARLAY BETTING APP STYLES
+   ========================================================================== */
 
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
-                Are You Actually Winning?
-            </h1>
-            <p class="text-gray-600">
-                Track your parlay betting performance honestly
-            </p>
-        </header>
+/* ==========================================================================
+   BASE STYLES
+   ========================================================================== */
 
-        <!-- Mission Statement -->
-        <section class="bg-gray-50 p-6 rounded-lg shadow-sm mb-8 text-center">
-            <p class="text-gray-700 text-lg font-medium">
-                The truth is in the numbers. Let your data tell the story.
-            </p>
-        </section>
+html, body {
+    height: 100%; /* Ensure HTML and Body take full viewport height */
+    min-height: 100vh; /* Ensure minimum viewport height */
+    margin: 0; /* Remove default body margin */
+    padding: 0; /* Remove default body padding */
+}
 
-        <!-- Parlay Input Form -->
-        <details class="parlay-section bg-white p-6 rounded-lg shadow-sm mb-8">
-            <summary class="cursor-pointer flex justify-center items-center text-2xl font-semibold text-gray-700 mb-4"
-                     aria-controls="parlayFormContent" aria-expanded="false">
-                Add New Parlay
-            </summary>
-            
-            <div class="parlay-content" id="parlayFormContent">
-                <form id="parlayForm" class="space-y-6">
-                    <!-- Overall Parlay Details -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <!-- Date (middle top) -->
-                        <div class="col-span-full flex justify-center">
-                            <div class="w-full sm:w-1/2 lg:w-1/3">
-                                <label for="date" class="block text-sm font-medium text-gray-700 mb-1 text-center">
-                                    Date
-                                </label>
-                                <input type="date" 
-                                       id="date" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
-                                       required>
-                                <span class="text-red-500 text-xs mt-1 hidden" id="dateError"></span>
-                            </div>
-                        </div>
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6; /* Light mode default background */
+    color: #4a5568; /* Light mode default text color */
+}
 
-                        <!-- Parlay Result -->
-                        <div class="col-span-1 lg:col-span-2">
-                            <label for="result" class="block text-sm font-medium text-gray-700 mb-1">
-                                Parlay Result
-                            </label>
-                            <select id="result" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-                                <option value="Win">Win</option>
-                                <option value="Loss">Loss</option>
-                                <option value="Push">Push</option>
-                            </select>
-                            <span class="text-red-500 text-xs mt-1 hidden" id="resultError"></span>
-                        </div>
-                        
-                        <!-- Payout Type -->
-                        <div class="col-span-1 lg:col-span-2">
-                            <label for="playType" class="block text-sm font-medium text-gray-700 mb-1">
-                                Payout Type
-                            </label>
-                            <select id="playType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-                                <option value="Power">Power Play</option>
-                                <option value="Flex">Flex Play</option>
-                            </select>
-                            <span class="text-red-500 text-xs mt-1 hidden" id="playTypeError"></span>
-                        </div>
-                        
-                        <!-- Amount Wagered -->
-                        <div class="col-span-1 lg:col-span-2">
-                            <label for="amountWagered" class="block text-sm font-medium text-gray-700 mb-1">
-                                Amount Wagered ($)
-                            </label>
-                            <input type="number" 
-                                       id="amountWagered" 
-                                       step="0.01" 
-                                       min="0" 
-                                       placeholder="0.00" 
-                                       class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-                            <span class="text-red-500 text-xs mt-1 hidden" id="amountWageredError"></span>
-                        </div>
-                        
-                        <!-- Amount Won/Loss -->
-                        <div class="col-span-1 lg:col-span-2">
-                            <label for="amountWonLoss" class="block text-sm font-medium text-gray-700 mb-1">
-                                Amount Won/Loss ($)
-                            </label>
-                            <input type="number" 
-                                       id="amountWonLoss" 
-                                       step="0.01" 
-                                       placeholder="0.00" 
-                                       class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-                            <span class="text-red-500 text-xs mt-1 hidden" id="amountWonLossError"></span>
-                        </div>
-                    </div>
+/* Dark Mode Styles - Softer Palette */
+body.dark {
+    background-color: #23272f; /* Softer dark background */
+    color: #e2e8f0; /* Light text */
+}
 
-                    <!-- Individual Bets Section -->
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-700 mb-3">
-                            Individual Player/Team Bets
-                        </label>
-                        <div id="playerPropInputs" class="space-y-3 mb-4">
-                            <!-- Dynamic player prop inputs will be added here -->
-                        </div>
-                        <button type="button" 
-                                id="addPlayerPropBtn" 
-                                class="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out">
-                            + Add Player/Team Bet
-                        </button>
-                        <span class="text-red-500 text-xs mt-1 hidden" id="individualBetsError"></span>
-                    </div>
+/* ==========================================================================
+   LAYOUT COMPONENTS
+   ========================================================================== */
 
-                    <!-- Submit Button -->
-                    <div class="flex justify-end">
-                        <button type="submit" 
-                                id="submitBtn" 
-                                class="bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
-                            Add Parlay Entry
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </details>
+.container {
+    max-width: 1024px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: #ffffff; /* Light mode container background */
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-        <!-- Summary Statistics -->
-        <section class="bg-blue-100 p-6 rounded-lg shadow-sm mb-8">
-            <h2 class="text-2xl font-semibold text-blue-800 mb-4">
-                Summary Statistics
-            </h2>
-            
-            <!-- Timeline Filters (Collapsible) -->
-            <details id="timelineDetails" class="parlay-section bg-white p-4 rounded-lg mb-6 shadow-sm">
-                <summary class="cursor-pointer flex justify-between items-center text-lg font-semibold text-gray-700">
-                    <span>Timeline</span>
-                    <span id="currentTimelineDisplay" class="text-sm font-normal text-gray-500 ml-2">All Time</span>
-                </summary>
-                
-                <div class="timeline-content mt-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0 mb-4">
-                        <div class="flex-1">
-                            <label for="filterFromDate" class="block text-sm font-medium text-gray-700 mb-1">From Date:</label>
-                            <input type="date" id="filterFromDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-                            <span class="text-red-500 text-xs mt-1 hidden" id="dateFilterError"></span>
-                        </div>
-                        <div class="flex-1">
-                            <label for="filterToDate" class="block text-sm font-medium text-gray-700 mb-1">To Date:</label>
-                            <input type="date" id="filterToDate" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-                        </div>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Quick Views:</h3>
-                    <div class="flex flex-wrap gap-2 justify-center">
-                        <button id="filterLast7Days" class="bg-blue-200 text-blue-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-300 transition-colors duration-200">Last 7 Days</button>
-                        <button id="filterLast30Days" class="bg-blue-200 text-blue-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-300 transition-colors duration-200">Last 30 Days</button>
-                        <button id="clearDateFilterBtn" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition-colors duration-200">Clear Custom Dates</button>
-                    </div>
-                </div>
-            </details>
+body.dark .container {
+    background-color: #303640; /* Softer dark container background */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Darker shadow */
+}
 
-            <!-- Statistics Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-blue-700 mb-6">
-                <div class="bg-white p-4 rounded-lg">
-                    <p class="text-sm text-blue-600 mb-1">Total Wagered</p>
-                    <p class="text-2xl font-bold">$<span id="totalWagered">0.00</span></p>
-                </div>
-                
-                <div class="bg-white p-4 rounded-lg">
-                    <p class="text-sm text-blue-600 mb-1">Net Profit/Loss</p>
-                    <p class="text-2xl font-bold">$<span id="netProfitLoss">0.00</span></p>
-                </div>
-                
-                <div class="bg-white p-4 rounded-lg">
-                    <p class="text-sm text-blue-600 mb-1">Total Parlays</p>
-                    <p class="text-2xl font-bold"><span id="totalParlays">0</span></p>
-                </div>
-                
-                <div class="bg-white p-4 rounded-lg">
-                    <p class="text-sm text-green-600 mb-1">Wins</p>
-                    <p class="text-xl font-bold text-green-700"><span id="totalWins">0</span></p>
-                </div>
-                
-                <div class="bg-white p-4 rounded-lg">
-                    <p class="text-sm text-red-600 mb-1">Losses</p>
-                    <p class="text-xl font-bold text-red-700"><span id="totalLosses">0</span></p>
-                </div>
-                
-                <div class="bg-white p-4 rounded-lg">
-                    <p class="text-sm text-yellow-600 mb-1">Pushes</p>
-                    <p class="text-xl font-bold text-yellow-700"><span id="totalPushes">0</span></p>
-                </div>
-            </div>
+/* Header elements */
+body.dark header h1 {
+    color: #e2e8f0; /* Light text for dark mode header */
+}
+body.dark header p {
+    color: #cbd5e0; /* Slightly darker light text for dark mode header */
+}
 
-            <!-- Success Rate -->
-            <div class="bg-white p-4 rounded-lg mb-6">
-                <label for="successPercentageCalc" class="block text-sm font-medium text-blue-700 mb-2">
-                    Success Rate
-                </label>
-                <!-- Added flex-wrap for better mobile responsiveness -->
-                <div class="flex items-center space-x-3 flex-wrap"> 
-                    <select id="successPercentageCalc" 
-                               class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800">
-                        <option value="parlays">Parlays</option>
-                        <option value="individualBets">Individual Props</option>
-                    </select>
-                    <p class="text-2xl font-bold text-blue-900">
-                        <span id="successPercentage">0.00</span>%
-                    </p>
-                </div>
-            </div>
+/* Mission statement section */
+body.dark section.bg-gray-50 {
+    background-color: #383e47; /* Softer background for mission statement */
+}
+body.dark section.bg-gray-50 p {
+    color: #cbd5e0; /* Light text for mission statement */
+}
 
-            <!-- Clear All Button -->
-            <div class="text-center">
-                <button id="clearAllBtn" 
-                               class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out">
-                    Clear All Entries
-                </button>
-            </div>
-        </section>
+/* ==========================================================================
+   FORM COMPONENTS
+   ========================================================================== */
 
-        <!-- Parlay History -->
-        <section class="bg-white p-6 rounded-lg shadow-sm">
-            <!-- New div for Parlay History header and buttons -->
-            <div class="parlay-history-header">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4 md:mb-0">
-                    Parlay History
-                </h2>
-                <div class="parlay-actions">
-                    <button id="importDataBtn" class="action-btn">
-                        <i class="fas fa-upload mr-2"></i>Import
-                    </button>
-                    <!-- Updated Export Buttons -->
-                    <button id="exportCsvBtn" class="action-btn">
-                        <i class="fas fa-file-csv mr-2"></i>Export CSV
-                    </button>
-                    <button id="exportJsonBtn" class="action-btn">
-                        <i class="fas fa-file-code mr-2"></i>Export JSON
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Hidden file input for import functionality -->
-            <input type="file" id="importFileInput" accept=".json" class="hidden">
+/* Parlay Input Form section */
+.parlay-section {
+    background-color: #ffffff; /* Light mode default */
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-            <!-- Desktop Table View -->
-            <div class="overflow-x-auto hidden md:block">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Date
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Result
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Type
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Wagered
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Won/Loss
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Individual Bets
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="parlayTableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- Parlay table entries will be dynamically added here -->
-                    </tbody>
-                </table>
-            </div>
+body.dark .parlay-section {
+    background-color: #303640; /* Softer dark background for form section */
+}
+body.dark .parlay-section summary {
+    color: #e2e8f0; /* Light text for summary */
+}
+body.dark .parlay-section h3 { /* General rule for h3 elements in dark mode parlay sections */
+    color: #e2e8f0; /* Light text for headings within dark form sections */
+}
+body.dark .parlay-section summary h3 {
+    color: #e2e8f0; /* Light text for summary heading */
+}
+body.dark .parlay-section .parlay-content {
+    border-top-color: #4a5568; /* Darker border */
+}
 
-            <!-- Mobile Card View -->
-            <div id="parlayHistoryContainer" class="parlay-card-grid block md:hidden">
-                <!-- Parlay cards will be dynamically added here -->
-            </div>
+/* Form inputs and labels */
+body.dark label {
+    color: #cbd5e0; /* Light text for labels */
+}
+body.dark input,
+body.dark select {
+    background-color: #4a505b; /* Softer dark input background */
+    border-color: #5b6270; /* Softer dark border */
+    color: #e2e8f0; /* Light text in inputs */
+}
+body.dark input::placeholder {
+    color: #a0aec0; /* Lighter placeholder text */
+}
+body.dark input:focus,
+body.dark select:focus {
+    border-color: #63b3ed; /* Brighter focus ring in dark mode */
+    --tw-ring-color: #63b3ed; /* Tailwind ring color for dark mode */
+}
+body.dark .text-red-500 {
+    color: #fca5a5; /* Adjust validation error color for dark mode */
+}
 
-            <!-- No Parlays Message -->
-            <div id="noParlaysMessage" class="text-center text-gray-500 py-12 hidden">
-                <p class="text-lg">No parlays tracked yet.</p>
-                <p class="text-sm">Add your first parlay above to get started!</p>
-            </div>
-        </section>
-    </div>
+/* Player Prop Form Rows */
+.player-prop-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) auto;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    align-items: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: slideIn 0.3s ease forwards;
+}
 
-    <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="confirmationModalTitle" aria-describedby="confirmationModalMessage">
-        <div class="modal-content">
-            <h3 id="confirmationModalTitle" class="text-2xl font-bold mb-4">Confirm Action</h3>
-            <p id="confirmationModalMessage" class="mb-6">Are you sure you want to proceed?</p>
-            <div class="flex justify-center space-x-4">
-                <button id="cancelClearBtn" class="bg-gray-200 text-gray-800 py-2 px-6 rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">Cancel</button>
-                <button id="confirmClearBtn" class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">Confirm</button>
-            </div>
-        </div>
-    </div>
+body.dark .player-prop-row {
+    background-color: #4a505b; /* Softer dark background for prop row */
+    border-color: #5b6270; /* Softer dark border */
+}
+body.dark .player-prop-row label {
+    color: #cbd5e0; /* Light text for labels in prop row */
+}
+body.dark .player-prop-row input,
+body.dark .player-prop-row select {
+    background-color: #303640; /* Softer dark input background in prop row */
+    border-color: #4a5568; /* Darker border */
+    color: #e2e8f0; /* Light text in inputs */
+}
+body.dark .remove-prop-btn {
+    background-color: #5b6270; /* Softer dark remove button background */
+    color: #e2e8f0; /* Light text for remove button */
+}
+body.dark .remove-prop-btn:hover {
+    background-color: #6d7688; /* Hover state for remove button */
+}
 
-    <!-- Welcome Modal -->
-    <div id="welcomeModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
-        <div class="modal-content">
-            <h3 id="welcomeModalTitle" class="text-2xl font-bold mb-4">"Are You Actually Winning?" - Your Reality Check</h3>
-            <p class="mb-6">
-                Most betting apps show you what you <strong>want</strong> to see. This one shows you what you <strong>need</strong> to see. "Are You Actually Winning?" is <strong>not a sharp tool, but a blunt object</strong> built for <strong>honest reflection</strong>.
-                We provide a space to cut through confirmation bias by providing a clear, unbiased view of your performance:
-            </p>
-            <ul class="text-left text-gray-700 mb-6 space-y-2 list-disc list-inside">
-                <li>Track every parlay, win or lose, to reveal your true net profit/loss.</li>
-                <li>Break down individual bet outcomes within parlays to pinpoint strengths and weaknesses.</li>
-                <li>Empower yourself with real data to make smarter decisions.</li>
-            </ul>
-            <p class="text-sm text-gray-600 mb-6">
-                This application uses anonymous data for personal research to support a Google Analytics certification. You'll see a consent form soon with more details about data usage.
-            </p>
-            <div class="flex justify-center space-x-4">
-                <button id="startTrackingBtn" class="bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
-                    Start Tracking My Bets
-                </button>
-                <button id="guideMeBtn" class="bg-gray-200 text-gray-800 py-2 px-6 rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out">
-                    Guide Me
-                </button>
-            </div>
-        </div>
-    </div>
+/* ==========================================================================
+   BUTTON COMPONENTS
+   ========================================================================== */
 
-    <!-- Feature Tour/Guidance Bubbles -->
-    <div id="tourOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-[999] hidden"></div>
-    <div id="tourBubble" class="absolute bg-blue-600 text-white p-4 rounded-lg shadow-xl z-[1000] max-w-xs transition-all duration-300 ease-in-out hidden">
-        <p id="tourBubbleText" class="mb-3"></p>
-        <div class="flex justify-between items-center">
-            <button id="tourSkipBtn" class="text-white text-sm opacity-75 hover:opacity-100 transition-opacity">Skip Tour</button>
-            <button id="tourNextBtn" class="bg-white text-blue-600 px-4 py-1.5 rounded-md text-sm font-semibold hover:bg-gray-100 transition-colors duration-200">Next &rarr;</button>
-            <button id="tourFinishBtn" class="bg-white text-blue-600 px-4 py-1.5 rounded-md text-sm font-semibold hover:bg-gray-100 transition-colors duration-200 hidden">Finish</button>
-        </div>
-        <div class="absolute w-4 h-4 bg-blue-600 rotate-45" id="tourBubbleArrow"></div>
-    </div>
+.btn-primary {
+    transition: all 0.2s ease;
+}
 
-    <script src="script.js"></script>
-</body>
-</html>
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Theme toggle button specific styles in dark mode */
+body.dark #themeToggle {
+    background-color: #5b6270; /* Softer dark background for toggle */
+    color: #e2e8f0;
+}
+body.dark #themeToggle:hover {
+    background-color: #6d7688; /* Softer hover state */
+}
+
+/* Form submit button in dark mode */
+body.dark #submitBtn {
+    background-color: #3b82f6; /* Keep original blue or adjust */
+    color: #ffffff;
+}
+body.dark #submitBtn:hover {
+    background-color: #2563eb;
+}
+
+/* Clear All button in dark mode */
+body.dark #clearAllBtn {
+    background-color: #ef4444; /* Keep original red or adjust */
+    color: #ffffff;
+}
+body.dark #clearAllBtn:hover {
+    background-color: #dc2626;
+}
+
+/* New styles for import/export buttons */
+.action-btn {
+    background-color: #3b82f6; /* A nice blue, matching other primary actions */
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 0.375rem; /* Equivalent to Tailwind's rounded-md */
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500; /* Medium font weight */
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    display: flex; /* Allow icon and text to sit side-by-side */
+    align-items: center; /* Vertically center icon and text */
+    gap: 0.5rem; /* Space between icon and text */
+}
+
+.action-btn:hover {
+    background-color: #2563eb; /* Darker blue on hover */
+    transform: translateY(-1px); /* Slight lift effect */
+    box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2); /* Subtle shadow on hover */
+}
+
+/* Dark mode specific styles for action buttons */
+body.dark .action-btn {
+    background-color: #63b3ed; /* Lighter blue for dark mode */
+    color: #1a202c; /* Darker text for contrast */
+}
+
+body.dark .action-btn:hover {
+    background-color: #4299e1; /* Even lighter blue on hover */
+    box-shadow: 0 2px 5px rgba(99, 179, 237, 0.3);
+}
+
+
+/* ==========================================================================
+   CARD COMPONENTS
+   ========================================================================== */
+
+/* Card Grid Layout */
+.parlay-card-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* Individual Cards */
+.parlay-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+body.dark .parlay-card {
+    background-color: #4a505b; /* Softer dark card background */
+    border-color: #5b6270; /* Softer dark border */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Darker shadow */
+}
+
+/* Card Summary Section */
+.parlay-card-summary {
+    cursor: pointer;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px dashed #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Arrow icon for mobile card summary - HIDDEN */
+.parlay-card-summary::after {
+    display: none; /* This line hides the arrow */
+}
+
+body.dark .parlay-card-summary {
+    border-bottom-color: #5b6270; /* Softer dark border */
+}
+body.dark .parlay-card-summary h3 {
+    color: #e2e8f0; /* Light text for card summary heading */
+}
+
+/* Card Details */
+.parlay-card-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+}
+
+body.dark .parlay-card-detail span {
+    color: #cbd5e0; /* Light text for card details */
+}
+body.dark .parlay-card-detail strong {
+    color: #e2e8f0; /* Lighter strong text for card details */
+}
+
+/* Card Actions */
+.parlay-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+body.dark .parlay-card-actions .edit-parlay-btn {
+    background-color: #6366f1; /* Adjusted indigo for dark mode */
+}
+body.dark .parlay-card-actions .edit-parlay-btn:hover {
+    background-color: #4338ca;
+}
+body.dark .parlay-card-actions .delete-parlay-btn {
+    background-color: #ef4444; /* Adjusted red for dark mode */
+}
+body.dark .parlay-card-actions .delete-parlay-btn:hover {
+    background-color: #dc2626;
+}
+
+
+/* Card Bets List */
+.parlay-card-bets ul {
+    margin-top: 0.5rem;
+    list-style: none;
+    padding-left: 0;
+}
+
+.parlay-card-bets li {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    padding-left: 1.25rem;
+    position: relative;
+}
+
+.parlay-card-bets li::before {
+    content: '•';
+    /* Original: color: #6b7280; in light mode */
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+body.dark .parlay-card-bets li {
+    /* Original: color: #cbd5e0; */
+    color: #e2e8f0; /* Changed for better contrast in dark mode */
+}
+body.dark .parlay-card-bets li::before {
+    /* Original: color: #a0aec0; */
+    color: #e2e8f0; /* Changed for better contrast in dark mode (match text) */
+}
+
+/* Card Toggle Details */
+.parlay-card-toggle-details.hidden {
+    display: none;
+}
+
+/* ==========================================================================
+   SUMMARY STATISTICS
+   ========================================================================== */
+
+/* Summary Statistics section */
+body.dark section.bg-blue-100 { /* TARGETING bg-blue-100 for dark mode */
+    background-color: #303640; /* Softer dark background for summary section */
+}
+body.dark section.bg-blue-100 h2 { /* TARGETING bg-blue-100 for dark mode */
+    color: #90cdf4; /* Lighter blue for heading */
+}
+body.dark section.bg-blue-100 .bg-white { /* TARGETING bg-blue-100 for dark mode */
+    background-color: #4a505b; /* Softer dark background for stat cards */
+    color: #e2e8f0; /* Light text */
+}
+body.dark section.bg-blue-100 .bg-white p { /* TARGETING bg-blue-100 for dark mode */
+    color: #cbd5e0; /* Slightly darker light text */
+}
+body.dark .text-blue-600 { /* Used for "Total Wagered", "Net Profit/Loss", "Total Parlays" in light mode */
+    color: #90cdf4; /* Adjust blue text for dark mode */
+}
+
+/* Specific color-coding for Wins/Losses/Pushes counts in dark mode */
+body.dark #netProfitLoss.text-green-600 { color: #8ce1a3; } /* Softer green for profit in dark mode */
+body.dark #netProfitLoss.text-red-600 { color: #ff9191; } /* Softer red for loss in dark mode */
+body.dark #netProfitLoss.text-yellow-600 { color: #ffe082; } /* Softer yellow for push in dark mode */
+
+body.dark .text-green-700 { /* Used for 'Wins' count in summary */
+    color: #8ce1a3; /* Softer green for dark mode Wins */
+}
+body.dark .text-red-700 { /* Used for 'Losses' count in summary */
+    color: #ff9190; /* Softer red for dark mode Losses */
+}
+body.dark .text-yellow-700 { /* Used for 'Pushes' count in summary */
+    color: #ffe082; /* Softer yellow for dark mode Pushes */
+}
+
+
+/* ==========================================================================
+   PARLAY HISTORY (Updated for mobile button alignment)
+   ========================================================================== */
+
+/* Parlay History section header for import/export buttons */
+.parlay-history-header {
+    display: flex; /* Enables Flexbox */
+    justify-content: space-between; /* Pushes content to the ends: title left, buttons right */
+    align-items: center; /* Vertically centers items */
+    margin-bottom: 1.5rem; /* Space between header and table/cards */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 1rem; /* Space between title and buttons if they wrap */
+}
+
+.parlay-history-header h2 {
+    margin: 0; /* Remove default margin */
+    /* On small screens, keep the h2 above the buttons if needed */
+    flex-basis: 100%; /* Force h2 to take full width on wrap */
+    text-align: center; /* Center the title on wrap */
+}
+
+.parlay-actions {
+    display: flex; /* Arrange buttons side-by-side */
+    gap: 0.75rem; /* Space between the buttons */
+    flex-wrap: wrap; /* IMPORTANT: Allow buttons to wrap to the next line */
+    justify-content: center; /* IMPORTANT: Center buttons when they wrap */
+    margin-left: 0; /* Override previous margin-left */
+    width: 100%; /* Take full width on mobile to allow proper centering/wrapping */
+}
+
+
+/* Parlay History section */
+body.dark section.bg-white { /* This is the specific section using bg-white in light mode */
+    background-color: #303640; /* Softer dark background for history section */
+}
+body.dark section.bg-white h2 {
+    color: #e2e8f0; /* Light text for heading */
+}
+body.dark table {
+    background-color: #303640; /* Softer dark table background */
+    color: #e2e8f0; /* Light text for table */
+}
+body.dark table thead th {
+    background-color: #4a505b; /* Softer dark table header background */
+    color: #cbd5e0; /* Light text for table headers */
+}
+body.dark table tbody td {
+    color: #e2e8f0; /* Light text for table cells */
+    border-color: #5b6270; /* Softer dark table borders */
+}
+body.dark table tbody tr {
+    background-color: #303640; /* Softer dark table row background */
+}
+/* Re-applying these to ensure they work in history table/cards for individual bets */
+body.dark .text-green-600 {
+    color: #8ce1a3; /* Adjusted green for dark mode */
+}
+body.dark .text-red-600 {
+    color: #ff9191; /* Adjusted red for dark mode */
+}
+body.dark .text-yellow-600 {
+    color: #ffe082; /* Adjusted yellow for dark mode */
+}
+
+
+/* ==========================================================================
+   MODAL COMPONENTS
+   ========================================================================= */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0; /* Ensures full width */
+    bottom: 0; /* Ensures full height */
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border: 1px solid #e5e7eb;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease-in-out;
+    color: #1f2937;
+}
+
+body.dark .modal-content {
+    background-color: #303640; /* Softer dark modal background */
+    border-color: #4a5568; /* Darker modal border */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); /* Darker modal shadow */
+}
+body.dark .modal-content h3 {
+    color: #e2e8f0; /* Light text for modal heading */
+}
+body.dark .modal-content p {
+    color: #cbd5e0; /* Light text for modal paragraphs */
+}
+body.dark #cancelClearBtn {
+    background-color: #5b6270; /* Adjusted gray for dark mode cancel button */
+    color: #e2e8f0;
+}
+body.dark #cancelClearBtn:hover {
+    background-color: #6d7688;
+}
+/* Confirmation modal's confirm button (red) */
+body.dark #confirmClearBtn.bg-red-500 {
+    background-color: #ef4444; /* Keep original red or adjust for dark mode */
+}
+body.dark #confirmClearBtn.bg-red-500:hover {
+    background-color: #dc2626;
+}
+/* Info modal's OK button (blue) */
+body.dark #confirmClearBtn.bg-blue-600 {
+    background-color: #3b82f6; /* Keep original blue or adjust for dark mode */
+}
+body.dark #confirmClearBtn.bg-blue-600:hover {
+    background-color: #2563eb;
+}
+
+/* ==========================================================================
+   FEATURE TOUR (GUIDANCE BUBBLES)
+   ========================================================================= */
+
+#tourOverlay {
+    position: fixed;
+    inset: 0; /* top, left, right, bottom: 0 */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+}
+#tourOverlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+#tourBubble {
+    /* Base styling inherited from HTML - Tailwind */
+    position: absolute;
+    transform: translate(-50%, -100%); /* Default to top-center positioning, adjust with JS */
+    pointer-events: auto; /* Allow clicks on the bubble */
+    z-index: 1000;
+}
+
+#tourBubbleArrow {
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    background-color: inherit; /* Inherit color from parent bubble */
+    z-index: -1; /* Behind the bubble content */
+    top: 100%; /* Position at the bottom of the bubble */
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg); /* Center and rotate */
+    transform-origin: center;
+}
+
+#tourBubble.position-top #tourBubbleArrow {
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+#tourBubble.position-bottom #tourBubbleArrow {
+    top: -0.5rem; /* Adjust to sit above the bubble */
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg); /* Points upwards */
+}
+
+#tourBubble.position-left #tourBubbleArrow {
+    top: 50%;
+    left: 100%;
+    transform: translate(-50%, -50%) rotate(45deg); /* Points left */
+}
+
+#tourBubble.position-right #tourBubbleArrow {
+    top: 50%;
+    left: -0.5rem; /* Adjust to sit left of the bubble */
+    transform: translate(-50%, -50%) rotate(45deg); /* Points right */
+}
+
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
