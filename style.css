@@ -1,10 +1,10 @@
 /* ==========================================================================
-    PARLAY BETTING APP STYLES
-    ========================================================================== */
+   PARLAY BETTING APP STYLES
+   ========================================================================== */
 
 /* ==========================================================================
-    BASE STYLES
-    ========================================================================== */
+   BASE STYLES
+   ========================================================================== */
 
 html, body {
     height: 100%; /* Ensure HTML and Body take full viewport height */
@@ -26,8 +26,8 @@ body.dark {
 }
 
 /* ==========================================================================
-    LAYOUT COMPONENTS
-    ========================================================================== */
+   LAYOUT COMPONENTS
+   ========================================================================== */
 
 .container {
     max-width: 1024px;
@@ -60,8 +60,8 @@ body.dark section.bg-gray-50 p {
 }
 
 /* ==========================================================================
-    FORM COMPONENTS
-    ========================================================================== */
+   FORM COMPONENTS
+   ========================================================================== */
 
 /* Parlay Input Form section */
 .parlay-section {
@@ -147,8 +147,8 @@ body.dark .remove-prop-btn:hover {
 }
 
 /* ==========================================================================
-    BUTTON COMPONENTS
-    ========================================================================== */
+   BUTTON COMPONENTS
+   ========================================================================== */
 
 .btn-primary {
     transition: all 0.2s ease;
@@ -221,8 +221,8 @@ body.dark .action-btn:hover {
 
 
 /* ==========================================================================
-    CARD COMPONENTS
-    ========================================================================== */
+   CARD COMPONENTS
+   ========================================================================== */
 
 /* Card Grid Layout */
 .parlay-card-grid {
@@ -346,8 +346,8 @@ body.dark .parlay-card-bets li::before {
 }
 
 /* ==========================================================================
-    SUMMARY STATISTICS
-    ========================================================================== */
+   SUMMARY STATISTICS
+   ========================================================================== */
 
 /* Summary Statistics section */
 body.dark section.bg-blue-100 { /* TARGETING bg-blue-100 for dark mode */
@@ -384,8 +384,8 @@ body.dark .text-yellow-700 { /* Used for 'Pushes' count in summary */
 
 
 /* ==========================================================================
-    PARLAY HISTORY
-    ========================================================================== */
+   PARLAY HISTORY (Updated for mobile button alignment)
+   ========================================================================== */
 
 /* Parlay History section header for import/export buttons */
 .parlay-history-header {
@@ -400,14 +400,17 @@ body.dark .text-yellow-700 { /* Used for 'Pushes' count in summary */
 .parlay-history-header h2 {
     margin: 0; /* Remove default margin */
     /* On small screens, keep the h2 above the buttons if needed */
-    /* For medium screens and up, Tailwind's md:mb-0 handles top margin */
+    flex-basis: 100%; /* Force h2 to take full width on wrap */
+    text-align: center; /* Center the title on wrap */
 }
 
 .parlay-actions {
     display: flex; /* Arrange buttons side-by-side */
     gap: 0.75rem; /* Space between the buttons */
-    /* Ensures buttons are aligned to the right, even when wrapped */
-    margin-left: auto; 
+    flex-wrap: wrap; /* IMPORTANT: Allow buttons to wrap to the next line */
+    justify-content: center; /* IMPORTANT: Center buttons when they wrap */
+    margin-left: 0; /* Override previous margin-left */
+    width: 100%; /* Take full width on mobile to allow proper centering/wrapping */
 }
 
 
@@ -446,8 +449,8 @@ body.dark .text-yellow-600 {
 
 
 /* ==========================================================================
-    MODAL COMPONENTS
-    ========================================================================= */
+   MODAL COMPONENTS
+   ========================================================================= */
 
 .modal-overlay {
     position: fixed;
@@ -520,15 +523,23 @@ body.dark #confirmClearBtn.bg-blue-600:hover {
 }
 
 /* ==========================================================================
-    FEATURE TOUR (GUIDANCE BUBBLES)
-    ========================================================================= */
+   FEATURE TOUR (GUIDANCE BUBBLES)
+   ========================================================================= */
 
 #tourOverlay {
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    position: fixed;
+    inset: 0; /* top, left, right, bottom: 0 */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
 }
+#tourOverlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
 
 #tourBubble {
     /* Base styling inherited from HTML - Tailwind */
@@ -576,8 +587,8 @@ body.dark #confirmClearBtn.bg-blue-600:hover {
 
 
 /* ==========================================================================
-    ANIMATIONS
-    ========================================================================== */
+   ANIMATIONS
+   ========================================================================== */
 
 @keyframes slideIn {
     to {
