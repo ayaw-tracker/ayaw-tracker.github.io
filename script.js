@@ -1,4 +1,3 @@
-// Parlay Tracker Application
 class ParlayTracker {
     // Static constants
     static MAX_UNDO_HISTORY = 10;
@@ -10,7 +9,7 @@ class ParlayTracker {
         DATE_FILTER_FROM: 'dateFilterFrom',
         DATE_FILTER_TO: 'dateFilterTo',
         TIMELINE_SUMMARY_TEXT: 'timelineSummaryText',
-        USER_CONSENT: 'userConsent' // <-- Added this line as requested
+        GA_CONSENT: 'gaConsent' // New key for Google Analytics consent
     };
 
     constructor() {
@@ -23,11 +22,6 @@ class ParlayTracker {
         this.filterFromDate = '';
         this.filterToDate = '';
         this.currentTimelineSummaryText = 'All Time'; // Default text for timeline summary
-
-        // Feature Tour properties
-        this.tourSteps = [];
-        this.currentTourStepIndex = 0;
-        this.isTourActive = false;
 
         // Initialize all element properties to null initially
         this.parlayForm = null;
@@ -53,8 +47,8 @@ class ParlayTracker {
         this.successPercentageCalcSelect = null;
         this.successPercentageSpan = null;
         this.welcomeModal = null;
-        this.startTrackingBtn = null; // New button for welcome modal
-        this.guideMeBtn = null; // New button for welcome modal
+        this.startTrackingBtn = null; // New button for welcome modal (original, now replaced by new buttons)
+        this.guideMeBtn = null; // New button for welcome modal (original, now replaced by new buttons)
         this.confirmationModal = null;
         this.confirmationModalTitle = null;
         this.confirmationModalMessage = null;
@@ -89,18 +83,10 @@ class ParlayTracker {
         this.exportJsonBtn = null; // Added for JSON export
         this.importFileInput = null;
 
-        // Tour elements
-        this.tourOverlay = null;
-        this.tourBubble = null;
-        this.tourBubbleText = null;
-        this.tourNextBtn = null;
-        this.tourSkipBtn = null;
-        this.tourFinishBtn = null;
-        this.tourBubbleArrow = null;
-
-        // Consent buttons
-        this.keepLocalBtn = null;    // Initialized to null here
-        this.participateBtn = null;  // Initialized to null here
+        // NEW: Welcome Modal Content & Buttons
+        this.welcomeModalContent = null;
+        this.welcomeModalParticipateBtn = null;
+        this.welcomeModalKeepLocalBtn = null;
 
         this.init();
     }
@@ -112,7 +98,6 @@ class ParlayTracker {
             this.attachEventListeners();
             this.loadData();
             this.initializeUI();
-            this.setupTourSteps(); // Setup tour steps after elements are initialized
         } catch (error) {
             console.error('Failed to initialize ParlayTracker:', error);
         }
@@ -143,8 +128,6 @@ class ParlayTracker {
             successPercentageCalcSelect: 'successPercentageCalc',
             successPercentageSpan: 'successPercentage',
             welcomeModal: 'welcomeModal',
-            startTrackingBtn: 'startTrackingBtn',
-            guideMeBtn: 'guideMeBtn',
             confirmationModal: 'confirmationModal',
             confirmationModalTitle: 'confirmationModalTitle',
             confirmationModalMessage: 'confirmationModalMessage',
@@ -168,18 +151,10 @@ class ParlayTracker {
             exportJsonBtn: 'exportJsonBtn', // Added new element
             importFileInput: 'importFileInput',
 
-            // Tour elements
-            tourOverlay: 'tourOverlay',
-            tourBubble: 'tourBubble',
-            tourBubbleText: 'tourBubbleText',
-            tourNextBtn: 'tourNextBtn',
-            tourSkipBtn: 'tourSkipBtn',
-            tourFinishBtn: 'tourFinishBtn',
-            tourBubbleArrow: 'tourBubbleArrow',
-
-            // Consent buttons (added as requested)
-            keepLocalBtn: 'keepLocalBtn',
-            participateBtn: 'participateBtn',
+            // NEW: Welcome Modal content and buttons
+            welcomeModalContent: 'welcomeModalContent',
+            welcomeModalParticipateBtn: 'welcomeModalParticipateBtn',
+            welcomeModalKeepLocalBtn: 'welcomeModalKeepLocalBtn'
         };
 
         Object.entries(elementsMap).forEach(([propertyName, id]) => {
@@ -251,20 +226,14 @@ class ParlayTracker {
             this.successPercentageCalcSelect.addEventListener('change', this.handleSuccessCalcChange.bind(this));
         }
 
-        // Welcome Modal Buttons
-        if (this.startTrackingBtn) {
-            this.startTrackingBtn.addEventListener('click', this.closeWelcomeModal.bind(this));
+        // NEW Welcome Modal Buttons
+        if (this.welcomeModalParticipateBtn) {
+            this.welcomeModalParticipateBtn.addEventListener('click', this.handleParticipateInCaseStudy.bind(this));
         }
-        if (this.guideMeBtn) {
-            this.guideMeBtn.addEventListener('click', this.startTour.bind(this));
+        if (this.welcomeModalKeepLocalBtn) {
+            this.welcomeModalKeepLocalBtn.addEventListener('click', this.handleKeepDataLocal.bind(this));
         }
-        // Consent buttons event listeners (added as requested)
-        if (this.keepLocalBtn) {
-            this.keepLocalBtn.addEventListener('click', () => this.handleConsent('local'));
-        }
-        if (this.participateBtn) {
-            this.participateBtn.addEventListener('click', () => this.handleConsent('participate'));
-        }
+
 
         if (this.cancelClearBtn) {
             this.cancelClearBtn.addEventListener('click', this.hideConfirmationModal.bind(this));
@@ -351,25 +320,6 @@ class ParlayTracker {
         }
         if (this.importFileInput) {
             this.importFileInput.addEventListener('change', this.handleImportFileSelect.bind(this));
-        }
-
-        // Tour navigation buttons
-        if (this.tourNextBtn) {
-            this.tourNextBtn.addEventListener('click', this.nextTourStep.bind(this));
-        }
-        if (this.tourSkipBtn) {
-            this.tourSkipBtn.addEventListener('click', this.endTour.bind(this));
-        }
-        if (this.tourFinishBtn) {
-            this.tourFinishBtn.addEventListener('click', this.endTour.bind(this));
-        }
-        if (this.tourOverlay) {
-            this.tourOverlay.addEventListener('click', (e) => {
-                // Only allow closing tour if clicking the overlay, not the bubble itself
-                if (e.target === this.tourOverlay && this.isTourActive) {
-                    this.endTour();
-                }
-            });
         }
     }
 
@@ -550,15 +500,15 @@ class ParlayTracker {
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-0.5">Result</label>
                 <select class="prop-result mt-1 block w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white text-gray-800">
-                                <option value="Win" ${result === 'Win' ? 'selected' : ''}>Win</option>
-                                <option value="Loss" ${result === 'Loss' ? 'selected' : ''}>Loss</option>
-                                <option value="Push" ${result === 'Push' ? 'selected' : ''}>Push</option>
-                            </select>
-                        </div>
-                        <div class="flex items-end">
-                            <button type="button" class="remove-prop-btn bg-gray-200 text-gray-800 w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-300 transition-all duration-200" aria-label="Remove player/team bet">-</button>
-                        </div>
-                    `;
+                            <option value="Win" ${result === 'Win' ? 'selected' : ''}>Win</option>
+                            <option value="Loss" ${result === 'Loss' ? 'selected' : ''}>Loss</option>
+                            <option value="Push" ${result === 'Push' ? 'selected' : ''}>Push</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" class="remove-prop-btn bg-gray-200 text-gray-800 w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-300 transition-all duration-200" aria-label="Remove player/team bet">-</button>
+                    </div>
+                `;
         this.playerPropInputsContainer.appendChild(div);
 
         const removeButton = div.querySelector('.remove-prop-btn');
@@ -786,7 +736,7 @@ class ParlayTracker {
             } finally {
                 event.target.value = ''; // Clear the input after processing
             }
-        };
+        }
         reader.readAsText(file);
     }
 
@@ -1059,12 +1009,12 @@ class ParlayTracker {
 
             const tableRow = `
                 <tr data-index="${index}">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formattedDate}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 ${getResultTextColor(parlay.result)}">${parlay.result}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.playType}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${parlay.amountWagered.toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 ${getResultTextColor(parlay.amountWonLoss > 0 ? 'Win' : parlay.amountWonLoss < 0 ? 'Loss' : 'Push')}">$${parlay.amountWonLoss.toFixed(2)}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">${formattedDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 ${getResultTextColor(parlay.result)}">${parlay.result}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">${parlay.playType}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">$${parlay.amountWagered.toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 ${getResultTextColor(parlay.amountWonLoss > 0 ? 'Win' : parlay.amountWonLoss < 0 ? 'Loss' : 'Push')}">$${parlay.amountWonLoss.toFixed(2)}</td>
+                    <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200">
                         ${parlay.individualBets.map(bet => `<div>${bet.player}: ${bet.prop} (<span class="${getResultTextColor(bet.result)}">${bet.result}</span>)</div>`).join('')}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -1078,10 +1028,10 @@ class ParlayTracker {
             const cardHtml = `
                 <div class="parlay-card border-gray-200 bg-white" data-index="${index}">
                     <div class="parlay-card-summary">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-2">${formattedDate} - ${parlay.playType}</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">${formattedDate} - ${parlay.playType}</h3>
                         <div class="parlay-card-detail">
                             <span>Result:</span>
-                            <strong class="text-gray-800 ${getResultTextColor(parlay.result)}">${parlay.result}</strong>
+                            <strong class="text-gray-800 dark:text-gray-200 ${getResultTextColor(parlay.result)}">${parlay.result}</strong>
                         </div>
                         <div class="parlay-card-detail">
                             <span>Wagered:</span>
@@ -1089,11 +1039,11 @@ class ParlayTracker {
                         </div>
                         <div class="parlay-card-detail">
                             <span>Profit/Loss:</span>
-                            <strong class="text-gray-800 ${getResultTextColor(parlay.amountWonLoss > 0 ? 'Win' : parlay.amountWonLoss < 0 ? 'Loss' : 'Push')}">$${parlay.amountWonLoss.toFixed(2)}</strong>
+                            <strong class="text-gray-800 dark:text-gray-200 ${getResultTextColor(parlay.amountWonLoss > 0 ? 'Win' : parlay.amountWonLoss < 0 ? 'Loss' : 'Push')}">$${parlay.amountWonLoss.toFixed(2)}</strong>
                         </div>
                     </div>
                     <div class="parlay-card-toggle-details hidden">
-                        <p class="text-sm font-medium text-gray-700 mb-1">Individual Bets:</p>
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Individual Bets:</p>
                         <ul class="parlay-card-bets">
                             ${parlay.individualBets.map(bet => `<li>${bet.player}: ${bet.prop} (<span class="${getResultTextColor(bet.result)}">${bet.result}</span>)</li>`).join('')}
                         </ul>
@@ -1180,7 +1130,7 @@ class ParlayTracker {
             totalCountForSuccess = totalWins + totalLosses + totalPushes;
             successfulCount = totalWins;
         } else if (this.currentSuccessCalcMethod === 'individualBets') {
-            totalCountForSuccess = individualBetWins + individualBetLosses;
+            totalCountForSuccess = individualBetWins + individualBetLosses + individualBetPushes;
             successfulCount = individualBetWins;
         }
 
@@ -1202,6 +1152,7 @@ class ParlayTracker {
     /**
      * Handles changes to the manual date filter inputs.
      * Validates the date range and updates the timeline summary display.
+     * @param {Event} event - The change event from the file input.
      */
     handleDateFilterChange() {
         if (!this.filterFromDateInput || !this.filterToDateInput || !this.currentTimelineDisplay || !this.dateFilterError) {
@@ -1217,27 +1168,12 @@ class ParlayTracker {
         let toDateObj = null;
         let isValidDateRange = true;
 
-        // Note: The following filteredParlays logic within handleDateFilterChange seems redundant
-        // as filterParlaysByDate() is called in renderParlays() later.
-        // The primary purpose of this function should be to set the filter dates
-        // and update the display string.
-        // I'm keeping the original code's filtering logic here for exact copy-paste,
-        // but it might be worth reviewing if this filtering is needed twice.
-        let filteredParlays = [...this.parlays]; // This line and the following filters were in your original code
         if (this.filterFromDate) {
             fromDateObj = new Date(this.filterFromDate + 'T00:00:00');
-            filteredParlays = filteredParlays.filter(parlay => {
-                const parlayDate = new Date(parlay.date + 'T00:00:00');
-                return parlayDate >= fromDateObj;
-            });
         }
 
         if (this.filterToDate) {
             toDateObj = new Date(this.filterToDate + 'T00:00:00');
-            filteredParlays = filteredParlays.filter(parlay => {
-                const parlayDate = new Date(parlay.date + 'T00:00:00');
-                return parlayDate <= toDateObj;
-            });
         }
 
         if (fromDateObj && toDateObj && fromDateObj > toDateObj) {
@@ -1369,20 +1305,43 @@ class ParlayTracker {
         this.checkAndShowWelcomeModal();
     }
 
+    // NEW: Updated checkAndShowWelcomeModal with new text and consent logic
     checkAndShowWelcomeModal() {
-        if (!this.welcomeModal) {
-            console.warn("Welcome modal element not found, welcome modal functionality skipped.");
+        if (!this.welcomeModal || !this.welcomeModalContent) {
+            console.warn("Welcome modal elements not found, welcome modal functionality skipped.");
             return;
         }
-        // Only show if user consent has not been recorded yet
-        const hasUserConsent = localStorage.getItem(ParlayTracker.STORAGE_KEYS.USER_CONSENT);
-        if (!hasUserConsent) {
+        const hasVisited = localStorage.getItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED);
+        const consentGiven = localStorage.getItem(ParlayTracker.STORAGE_KEYS.GA_CONSENT); // New: Check for consent
+        
+        // Only show if never visited AND consent hasn't been explicitly given/denied
+        if (!hasVisited && !consentGiven) {
+            this.welcomeModalContent.innerHTML = `
+                <p class="text-gray-700 mb-4">
+                    <strong>I’m a sports bettor just like you</strong> — I know good weeks, bad weeks, and how they can blind us from our true performance. The books thrive when we chase losses.
+                </p>
+                <p class="text-gray-700 mb-4">
+                    <strong>Are You Actually Winning?</strong> isn’t a sharp tool for quick edges — it’s a blunt instrument built to cut through the noise and give you a clear, honest view of your betting results.
+                </p>
+                <p class="text-gray-700 mb-4">
+                    Track every parlay, win or lose, to reveal your true net profit or loss. Break down individual bets to identify your real strengths and weaknesses. Empower yourself with honest data to make smarter decisions.
+                </p>
+                <p class="text-gray-700 mb-6">
+                    Your participation in my Analytics case study is optional. If you choose to help, your data stays anonymous and secure.
+                </p>
+                <p class="text-gray-800 font-semibold text-lg">
+                    Ready to get real? Let’s get started.
+                </p>
+            `;
+
             this.welcomeModal.classList.remove('hidden');
             setTimeout(() => {
                 this.welcomeModal.classList.add('show');
             }, 10);
-            // Do NOT set HAS_VISITED here, as user hasn't made a choice yet.
-            // HAS_VISITED should be set after they interact with the welcome modal.
+            // Don't set HAS_VISITED here. Set it after a choice is made.
+        } else {
+            // If already visited or consent given, close the modal if it's somehow open
+            this.closeWelcomeModal();
         }
     }
 
@@ -1391,9 +1350,26 @@ class ParlayTracker {
         this.welcomeModal.classList.remove('show');
         this.welcomeModal.addEventListener('transitionend', () => {
             this.welcomeModal.classList.add('hidden');
-            // Set HAS_VISITED only after the modal is closed, indicating interaction.
-            localStorage.setItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED, 'true');
         }, { once: true });
+    }
+
+    // NEW: Handle Participate in Case Study button click
+    handleParticipateInCaseStudy() {
+        localStorage.setItem(ParlayTracker.STORAGE_KEYS.GA_CONSENT, 'true');
+        localStorage.setItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED, 'true'); // Mark as visited
+        this.closeWelcomeModal();
+        this.showInfoModal('Consent Granted', 'Thank you for participating! Your anonymous data will help improve this tool.');
+        // Here, you would typically initialize Google Analytics tracking
+        // e.g., if (typeof gtag === 'function') { gtag('consent', 'update', { 'analytics_storage': 'granted' }); }
+        // For now, it just stores the consent.
+    }
+
+    // NEW: Handle Keep Data Local button click
+    handleKeepDataLocal() {
+        localStorage.setItem(ParlayTracker.STORAGE_KEYS.GA_CONSENT, 'false');
+        localStorage.setItem(ParlayTracker.STORAGE_KEYS.HAS_VISITED, 'true'); // Mark as visited
+        this.closeWelcomeModal();
+        this.showInfoModal('Data Local', 'Your data will remain on your device only. No analytics data will be collected.');
     }
 
     handleKeyboardShortcuts(event) {
@@ -1440,216 +1416,9 @@ class ParlayTracker {
             this.themeToggle.setAttribute('aria-label', `Switch to ${savedTheme === 'dark' ? 'light' : 'dark'} mode`);
         }
     }
-
-    // --- Feature Tour Methods ---
-    setupTourSteps() {
-        this.tourSteps = [
-            {
-                element: document.querySelector('.parlay-section summary'),
-                text: "This is where you'll log your parlays. Click this bar to expand the form and start entering your data.",
-                position: 'bottom'
-            },
-            {
-                element: document.querySelector('.parlay-section .parlay-content #addPlayerPropBtn'),
-                text: "Add individual player or team bets to your parlay entry here. This helps you track specific prop performance!",
-                position: 'top'
-            },
-            {
-                element: this.totalWageredSpan?.closest('.bg-white.p-4.rounded-lg'), // Target the parent div of totalWageredSpan
-                text: "This 'Summary Statistics' section gives you the overall picture: total money wagered, net profit/loss, and more.",
-                position: 'bottom'
-            },
-            {
-                element: this.timelineDetails, // Target the new timeline details element
-                text: "This 'Timeline' section allows you to filter your data by specific date ranges or quick presets, giving you focused insights. It's collapsed by default for a cleaner view.",
-                position: 'bottom'
-            },
-            {
-                element: this.parlayTableBody?.closest('section.bg-white'),
-                text: "All your recorded parlays appear here, in both table (desktop) and card (mobile) views. You can edit or delete entries.",
-                position: 'top'
-            },
-            {
-                element: this.themeToggle,
-                text: "Easily switch between light and dark modes here to suit your preference.",
-                position: 'left' // Position to the left of the button
-            },
-            {
-                element: this.importDataBtn,
-                text: "Use these buttons to import or export your parlay data as a JSON file, so you can back up your progress or move it to another device.",
-                position: 'bottom'
-            }
-        ].filter(step => step.element !== null); // Filter out steps where element might not be found
-
-        if (this.tourSteps.length > 0) {
-            if (this.tourNextBtn) this.tourNextBtn.classList.remove('hidden');
-            if (this.tourFinishBtn) this.tourFinishBtn.classList.add('hidden');
-        } else {
-            console.warn("No tour steps found, tour functionality might be limited or unavailable.");
-            if (this.tourBubble) this.tourBubble.classList.add('hidden');
-            if (this.tourOverlay) this.tourOverlay.classList.add('hidden');
-        }
-    }
-
-    startTour() {
-        if (!this.welcomeModal || !this.tourOverlay || !this.tourBubble) {
-            console.error("Tour elements not fully initialized.");
-            return;
-        }
-
-        this.isTourActive = true;
-        this.currentTourStepIndex = 0;
-        this.closeWelcomeModal(); // Close the welcome modal immediately
-
-        setTimeout(() => {
-            this.tourOverlay.classList.remove('hidden');
-            this.tourBubble.classList.remove('hidden');
-            this.showCurrentTourStep();
-        }, 300); // Small delay to allow welcome modal to transition out
-    }
-
-    showCurrentTourStep() {
-        if (!this.isTourActive || this.currentTourStepIndex >= this.tourSteps.length) {
-            this.endTour();
-            return;
-        }
-
-        const step = this.tourSteps[this.currentTourStepIndex];
-        if (!step.element) {
-            console.warn(`Tour step ${this.currentTourStepIndex} has no element. Skipping.`);
-            this.nextTourStep();
-            return;
-        }
-
-        // Ensure the target element is visible (e.g., if it's inside a closed <details>)
-        if (step.element.closest('details') && !step.element.closest('details').open) {
-            step.element.closest('details').open = true;
-        }
-
-        // Scroll the element into view with a slight offset
-        const elementRect = step.element.getBoundingClientRect();
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-        const scrollOffset = 50; // pixels
-        const targetY = elementRect.top + window.scrollY - scrollOffset;
-
-        window.scrollTo({
-            top: Math.max(0, targetY), // Ensure not to scroll above 0
-            behavior: 'smooth'
-        });
-
-        // Position the tour bubble
-        setTimeout(() => { // Give a moment for scroll to complete
-            this.positionTourBubble(step.element, step.text, step.position);
-
-            // Update tour navigation buttons
-            if (this.currentTourStepIndex === this.tourSteps.length - 1) {
-                if (this.tourNextBtn) this.tourNextBtn.classList.add('hidden');
-                if (this.tourFinishBtn) this.tourFinishBtn.classList.remove('hidden');
-            } else {
-                if (this.tourNextBtn) this.tourNextBtn.classList.remove('hidden');
-                if (this.tourFinishBtn) this.tourFinishBtn.classList.add('hidden');
-            }
-        }, 400); // Adjust delay as needed
-    }
-
-    positionTourBubble(targetElement, text, position = 'bottom') {
-        if (!this.tourBubble || !this.tourBubbleText || !this.tourBubbleArrow) return;
-
-        this.tourBubbleText.textContent = text;
-        const targetRect = targetElement.getBoundingClientRect();
-        const bubbleRect = this.tourBubble.getBoundingClientRect(); // Get current bubble dimensions
-
-        let top = 0;
-        let left = 0;
-        let arrowClass = '';
-
-        // Reset previous positioning classes
-        this.tourBubble.classList.remove('position-top', 'position-bottom', 'position-left', 'position-right');
-        this.tourBubbleArrow.className = 'absolute w-4 h-4 bg-blue-600 rotate-45'; // Reset arrow position
-
-        switch (position) {
-            case 'top':
-                top = targetRect.top - bubbleRect.height - 20; // 20px buffer
-                left = targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2);
-                arrowClass = 'position-top';
-                break;
-            case 'bottom':
-                top = targetRect.bottom + 20; // 20px buffer
-                left = targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2);
-                arrowClass = 'position-bottom';
-                break;
-            case 'left':
-                top = targetRect.top + (targetRect.height / 2) - (bubbleRect.height / 2);
-                left = targetRect.left - bubbleRect.width - 20;
-                arrowClass = 'position-left';
-                break;
-            case 'right':
-                top = targetRect.top + (targetRect.height / 2) - (bubbleRect.height / 2);
-                left = targetRect.right + 20;
-                arrowClass = 'position-right';
-                break;
-            default: // Default to bottom if position is invalid
-                top = targetRect.bottom + 20;
-                left = targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2);
-                arrowClass = 'position-bottom';
-                break;
-        }
-
-        // Adjust for viewport boundaries
-        if (left < 10) left = 10;
-        if (left + bubbleRect.width > window.innerWidth - 10) {
-            left = window.innerWidth - bubbleRect.width - 10;
-        }
-        if (top < 10) top = 10;
-        if (top + bubbleRect.height > window.innerHeight - 10) {
-            top = window.innerHeight - bubbleRect.height - 10;
-        }
-
-        this.tourBubble.style.top = `${top + window.scrollY}px`;
-        this.tourBubble.style.left = `${left}px`;
-        this.tourBubble.classList.add(arrowClass);
-    }
-
-
-    nextTourStep() {
-        this.currentTourStepIndex++;
-        if (this.currentTourStepIndex < this.tourSteps.length) {
-            this.showCurrentTourStep();
-        } else {
-            this.endTour();
-        }
-    }
-
-    endTour() {
-        this.isTourActive = false;
-        this.currentTourStepIndex = 0;
-        if (this.tourOverlay) this.tourOverlay.classList.add('hidden');
-        if (this.tourBubble) this.tourBubble.classList.add('hidden');
-        if (this.tourNextBtn) this.tourNextBtn.classList.remove('hidden'); // Reset for next time
-        if (this.tourFinishBtn) this.tourFinishBtn.classList.add('hidden'); // Reset for next time
-    }
-
-    // Add the consent handler method to your ParlayTracker class:
-    handleConsent(type) {
-        localStorage.setItem(ParlayTracker.STORAGE_KEYS.USER_CONSENT, type);
-        this.closeWelcomeModal();
-        if (type === 'participate') {
-            // Initialize Firebase or trigger data sharing here
-            this.enableFirebaseAnalytics();
-        }
-        // If 'local', nothing else is needed
-    }
-
-    // Placeholder for Firebase logic (implement your Firebase integration here)
-    enableFirebaseAnalytics() {
-        // TODO: Add your Firebase analytics integration here
-        // Example: firebase.analytics().logEvent('user_participated');
-        // You can initialize Firebase SDK here if not already initialized.
-        console.log("Firebase analytics enabled (placeholder).");
-    }
 }
 
-// Initialize the app when the DOM is fully loaded
+// Initialize the tracker when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     new ParlayTracker();
 });
