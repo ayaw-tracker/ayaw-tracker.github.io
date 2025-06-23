@@ -1123,6 +1123,7 @@ class ParlayTracker {
                 totalPushes++;
             }
 
+            // Accumulate individual bet results
             parlay.individualBets.forEach(bet => {
                 if (bet.result === 'Win') {
                     individualBetWins++;
@@ -1134,7 +1135,6 @@ class ParlayTracker {
             });
         });
 
-        // Removed the '$' from the HTML, so add it here.
         this.totalWageredSpan.textContent = `${totalWagered.toFixed(2)}`;
         this.netProfitLossSpan.textContent = `${totalWonLoss.toFixed(2)}`;
         this.totalParlaysSpan.textContent = filteredParlays.length.toString();
@@ -1164,7 +1164,6 @@ class ParlayTracker {
             totalCountForSuccess = totalWins + totalLosses + totalPushes;
             successfulCount = totalWins;
         } else if (this.currentSuccessCalcMethod === 'individualBets') {
-            // For individual props, typically success rate excludes pushes from the total considered
             totalCountForSuccess = individualBetWins + individualBetLosses;
             successfulCount = individualBetWins;
         }
@@ -1173,7 +1172,6 @@ class ParlayTracker {
         if (totalCountForSuccess > 0) {
             successPercentage = (successfulCount / totalCountForSuccess) * 100;
         }
-        // Removed the '%' as it's already in the HTML
         this.successPercentageSpan.textContent = `${successPercentage.toFixed(2)}`;
     }
 
@@ -1203,6 +1201,13 @@ class ParlayTracker {
         let toDateObj = null;
         let isValidDateRange = true;
 
+        // Note: The following filteredParlays logic within handleDateFilterChange seems redundant
+        // as filterParlaysByDate() is called in renderParlays() later.
+        // The primary purpose of this function should be to set the filter dates
+        // and update the display string.
+        // I'm keeping the original code's filtering logic here for exact copy-paste,
+        // but it might be worth reviewing if this filtering is needed twice.
+        let filteredParlays = [...this.parlays]; // This line and the following filters were in your original code
         if (this.filterFromDate) {
             fromDateObj = new Date(this.filterFromDate + 'T00:00:00');
             filteredParlays = filteredParlays.filter(parlay => {
@@ -1484,157 +1489,128 @@ class ParlayTracker {
     }
 
     showCurrentTourStep() {
-        if (this.currentTourStepIndex >= this.tourSteps.length) {
+        if (!this.isTourActive || this.currentTourStepIndex >= this.tourSteps.length) {
             this.endTour();
             return;
         }
 
         const step = this.tourSteps[this.currentTourStepIndex];
-        if (!step.element || !this.tourBubble || !this.tourBubbleText || !this.tourBubbleArrow) {
-            console.error(`Tour step ${this.currentTourStepIndex} element is null, skipping step.`);
-            this.nextTourStep(); // Skip to next step
+        if (!step.element) {
+            console.warn(`Tour step ${this.currentTourStepIndex} has no element. Skipping.`);
+            this.nextTourStep();
             return;
         }
 
-        this.tourBubbleText.textContent = step.text;
-
-        // Reset previous highlight
-        document.querySelectorAll('.highlight-element').forEach(el => el.classList.remove('highlight-element'));
-        // Highlight current element
-        step.element.classList.add('highlight-element');
-        step.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        this.positionTourBubble(step.element, this.tourBubble, step.position);
-
-        if (this.currentTourStepIndex === this.tourSteps.length - 1) {
-            if (this.tourNextBtn) this.tourNextBtn.classList.add('hidden');
-            if (this.tourFinishBtn) this.tourFinishBtn.classList.remove('hidden');
-        } else {
-            if (this.tourNextBtn) this.tourNextBtn.classList.remove('hidden');
-            if (this.tourFinishBtn) this.tourFinishBtn.classList.add('hidden');
+        // Ensure the target element is visible (e.g., if it's inside a closed <details>)
+        if (step.element.closest('details') && !step.element.closest('details').open) {
+            step.element.closest('details').open = true;
         }
+
+        // Scroll the element into view with a slight offset
+        const elementRect = step.element.getBoundingClientRect();
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const scrollOffset = 50; // pixels
+        const targetY = elementRect.top + window.scrollY - scrollOffset;
+
+        window.scrollTo({
+            top: Math.max(0, targetY), // Ensure not to scroll above 0
+            behavior: 'smooth'
+        });
+
+        // Position the tour bubble
+        setTimeout(() => { // Give a moment for scroll to complete
+            this.positionTourBubble(step.element, step.text, step.position);
+
+            // Update tour navigation buttons
+            if (this.currentTourStepIndex === this.tourSteps.length - 1) {
+                if (this.tourNextBtn) this.tourNextBtn.classList.add('hidden');
+                if (this.tourFinishBtn) this.tourFinishBtn.classList.remove('hidden');
+            } else {
+                if (this.tourNextBtn) this.tourNextBtn.classList.remove('hidden');
+                if (this.tourFinishBtn) this.tourFinishBtn.classList.add('hidden');
+            }
+        }, 400); // Adjust delay as needed
     }
 
-    positionTourBubble(targetElement, bubbleElement, position) {
+    positionTourBubble(targetElement, text, position = 'bottom') {
+        if (!this.tourBubble || !this.tourBubbleText || !this.tourBubbleArrow) return;
+
+        this.tourBubbleText.textContent = text;
         const targetRect = targetElement.getBoundingClientRect();
-        const bubbleRect = bubbleElement.getBoundingClientRect();
-        const arrow = this.tourBubbleArrow;
+        const bubbleRect = this.tourBubble.getBoundingClientRect(); // Get current bubble dimensions
 
-        // Reset arrow class
-        arrow.classList.remove('position-top', 'position-bottom', 'position-left', 'position-right');
-        bubbleElement.classList.remove('position-top', 'position-bottom', 'position-left', 'position-right');
+        let top = 0;
+        let left = 0;
+        let arrowClass = '';
 
-        let top, left;
-
-        // Offset to prevent direct overlap and position the arrow well
-        const offset = 20; // Distance from target element
+        // Reset previous positioning classes
+        this.tourBubble.classList.remove('position-top', 'position-bottom', 'position-left', 'position-right');
+        this.tourBubbleArrow.className = 'absolute w-4 h-4 bg-blue-600 rotate-45'; // Reset arrow position
 
         switch (position) {
-            case 'bottom':
-                top = targetRect.bottom + window.scrollY + offset;
-                left = targetRect.left + window.scrollX + (targetRect.width / 2);
-                arrow.style.top = `-0.5rem`; // Arrow points upwards
-                arrow.style.left = `50%`;
-                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
-                bubbleElement.classList.add('position-bottom');
-                break;
             case 'top':
-                top = targetRect.top + window.scrollY - bubbleRect.height - offset;
-                left = targetRect.left + window.scrollX + (targetRect.width / 2);
-                arrow.style.top = `100%`; // Arrow points downwards
-                arrow.style.left = `50%`;
-                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
-                bubbleElement.classList.add('position-top');
+                top = targetRect.top - bubbleRect.height - 20; // 20px buffer
+                left = targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2);
+                arrowClass = 'position-top';
+                break;
+            case 'bottom':
+                top = targetRect.bottom + 20; // 20px buffer
+                left = targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2);
+                arrowClass = 'position-bottom';
                 break;
             case 'left':
-                top = targetRect.top + window.scrollY + (targetRect.height / 2);
-                left = targetRect.left + window.scrollX - bubbleRect.width - offset;
-                arrow.style.top = `50%`;
-                arrow.style.left = `100%`; // Arrow points left
-                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
-                bubbleElement.classList.add('position-left');
+                top = targetRect.top + (targetRect.height / 2) - (bubbleRect.height / 2);
+                left = targetRect.left - bubbleRect.width - 20;
+                arrowClass = 'position-left';
                 break;
             case 'right':
-                top = targetRect.top + window.scrollY + (targetRect.height / 2);
-                left = targetRect.right + window.scrollX + offset;
-                arrow.style.top = `50%`;
-                arrow.style.left = `-0.5rem`; // Arrow points right
-                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
-                bubbleElement.classList.add('position-right');
+                top = targetRect.top + (targetRect.height / 2) - (bubbleRect.height / 2);
+                left = targetRect.right + 20;
+                arrowClass = 'position-right';
                 break;
-            default: // Default to bottom if position is not specified or invalid
-                top = targetRect.bottom + window.scrollY + offset;
-                left = targetRect.left + window.scrollX + (targetRect.width / 2);
-                arrow.style.top = `-0.5rem`;
-                arrow.style.left = `50%`;
-                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
-                bubbleElement.classList.add('position-bottom');
-        }
-
-        // Adjust bubble position to try and keep it on screen
-        const bubbleFinalLeft = left - (bubbleRect.width / 2); // Calculate true left position of bubble's center
-        const bubbleFinalTop = top - (bubbleRect.height / 2); // Calculate true top position of bubble's center
-
-        // Clamp left to screen boundaries
-        let newLeft = Math.max(0, Math.min(bubbleFinalLeft, window.innerWidth - bubbleRect.width));
-
-        // Clamp top to screen boundaries
-        let newTop = Math.max(window.scrollY, Math.min(bubbleFinalTop, window.scrollY + window.innerHeight - bubbleRect.height));
-
-        bubbleElement.style.left = `${newLeft}px`;
-        bubbleElement.style.top = `${newTop}px`;
-        bubbleElement.style.transform = `none`; // Reset transform as we're setting absolute positions
-
-        // Re-position arrow based on where the bubble ended up relative to target
-        const arrowOffsetLeft = (targetRect.left + targetRect.width / 2) - newLeft;
-        const arrowOffsetTop = (targetRect.top + targetRect.height / 2) - newTop;
-
-        switch (position) {
-            case 'bottom': // Arrow on top of bubble, points down to target
-                arrow.style.top = `0`;
-                arrow.style.left = `${arrowOffsetLeft}px`;
-                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
-                break;
-            case 'top': // Arrow on bottom of bubble, points up to target
-                arrow.style.top = `${bubbleRect.height}px`;
-                arrow.style.left = `${arrowOffsetLeft}px`;
-                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
-                break;
-            case 'left': // Arrow on right of bubble, points left to target
-                arrow.style.top = `${arrowOffsetTop}px`;
-                arrow.style.left = `${bubbleRect.width}px`;
-                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
-                break;
-            case 'right': // Arrow on left of bubble, points right to target
-                arrow.style.top = `${arrowOffsetTop}px`;
-                arrow.style.left = `0`;
-                arrow.style.transform = `translate(-50%, -50%) rotate(45deg)`;
+            default: // Default to bottom if position is invalid
+                top = targetRect.bottom + 20;
+                left = targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2);
+                arrowClass = 'position-bottom';
                 break;
         }
 
+        // Adjust for viewport boundaries
+        if (left < 10) left = 10;
+        if (left + bubbleRect.width > window.innerWidth - 10) {
+            left = window.innerWidth - bubbleRect.width - 10;
+        }
+        if (top < 10) top = 10;
+        if (top + bubbleRect.height > window.innerHeight - 10) {
+            top = window.innerHeight - bubbleRect.height - 10;
+        }
+
+        this.tourBubble.style.top = `${top + window.scrollY}px`;
+        this.tourBubble.style.left = `${left}px`;
+        this.tourBubble.classList.add(arrowClass);
     }
 
 
     nextTourStep() {
         this.currentTourStepIndex++;
-        this.showCurrentTourStep();
+        if (this.currentTourStepIndex < this.tourSteps.length) {
+            this.showCurrentTourStep();
+        } else {
+            this.endTour();
+        }
     }
 
     endTour() {
         this.isTourActive = false;
+        this.currentTourStepIndex = 0;
         if (this.tourOverlay) this.tourOverlay.classList.add('hidden');
         if (this.tourBubble) this.tourBubble.classList.add('hidden');
-        document.querySelectorAll('.highlight-element').forEach(el => el.classList.remove('highlight-element'));
-        if (this.tourBubble) {
-            this.tourBubble.style.top = ''; // Clear inline styles
-            this.tourBubble.style.left = '';
-            this.tourBubble.style.transform = '';
-            this.tourBubble.classList.remove('position-top', 'position-bottom', 'position-left', 'position-right');
-        }
+        if (this.tourNextBtn) this.tourNextBtn.classList.remove('hidden'); // Reset for next time
+        if (this.tourFinishBtn) this.tourFinishBtn.classList.add('hidden'); // Reset for next time
     }
 }
 
-// Instantiate the tracker when the DOM is fully loaded
+// Initialize the app when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     new ParlayTracker();
 });
