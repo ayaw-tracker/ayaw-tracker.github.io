@@ -120,9 +120,10 @@ body.dark .text-red-500 {
     border: 1px solid #e5e7eb;
     align-items: center;
     transition: all 0.3s ease;
-    opacity: 0;
-    transform: translateY(-10px);
-    animation: slideIn 0.3s ease forwards;
+    /* Directly set opacity and transform for immediate visibility */
+    opacity: 1; /* Changed from 0 */
+    transform: translateY(0); /* Changed from -10px */
+    /* Removed 'animation: slideIn 0.3s ease forwards;' */
 }
 
 body.dark .player-prop-row {
@@ -522,8 +523,16 @@ body.dark #confirmClearBtn.bg-blue-600:hover {
     background-color: #2563eb;
 }
 
-/* ==========================================================================
-   FEATURE TOUR (GUIDANCE BUBBLES)
-   ========================================================================= */
-
-/* Removed tour specific styles */
+/* Removed keyframes for slideIn as it's no longer needed for initial display */
+/* @keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+} */
+@keyframes slideOut {
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
