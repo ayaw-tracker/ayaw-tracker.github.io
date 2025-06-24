@@ -1022,10 +1022,10 @@ class ParlayTracker {
             const tableRow = `
                 <tr data-index="${index}">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formattedDate}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 ${getResultTextColor(parlay.result)}">${parlay.result}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${getResultTextColor(parlay.result)}">${parlay.result}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parlay.playType}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${parlay.amountWagered.toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 ${getResultTextColor(parlay.amountWonLoss > 0 ? 'Win' : parlay.amountWonLoss < 0 ? 'Loss' : 'Push')}">$${parlay.amountWonLoss.toFixed(2)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${getResultTextColor(parlay.amountWonLoss > 0 ? 'Win' : parlay.amountWonLoss < 0 ? 'Loss' : 'Push')}">$${parlay.amountWonLoss.toFixed(2)}</td>
                     <td class="px-6 py-4 text-sm text-gray-900">
                         ${parlay.individualBets.map(bet => `<div>${bet.player}: ${bet.prop} (<span class="${getResultTextColor(bet.result)}">${bet.result}</span>)</div>`).join('')}
                     </td>
