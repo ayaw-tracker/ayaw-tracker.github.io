@@ -290,12 +290,6 @@ body.dark .parlay-card-detail strong {
 }
 
 /* Card Actions */
-.parlay-card-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    justify-content: flex-end;
-}
 body.dark .parlay-card-actions .edit-parlay-btn {
     background-color: #6366f1; /* Adjusted indigo for dark mode */
 }
