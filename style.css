@@ -573,3 +573,70 @@ body.dark #confirmClearBtn.bg-blue-600 {
 body.dark #confirmClearBtn.bg-blue-600:hover {
     background-color: #2563eb;
 }
+
+/* ==========================================================================
+   FEEDBACK CHATBOX STYLES
+   ========================================================================== */
+#feedbackChatbox {
+    /* Fixed positioning is in HTML, here are additional styles */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align items to the right */
+    pointer-events: none; /* Allow clicks to pass through the container itself initially */
+}
+
+#feedbackChatbox > * {
+    pointer-events: auto; /* Enable pointer events on children */
+}
+
+#chatFormContainer {
+    /* Initial hidden state, will transition to visible */
+    opacity: 0;
+    transform: translateY(20px); /* Start slightly below */
+    pointer-events: none; /* Make it unclickable when hidden */
+}
+
+#chatFormContainer.show {
+    opacity: 1;
+    transform: translateY(0); /* Slide up to position */
+    pointer-events: auto; /* Make it clickable when shown */
+}
+
+/* Dark mode for feedback chatbox */
+body.dark #openChatBtn {
+    background-color: #63b3ed;
+    color: #1a202c;
+}
+body.dark #openChatBtn:hover {
+    background-color: #4299e1;
+}
+
+body.dark #chatFormContainer {
+    background-color: #303640; /* Matches other sections in dark mode */
+    border: 1px solid #4a5568;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+body.dark #chatFormContainer .bg-blue-600 {
+    background-color: #3b82f6; /* Consistent blue header */
+}
+body.dark #chatFormContainer h4 {
+    color: #e2e8f0; /* Light text for title */
+}
+body.dark #chatFormContainer #closeChatBtn {
+    color: #e2e8f0;
+}
+body.dark #feedbackMessage {
+    background-color: #4a505b;
+    border-color: #5b6270;
+    color: #e2e8f0;
+}
+body.dark #feedbackMessage::placeholder {
+    color: #a0aec0;
+}
+body.dark #sendFeedbackBtn {
+    background-color: #3b82f6;
+    color: #ffffff;
+}
+body.dark #sendFeedbackBtn:hover {
+    background-color: #2563eb;
+}
