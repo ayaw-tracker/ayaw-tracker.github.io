@@ -13,7 +13,7 @@ class ParlayTracker {
     };
 
     // Replace with your actual email address
-    static FEEDBACK_EMAIL = '4ayaw55@gmail.com'; 
+    static FEEDBACK_EMAIL = 'your_email@example.com'; 
 
     constructor() {
         this.parlays = [];
@@ -175,6 +175,7 @@ class ParlayTracker {
             const element = document.getElementById(id);
             if (element) {
                 this[propertyName] = element;
+                // console.log(`Element found: ${propertyName} (${id})`); // Temporary log for debugging
             } else {
                 console.error(`ERROR: Element with ID '${id}' for property '${propertyName}' not found. Functionality relying on this element may be broken.`);
                 this[propertyName] = null; // Explicitly set to null if not found
@@ -193,6 +194,7 @@ class ParlayTracker {
             const element = document.getElementById(id);
             if (element) {
                 this[propertyName] = element;
+                // console.log(`Error Span found: ${propertyName} (${id})`); // Temporary log for debugging
             } else {
                 console.warn(`WARNING: Error span with ID '${id}' for property '${propertyName}' not found. Validation messages may not display.`);
                 this[propertyName] = null;
@@ -201,12 +203,16 @@ class ParlayTracker {
 
         // Special query for elements not having an ID directly
         this.parlaySectionDetails = document.querySelector('details.parlay-section');
-        if (!this.parlaySectionDetails) {
+        if (this.parlaySectionDetails) {
+            // console.log("Element found: parlaySectionDetails (details.parlay-section)"); // Temporary log for debugging
+            this.parlayFormSummary = this.parlaySectionDetails.querySelector('summary');
+            if (this.parlayFormSummary) {
+                // console.log("Element found: parlayFormSummary (summary inside details)"); // Temporary log for debugging
+            } else {
+                console.error("ERROR: Summary element within '.parlay-section' not found. Form toggle may not function.");
+            }
+        } else {
             console.error("ERROR: Element with class 'details.parlay-section' not found. Add New Parlay section may not function.");
-        }
-        this.parlayFormSummary = this.parlaySectionDetails ? this.parlaySectionDetails.querySelector('summary') : null;
-        if (this.parlaySectionDetails && !this.parlayFormSummary) {
-            console.error("ERROR: Summary element within '.parlay-section' not found. Form toggle may not function.");
         }
     }
 
@@ -543,6 +549,7 @@ class ParlayTracker {
 
     // Adds a new row for individual player/team bet input
     addPlayerPropRow(player = '', prop = '', result = 'Win') {
+        console.log('addPlayerPropRow called. playerPropInputsContainer:', this.playerPropInputsContainer); // Debugging log
         if (!this.playerPropInputsContainer) {
             console.error("Player prop inputs container not found. Cannot add player prop row.");
             return;
@@ -1557,18 +1564,28 @@ class ParlayTracker {
             return;
         }
 
-        const isOpen = this.chatFormContainer.classList.toggle('show');
-        this.chatFormContainer.classList.toggle('hidden', !isOpen); // Toggle 'hidden' based on 'show' state
+        const isCurrentlyHidden = this.chatFormContainer.classList.contains('hidden');
 
-        // Adjust open button icon
-        if (isOpen) {
-            this.openChatBtn.innerHTML = '<i class="fas fa-times"></i>'; // 'X' icon when open
+        if (isCurrentlyHidden) {
+            // SHOW chatbox
+            this.chatFormContainer.classList.remove('hidden'); // Make it display (removes display:none)
+            setTimeout(() => {
+                this.chatFormContainer.classList.add('show'); // Triggers opacity/transform transition
+            }, 10); // Small delay to allow 'hidden' removal to process before 'show' is added
+
+            this.openChatBtn.innerHTML = '<i class="fas fa-times"></i>'; // Change icon to 'X'
             this.openChatBtn.setAttribute('aria-label', 'Close feedback chat');
             this.openChatBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
             this.openChatBtn.classList.add('bg-red-500', 'hover:bg-red-600');
             this.feedbackMessageInput?.focus(); // Focus on textarea when chat opens
         } else {
-            this.openChatBtn.innerHTML = '<i class="fas fa-comment-dots"></i>'; // Comment icon when closed
+            // HIDE chatbox
+            this.chatFormContainer.classList.remove('show'); // Triggers opacity/transform fade-out
+            this.chatFormContainer.addEventListener('transitionend', () => {
+                this.chatFormContainer.classList.add('hidden'); // Add display:none after transition
+            }, { once: true }); // Ensure this listener only fires once
+
+            this.openChatBtn.innerHTML = '<i class="fas fa-comment-dots"></i>'; // Change icon back to comment
             this.openChatBtn.setAttribute('aria-label', 'Open feedback chat');
             this.openChatBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
             this.openChatBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
