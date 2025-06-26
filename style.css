@@ -18,7 +18,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: #f3f4f6; /* Light mode default background */
     color: #4a5568; /* Light mode default text color */
-    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; /* Smooth theme transition */
+    transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out; /* Smooth theme transition */
 }
 
 /* Dark Mode Styles - Softer Palette */
@@ -40,7 +40,7 @@ body.dark {
     background-color: #ffffff; /* Light mode container background */
     border-radius: 0.75rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth theme transition */
+    transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Smooth theme transition */
 }
 
 body.dark .container {
@@ -74,7 +74,7 @@ body.dark section.bg-gray-50 p {
     padding: 1.5rem;
     border-radius: 0.75rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth theme transition */
+    transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Smooth theme transition */
 }
 
 body.dark .parlay-section {
@@ -106,7 +106,7 @@ body.dark select {
     background-color: #4a505b; /* Softer dark input background */
     border-color: #5b6270; /* Softer dark border */
     color: #e2e8f0; /* Light text in inputs */
-    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, color 0.3s ease-in-out; /* Smooth theme transition */
+    transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out, color 0.1s ease-in-out; /* Smooth theme transition */
 }
 body.dark input::placeholder {
     color: #a0aec0; /* Lighter placeholder text */
@@ -252,7 +252,7 @@ body.dark #clearAllBtn:hover {
     cursor: pointer;
     font-size: 0.9em;
     font-weight: 500; /* Medium font weight */
-    transition: background-color 0.3s ease, transform 0.1s ease;
+    transition: background-color 0.1s ease, transform 0.1s ease;
     display: flex; /* Allow icon and text to sit side-by-side */
     align-items: center; /* Vertically center icon and text */
     gap: 0.5rem; /* Space between icon and text */
