@@ -7,10 +7,11 @@
     <!-- Tailwind CSS CDN for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Custom Stylesheet -->
+    
+    <!-- Link to external stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-100 p-4 sm:p-6 md:p-8 text-gray-800 font-inter">
@@ -117,9 +118,12 @@
 
                     <!-- Individual Bets Section -->
                     <div>
-                        <label class="block text-lg font-semibold text-gray-700 mb-3">
-                            Individual Player/Team Bets
-                        </label>
+                        <div class="flex justify-between items-center mb-3">
+                            <label class="block text-lg font-semibold text-gray-700">
+                                Individual Player/Team Bets
+                            </label>
+                            <!-- The toggleAdvancedDetailsBtn is moved below -->
+                        </div>
                         <div id="playerPropInputs" class="space-y-3 mb-4">
                             <!-- Dynamic player prop inputs will be added here -->
                         </div>
@@ -131,8 +135,14 @@
                         <span class="text-red-500 text-xs mt-1 hidden" id="individualBetsError"></span>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="flex justify-end">
+                    <!-- Submit Button row with new "More Details" button -->
+                    <div class="flex justify-between items-center">
+                        <button type="button" 
+                                id="toggleAdvancedDetailsBtn" 
+                                class="bg-gray-200 text-gray-700 py-1.5 px-3 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out text-sm">
+                            <i class="fas fa-plus mr-1"></i>
+                            <span>More Details</span>
+                        </button>
                         <button type="submit" 
                                 id="submitBtn" 
                                 class="bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
@@ -352,6 +362,21 @@
         </div>
     </div>
 
+    <!-- New: Individual Bet Details Modal -->
+    <div id="individualBetDetailsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="individualBetDetailsTitle">
+        <div class="modal-content individual-bet-modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="individualBetDetailsTitle" class="text-2xl font-bold text-gray-800">Individual Bet Details</h3>
+                <button id="closeIndividualBetDetailsModalBtn" class="text-gray-500 hover:text-gray-700 text-3xl leading-none focus:outline-none" aria-label="Close individual bet details modal">
+                    &times;
+                </button>
+            </div>
+            <ul id="individualBetsList" class="space-y-3">
+                <!-- Individual bet details will be dynamically loaded here -->
+            </ul>
+        </div>
+    </div>
+
     <!-- Feedback Chatbox -->
     <div id="feedbackChatbox" class="fixed bottom-4 right-4 z-20">
         <!-- Open Chat Button -->
@@ -368,7 +393,7 @@
                 </button>
             </div>
             <form id="feedbackForm" class="p-4 space-y-4">
-                <textarea id="feedbackMessage" class="w-full h-24 p-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800" placeholder="Type your feedback here..." required></textarea>
+                <textarea id="feedbackMessage" class="w-full h-24 p-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800" placeholder="Let us know how to improve your experience ..." required></textarea>
                 <button type="submit" id="sendFeedbackBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
                     Send Feedback
                 </button>
@@ -376,6 +401,7 @@
         </div>
     </div>
 
+    <!-- Link to external JavaScript file -->
     <script src="script.js"></script>
 </body>
 </html>
