@@ -7,7 +7,7 @@
     <!-- Tailwind CSS CDN for utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Custom Stylesheet -->
@@ -349,6 +349,30 @@
                     Participate
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Feedback Chatbox -->
+    <div id="feedbackChatbox" class="fixed bottom-4 right-4 z-20">
+        <!-- Open Chat Button -->
+        <button id="openChatBtn" class="bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 flex items-center justify-center text-xl">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+
+        <!-- Chat Form Container -->
+        <div id="chatFormContainer" class="hidden absolute bottom-full right-0 mb-4 w-72 bg-white rounded-lg shadow-xl flex flex-col transform translate-y-2 opacity-0 transition-all duration-300 ease-in-out">
+            <div class="bg-blue-600 text-white p-3 rounded-t-lg flex justify-between items-center">
+                <h4 class="font-semibold text-lg">Feedback</h4>
+                <button id="closeChatBtn" class="text-white hover:text-gray-200 focus:outline-none text-2xl" aria-label="Close feedback chat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="feedbackForm" class="p-4 space-y-4">
+                <textarea id="feedbackMessage" class="w-full h-24 p-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800" placeholder="Type your feedback here..." required></textarea>
+                <button type="submit" id="sendFeedbackBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                    Send Feedback
+                </button>
+            </form>
         </div>
     </div>
 
