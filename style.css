@@ -11,12 +11,14 @@ html, body {
     min-height: 100vh; /* Ensure minimum viewport height */
     margin: 0; /* Remove default body margin */
     padding: 0; /* Remove default body padding */
+    line-height: 1.5; /* Default line height for readability */
 }
 
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f3f4f6; /* Light mode default background */
     color: #4a5568; /* Light mode default text color */
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; /* Smooth theme transition */
 }
 
 /* Dark Mode Styles - Softer Palette */
@@ -30,12 +32,15 @@ body.dark {
    ========================================================================== */
 
 .container {
+    /* Tailwind already handles max-width, margin auto, padding, border-radius, box-shadow */
+    /* Keeping for clarity, but these align with initial Tailwind classes */
     max-width: 1024px;
     margin: 2rem auto;
     padding: 1.5rem;
     background-color: #ffffff; /* Light mode container background */
     border-radius: 0.75rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth theme transition */
 }
 
 body.dark .container {
@@ -69,6 +74,7 @@ body.dark section.bg-gray-50 p {
     padding: 1.5rem;
     border-radius: 0.75rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth theme transition */
 }
 
 body.dark .parlay-section {
@@ -77,12 +83,16 @@ body.dark .parlay-section {
 body.dark .parlay-section summary {
     color: #e2e8f0; /* Light text for summary */
 }
-body.dark .parlay-section h3 { /* General rule for h3 elements in dark mode parlay sections */
+/* This specific H3 rule inside parlay-section wasn't strictly necessary as the general dark body rule covers it,
+   but keeping it if there's a specific intention. Tailwind overrides might affect it. */
+body.dark .parlay-section h3 {
     color: #e2e8f0; /* Light text for headings within dark form sections */
 }
 body.dark .parlay-section summary h3 {
     color: #e2e8f0; /* Light text for summary heading */
 }
+/* The border-top-color on parlay-content isn't directly applied in your HTML,
+   but if it were, this rule would style it. */
 body.dark .parlay-section .parlay-content {
     border-top-color: #4a5568; /* Darker border */
 }
@@ -96,6 +106,7 @@ body.dark select {
     background-color: #4a505b; /* Softer dark input background */
     border-color: #5b6270; /* Softer dark border */
     color: #e2e8f0; /* Light text in inputs */
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, color 0.3s ease-in-out; /* Smooth theme transition */
 }
 body.dark input::placeholder {
     color: #a0aec0; /* Lighter placeholder text */
@@ -119,11 +130,53 @@ body.dark .text-red-500 {
     border-radius: 0.5rem;
     border: 1px solid #e5e7eb;
     align-items: center;
-    transition: all 0.3s ease;
-    /* Directly set opacity and transform for immediate visibility */
-    opacity: 1; /* Changed from 0 */
-    transform: translateY(0); /* Changed from -10px */
-    /* Removed 'animation: slideIn 0.3s ease forwards;' */
+    transition: all 0.3s ease; /* Ensure transitions for non-animation properties */
+    /* Initial state for entrance animation (controlled by .fade-in) */
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Animation for adding new player prop rows */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.player-prop-row.fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Animation for removing player prop rows */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+        height: auto;
+        padding-top: initial;
+        padding-bottom: initial;
+        margin-top: initial;
+        margin-bottom: initial;
+    }
+    to {
+        opacity: 0;
+        height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        overflow: hidden;
+        transform: translateY(-20px);
+    }
+}
+
+.player-prop-row.removing {
+    animation: fadeOut 0.4s ease-in-out forwards;
 }
 
 body.dark .player-prop-row {
@@ -151,6 +204,8 @@ body.dark .remove-prop-btn:hover {
    BUTTON COMPONENTS
    ========================================================================== */
 
+/* Buttons often benefit from direct styling or consistent Tailwind application.
+   These custom rules provide specific transitions and effects. */
 .btn-primary {
     transition: all 0.2s ease;
 }
@@ -242,6 +297,7 @@ body.dark .action-btn:hover {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Smooth theme transition */
 }
 
 body.dark .parlay-card {
@@ -259,6 +315,7 @@ body.dark .parlay-card {
     display: flex;
     flex-direction: column;
     position: relative;
+    transition: border-bottom-color 0.3s ease-in-out; /* Smooth theme transition */
 }
 
 /* Arrow icon for mobile card summary - HIDDEN */
@@ -515,18 +572,4 @@ body.dark #confirmClearBtn.bg-blue-600 {
 }
 body.dark #confirmClearBtn.bg-blue-600:hover {
     background-color: #2563eb;
-}
-
-/* Removed keyframes for slideIn as it's no longer needed for initial display */
-/* @keyframes slideIn {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-} */
-@keyframes slideOut {
-    to {
-        opacity: 0;
-        transform: translateX(-100%);
-    }
 }
