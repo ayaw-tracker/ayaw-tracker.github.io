@@ -13,7 +13,7 @@ class ParlayTracker {
     };
 
     // Replace with your actual email address
-    static FEEDBACK_EMAIL = 'your_email@example.com'; 
+    static FEEDBACK_EMAIL = '4ayaw55@gmail.com'; 
 
     constructor() {
         this.parlays = [];
