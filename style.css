@@ -18,7 +18,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: #f3f4f6; /* Light mode default background */
     color: #4a5568; /* Light mode default text color */
-    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out; /* Smooth theme transition - Adjusted to 0.15s */
+    transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
 }
 
 /* Dark Mode Styles - Softer Palette */
@@ -40,7 +40,7 @@ body.dark {
     background-color: #ffffff; /* Light mode container background */
     border-radius: 0.75rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Smooth theme transition - Adjusted to 0.15s */
+    transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
 }
 
 body.dark .container {
@@ -74,7 +74,7 @@ body.dark section.bg-gray-50 p {
     padding: 1.5rem;
     border-radius: 0.75rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Smooth theme transition - Adjusted to 0.15s */
+    transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
 }
 
 body.dark .parlay-section {
@@ -106,7 +106,7 @@ body.dark select {
     background-color: #4a505b; /* Softer dark input background */
     border-color: #5b6270; /* Softer dark border */
     color: #e2e8f0; /* Light text in inputs */
-    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, color 0.15s ease-in-out; /* Smooth theme transition - Adjusted to 0.15s */
+    transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out, color 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
 }
 body.dark input::placeholder {
     color: #a0aec0; /* Lighter placeholder text */
@@ -219,7 +219,7 @@ body.dark .remove-prop-btn:hover {
 body.dark #themeToggle {
     background-color: #5b6270; /* Softer dark background for toggle */
     color: #e2e8f0;
-    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out; /* Adjusted to 0.15s */
+    transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out; /* Adjusted to 0.1s */
 }
 body.dark #themeToggle:hover {
     background-color: #6d7688; /* Softer hover state */
@@ -298,7 +298,7 @@ body.dark .action-btn:hover {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Smooth theme transition - Adjusted to 0.15s */
+    transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
 }
 
 body.dark .parlay-card {
@@ -316,7 +316,7 @@ body.dark .parlay-card {
     display: flex;
     flex-direction: column;
     position: relative;
-    transition: border-bottom-color 0.15s ease-in-out; /* Smooth theme transition - Adjusted to 0.15s */
+    transition: border-bottom-color 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
 }
 
 /* Arrow icon for mobile card summary - HIDDEN */
@@ -348,6 +348,14 @@ body.dark .parlay-card-detail strong {
 }
 
 /* Card Actions */
+.parlay-card-actions {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column; /* Changed to column for vertical alignment */
+    justify-content: flex-end; /* Aligns buttons to the bottom of the card */
+    gap: 0.5rem; /* Space between the buttons vertically */
+}
+
 body.dark .parlay-card-actions .edit-parlay-btn {
     background-color: #6366f1; /* Adjusted indigo for dark mode */
 }
