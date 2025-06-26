@@ -140,21 +140,39 @@ body.dark .text-red-500 {
 @media (max-width: 639px) { /* Tailwind's sm breakpoint - 1px */
     .player-prop-row {
         flex-wrap: wrap; /* Allow wrapping on very small screens */
+        align-items: flex-start; /* Align items to the top when wrapped */
     }
-    /* Adjust the input containers to take full width when wrapped */
+
+    /* Target the container holding all the actual input fields */
+    .player-prop-row > div:first-child { /* This targets the inputsContainer */
+        flex-basis: 100%; /* Make it take full width */
+        flex-direction: column; /* Stack its direct children (basic/advanced containers) */
+        gap: 0.5rem; /* Smaller gap between basic/advanced containers if both were visible (though they toggle) */
+        align-items: stretch; /* Ensure children stretch to fill width */
+    }
+
+    /* Target the basic and advanced field containers themselves */
     .player-prop-row .basic-fields-container,
     .player-prop-row .advanced-fields-container {
-        flex-basis: 100%; /* Take full width */
-        flex-direction: column; /* Stack inputs vertically */
-        gap: 0.5rem; /* Smaller gap when stacked */
+        flex-basis: 100%; /* Make them take full width */
+        flex-direction: column; /* Stack inputs vertically within these containers */
+        gap: 0.5rem; /* Smaller gap between individual inputs */
+        align-items: stretch; /* Ensure inputs stretch to fill width */
     }
+
+    /* Target individual input wrappers (playerDiv, propDiv, etc.) */
     .player-prop-row .basic-fields-container > div,
     .player-prop-row .advanced-fields-container > div {
         flex-basis: 100%; /* Ensure individual inputs also take full width */
     }
-    .player-prop-row .remove-prop-btn {
-        margin-left: 0; /* Reset ml-auto on wrap */
-        width: 100%; /* Ensure button takes full width when wrapped */
+
+    /* Target the remove button's wrapper */
+    .player-prop-row .flex-shrink-0.ml-auto { /* This targets removeBtnWrapper */
+        flex-basis: 100%; /* Make it take full width */
+        margin-left: 0; /* Remove ml-auto */
+        display: flex; /* Make it a flex container */
+        justify-content: center; /* Center its content (the button) */
+        margin-top: 0.75rem; /* Add some space above the button when it wraps */
     }
 }
 
