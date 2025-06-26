@@ -12,6 +12,9 @@ class ParlayTracker {
         HAS_VISITED_BEFORE: 'hasVisitedBefore' // Key for welcome modal dismissal
     };
 
+    // Replace with your actual email address
+    static FEEDBACK_EMAIL = 'your_email@example.com'; 
+
     constructor() {
         this.parlays = [];
         this.currentSuccessCalcMethod = 'parlays';
@@ -86,6 +89,15 @@ class ParlayTracker {
         this.keepLocalBtn = null;
         this.participateBtn = null;
 
+        // Feedback Chatbox Elements
+        this.feedbackChatbox = null;
+        this.openChatBtn = null;
+        this.chatFormContainer = null;
+        this.closeChatBtn = null;
+        this.feedbackForm = null;
+        this.feedbackMessageInput = null;
+        this.sendFeedbackBtn = null;
+
         this.init();
     }
 
@@ -148,6 +160,14 @@ class ParlayTracker {
             importFileInput: 'importFileInput',
             keepLocalBtn: 'keepLocalBtn',
             participateBtn: 'participateBtn',
+            // New feedback chatbox elements
+            feedbackChatbox: 'feedbackChatbox',
+            openChatBtn: 'openChatBtn',
+            chatFormContainer: 'chatFormContainer',
+            closeChatBtn: 'closeChatBtn',
+            feedbackForm: 'feedbackForm',
+            feedbackMessageInput: 'feedbackMessage',
+            sendFeedbackBtn: 'sendFeedbackBtn',
         };
 
         // Iterate through the map to get element references and log errors if not found
@@ -323,6 +343,17 @@ class ParlayTracker {
         }
         if (this.importFileInput) {
             this.importFileInput.addEventListener('change', this.handleImportFileSelect.bind(this));
+        }
+
+        // Feedback chatbox event listeners
+        if (this.openChatBtn) {
+            this.openChatBtn.addEventListener('click', this.toggleFeedbackChatbox.bind(this));
+        }
+        if (this.closeChatBtn) {
+            this.closeChatBtn.addEventListener('click', this.toggleFeedbackChatbox.bind(this));
+        }
+        if (this.feedbackForm) {
+            this.feedbackForm.addEventListener('submit', this.sendFeedback.bind(this));
         }
     }
 
@@ -1514,6 +1545,63 @@ class ParlayTracker {
         if (this.themeToggle) {
             this.themeToggle.querySelector('i').className = savedTheme === 'dark' ? 'fas fa-moon text-xl' : 'fas fa-sun text-xl';
             this.themeToggle.setAttribute('aria-label', `Switch to ${savedTheme === 'dark' ? 'light' : 'dark'} mode`);
+        }
+    }
+
+    /**
+     * Toggles the visibility of the feedback chatbox.
+     */
+    toggleFeedbackChatbox() {
+        if (!this.chatFormContainer || !this.openChatBtn) {
+            console.error("Feedback chatbox elements not found. Cannot toggle.");
+            return;
+        }
+
+        const isOpen = this.chatFormContainer.classList.toggle('show');
+        this.chatFormContainer.classList.toggle('hidden', !isOpen); // Toggle 'hidden' based on 'show' state
+
+        // Adjust open button icon
+        if (isOpen) {
+            this.openChatBtn.innerHTML = '<i class="fas fa-times"></i>'; // 'X' icon when open
+            this.openChatBtn.setAttribute('aria-label', 'Close feedback chat');
+            this.openChatBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            this.openChatBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+            this.feedbackMessageInput?.focus(); // Focus on textarea when chat opens
+        } else {
+            this.openChatBtn.innerHTML = '<i class="fas fa-comment-dots"></i>'; // Comment icon when closed
+            this.openChatBtn.setAttribute('aria-label', 'Open feedback chat');
+            this.openChatBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+            this.openChatBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            this.feedbackMessageInput?.value = ''; // Clear message when closing
+        }
+    }
+
+    /**
+     * Handles sending feedback via a mailto link.
+     * This will open the user's default email client.
+     */
+    sendFeedback(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        if (!this.feedbackMessageInput) {
+            console.error("Feedback message input not found. Cannot send feedback.");
+            return;
+        }
+
+        const message = this.feedbackMessageInput.value.trim();
+
+        if (message) {
+            const subject = encodeURIComponent('Feedback for Are You Actually Winning?');
+            const body = encodeURIComponent(message);
+            const mailtoLink = `mailto:${ParlayTracker.FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
+
+            window.location.href = mailtoLink; // Open mail client
+
+            this.showInfoModal('Feedback Sent!', 'Your feedback has been sent. Thank you!');
+            this.feedbackMessageInput.value = ''; // Clear textarea
+            this.toggleFeedbackChatbox(); // Close the chatbox
+        } else {
+            this.showInfoModal('Oops!', 'Please type a message before sending feedback.');
         }
     }
 }
