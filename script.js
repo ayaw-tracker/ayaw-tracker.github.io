@@ -10,6 +10,7 @@ class ParlayTracker {
         DATE_FILTER_TO: 'dateFilterTo',
         TIMELINE_SUMMARY_TEXT: 'timelineSummaryText',
         HAS_VISITED_BEFORE: 'hasVisitedBefore' // Key for welcome modal dismissal
+        // Removed ADVANCED_FIELDS_VISIBLE from here, as it will not be persisted
     };
 
     // Replace with your actual email address
@@ -21,6 +22,7 @@ class ParlayTracker {
         this.editingIndex = -1;
         this.undoStack = [];
         this.playerPropCounter = 0; // New counter for unique IDs of player prop rows
+        this.advancedFieldsVisible = false; // Always start as false (hidden)
 
         // Date filtering properties
         this.filterFromDate = '';
@@ -57,6 +59,7 @@ class ParlayTracker {
         this.confirmClearBtn = null;
         this.welcomeModalTitle = null;
         this.themeToggle = null;
+        this.toggleAdvancedDetailsBtn = null; // Reference for the new button
 
         // Error span references
         this.dateErrorSpan = null;
@@ -97,6 +100,12 @@ class ParlayTracker {
         this.feedbackForm = null;
         this.feedbackMessageInput = null;
         this.sendFeedbackBtn = null;
+
+        // New: Individual Bet Details Modal elements
+        this.individualBetDetailsModal = null;
+        this.individualBetDetailsTitle = null;
+        this.individualBetsList = null;
+        this.closeIndividualBetDetailsModalBtn = null;
 
         this.init();
     }
@@ -146,6 +155,7 @@ class ParlayTracker {
             confirmClearBtn: 'confirmClearBtn',
             welcomeModalTitle: 'welcomeModalTitle',
             themeToggle: 'themeToggle',
+            toggleAdvancedDetailsBtn: 'toggleAdvancedDetailsBtn', // New element reference
             timelineDetails: 'timelineDetails',
             currentTimelineDisplay: 'currentTimelineDisplay',
             filterFromDateInput: 'filterFromDate',
@@ -168,6 +178,11 @@ class ParlayTracker {
             feedbackForm: 'feedbackForm',
             feedbackMessageInput: 'feedbackMessage',
             sendFeedbackBtn: 'sendFeedbackBtn',
+            // New: Individual Bet Details Modal elements
+            individualBetDetailsModal: 'individualBetDetailsModal',
+            individualBetDetailsTitle: 'individualBetDetailsTitle',
+            individualBetsList: 'individualBetsList',
+            closeIndividualBetDetailsModalBtn: 'closeIndividualBetDetailsModalBtn'
         };
 
         // Iterate through the map to get element references and log errors if not found
@@ -269,6 +284,14 @@ class ParlayTracker {
         } else {
             console.warn("Theme toggle button not found, theme toggle functionality will not work.");
         }
+        
+        // New: Toggle Advanced Details button
+        if (this.toggleAdvancedDetailsBtn) {
+            this.toggleAdvancedDetailsBtn.addEventListener('click', () => this.toggleAdvancedBetDetails());
+        } else {
+            console.warn("Toggle Advanced Details button not found.");
+        }
+
 
         // Global keyboard shortcuts (e.g., Ctrl+Z for undo)
         document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
@@ -306,6 +329,14 @@ class ParlayTracker {
                     if (details) {
                         details.classList.toggle('hidden');
                     }
+                }
+            }
+            // New: View Individual Bets Details button click
+            else if (target.closest('.view-individual-bets-btn')) {
+                const button = target.closest('.view-individual-bets-btn');
+                const index = parseInt(button.dataset.index);
+                if (!isNaN(index)) {
+                    this.showIndividualBetDetailsModal(index);
                 }
             }
         });
@@ -357,6 +388,11 @@ class ParlayTracker {
         }
         if (this.feedbackForm) {
             this.feedbackForm.addEventListener('submit', this.sendFeedback.bind(this));
+        }
+
+        // New: Close Individual Bet Details Modal button
+        if (this.closeIndividualBetDetailsModalBtn) {
+            this.closeIndividualBetDetailsModalBtn.addEventListener('click', this.hideIndividualBetDetailsModal.bind(this));
         }
     }
 
@@ -544,66 +580,230 @@ class ParlayTracker {
         this.clearValidationError(this.filterFromDateInput, this.dateFilterError);
     }
 
+    /**
+     * Sets or toggles the visibility of advanced input fields (Sport, League, Prop Category)
+     * and simultaneously hides/shows basic fields within individual player/team bet rows.
+     * @param {boolean|null} show - If true, shows advanced and hides basic fields.
+     * If false, hides advanced and shows basic fields.
+     * If null (default), toggles current visibility.
+     */
+    toggleAdvancedBetDetails(show = null) {
+        if (show !== null) {
+            this.advancedFieldsVisible = show;
+        } else {
+            this.advancedFieldsVisible = !this.advancedFieldsVisible;
+        }
+
+        // Update button text and icon
+        if (this.toggleAdvancedDetailsBtn) {
+            const icon = this.toggleAdvancedDetailsBtn.querySelector('i');
+            const textSpan = this.toggleAdvancedDetailsBtn.querySelector('span');
+            if (this.advancedFieldsVisible) {
+                icon.className = 'fas fa-minus mr-1';
+                textSpan.textContent = 'Hide Details';
+            } else {
+                icon.className = 'fas fa-plus mr-1';
+                textSpan.textContent = 'More Details';
+            }
+        }
+
+        // Apply visibility to currently rendered rows
+        if (this.playerPropInputsContainer) {
+            const currentRows = this.playerPropInputsContainer.querySelectorAll('.player-prop-row');
+            currentRows.forEach(row => {
+                const basicContainer = row.querySelector('.basic-fields-container');
+                const advancedContainer = row.querySelector('.advanced-fields-container');
+
+                if (basicContainer) {
+                    if (this.advancedFieldsVisible) {
+                        basicContainer.classList.add('hidden'); // Hide basic fields
+                    } else {
+                        basicContainer.classList.remove('hidden'); // Show basic fields
+                    }
+                }
+                if (advancedContainer) {
+                    if (this.advancedFieldsVisible) {
+                        advancedContainer.classList.remove('hidden'); // Show advanced fields
+                    } else {
+                        advancedContainer.classList.add('hidden'); // Hide advanced fields
+                    }
+                }
+            });
+        }
+    }
+
     // Adds a new row for individual player/team bet input
-    addPlayerPropRow(player = '', prop = '', result = 'Win') {
-        console.log('addPlayerPropRow called. playerPropInputsContainer:', this.playerPropInputsContainer); // Debugging log
+    addPlayerPropRow(player = '', prop = '', result = 'Win', sport = '', league = '', propCategory = '') {
         if (!this.playerPropInputsContainer) {
             console.error("Player prop inputs container not found. Cannot add player prop row.");
             return;
         }
         
-        // Generate a unique ID for new inputs within this row
-        const uniqueId = `player-prop-${this.playerPropCounter}`; 
-        this.playerPropCounter++; // Increment counter for the next row
+        const uniqueId = `player-prop-${this.playerPropCounter++}`;
 
-        const div = document.createElement('div');
-        // Add Tailwind classes for flex layout and spacing. 'fade-in' class for animation.
-        div.classList.add('player-prop-row', 'flex', 'flex-col', 'sm:flex-row', 'space-y-2', 'sm:space-y-0', 'sm:space-x-2', 'p-3', 'bg-gray-50', 'rounded-md', 'shadow-sm', 'mb-3', 'items-center', 'fade-in');
-        div.innerHTML = `
-            <div class="flex-1 w-full">
-                <label for="${uniqueId}-player" class="sr-only">Player/Team Name</label>
-                <input type="text" id="${uniqueId}-player" placeholder="Player/Team Name (e.g., Lakers)" value="${player}"
-                       class="player-name w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white text-gray-800" required>
-            </div>
-            <div class="flex-1 w-full">
-                <label for="${uniqueId}-prop" class="sr-only">Prop Type</label>
-                <input type="text" id="${uniqueId}-prop" placeholder="Prop Type (e.g., Over 25.5 Pts)" value="${prop}"
-                       class="prop-type w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white text-gray-800" required>
-            </div>
-            <div class="flex-shrink-0 w-full sm:w-auto">
-                <label for="${uniqueId}-result" class="sr-only">Prop Result</label>
-                <select id="${uniqueId}-result"
-                        class="prop-result w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white text-gray-800">
-                    <option value="Win" ${result === 'Win' ? 'selected' : ''}>Win</option>
-                    <option value="Loss" ${result === 'Loss' ? 'selected' : ''}>Loss</option>
-                    <option value="Push" ${result === 'Push' ? 'selected' : ''}>Push</option>
-                </select>
-            </div>
-            <div class="flex-shrink-0">
-                <button type="button" class="remove-prop-btn text-red-500 hover:text-red-700 p-2 rounded-full transition-colors duration-200" aria-label="Remove this player prop bet">
-                    <i class="fas fa-times-circle text-xl"></i>
-                </button>
-            </div>
-        `;
-        this.playerPropInputsContainer.appendChild(div);
-        console.log(`Appended player prop row. Current child count: ${this.playerPropInputsContainer.children.length}`);
+        // Create the main row div
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('player-prop-row', 'flex', 'items-center', 'gap-3', 'p-3', 'bg-gray-50', 'rounded-md', 'shadow-sm', 'mb-3', 'fade-in');
+
+        // Create the flex-grow container for inputs
+        const inputsContainer = document.createElement('div');
+        inputsContainer.classList.add('flex-grow', 'flex', 'items-center', 'gap-3');
+
+        // Create Basic Fields Container
+        const basicFieldsContainer = document.createElement('div');
+        basicFieldsContainer.classList.add('flex', 'flex-grow', 'items-center', 'gap-3', 'basic-fields-container');
+        if (this.advancedFieldsVisible) {
+            basicFieldsContainer.classList.add('hidden');
+        }
+
+        // Player/Team Name Input
+        const playerDiv = document.createElement('div');
+        playerDiv.classList.add('flex-grow');
+        const playerLabel = document.createElement('label');
+        playerLabel.htmlFor = `${uniqueId}-player`;
+        playerLabel.classList.add('sr-only');
+        playerLabel.textContent = 'Player/Team Name';
+        const playerInput = document.createElement('input');
+        playerInput.type = 'text';
+        playerInput.id = `${uniqueId}-player`;
+        playerInput.placeholder = 'Player/Team Name (e.g., LeBron James)';
+        playerInput.value = player;
+        playerInput.classList.add('player-name', 'w-full', 'p-2', 'border', 'border-gray-300', 'rounded-md', 'focus:ring-2', 'focus:ring-blue-500', 'focus:border-transparent', 'text-sm', 'bg-white', 'text-gray-800');
+        playerInput.required = true;
+        playerDiv.appendChild(playerLabel);
+        playerDiv.appendChild(playerInput);
+        basicFieldsContainer.appendChild(playerDiv);
+
+        // Prop Type Input
+        const propDiv = document.createElement('div');
+        propDiv.classList.add('flex-grow');
+        const propLabel = document.createElement('label');
+        propLabel.htmlFor = `${uniqueId}-prop`;
+        propLabel.classList.add('sr-only');
+        propLabel.textContent = 'Prop Type';
+        const propInput = document.createElement('input');
+        propInput.type = 'text';
+        propInput.id = `${uniqueId}-prop`;
+        propInput.placeholder = 'Prop Type (e.g., Over 25.5 Pts)';
+        propInput.value = prop;
+        propInput.classList.add('prop-type', 'w-full', 'p-2', 'border', 'border-gray-300', 'rounded-md', 'focus:ring-2', 'focus:ring-blue-500', 'focus:border-transparent', 'text-sm', 'bg-white', 'text-gray-800');
+        propInput.required = true;
+        propDiv.appendChild(propLabel);
+        propDiv.appendChild(propInput);
+        basicFieldsContainer.appendChild(propDiv);
+
+        // Prop Result Select
+        const propResultDiv = document.createElement('div');
+        propResultDiv.classList.add('flex-grow');
+        const propResultLabel = document.createElement('label');
+        propResultLabel.htmlFor = `${uniqueId}-result`;
+        propResultLabel.classList.add('sr-only');
+        propResultLabel.textContent = 'Prop Result';
+        const propResultSelect = document.createElement('select');
+        propResultSelect.id = `${uniqueId}-result`;
+        propResultSelect.classList.add('prop-result', 'w-full', 'p-2', 'border', 'border-gray-300', 'rounded-md', 'focus:ring-2', 'focus:ring-blue-500', 'focus:border-transparent', 'text-sm', 'bg-white', 'text-gray-800');
+        ['Win', 'Loss', 'Push'].forEach(optionText => {
+            const option = document.createElement('option');
+            option.value = optionText;
+            option.textContent = optionText;
+            if (optionText === result) {
+                option.selected = true;
+            }
+            propResultSelect.appendChild(option);
+        });
+        propResultDiv.appendChild(propResultLabel);
+        propResultDiv.appendChild(propResultSelect);
+        basicFieldsContainer.appendChild(propResultDiv);
+        inputsContainer.appendChild(basicFieldsContainer);
+
+
+        // Create Advanced Fields Container
+        const advancedFieldsContainer = document.createElement('div');
+        advancedFieldsContainer.classList.add('flex', 'flex-grow', 'items-center', 'gap-3', 'advanced-fields-container');
+        if (!this.advancedFieldsVisible) {
+            advancedFieldsContainer.classList.add('hidden');
+        }
+
+        // Sport Input
+        const sportDiv = document.createElement('div');
+        sportDiv.classList.add('flex-grow');
+        const sportLabel = document.createElement('label');
+        sportLabel.htmlFor = `${uniqueId}-sport`;
+        sportLabel.classList.add('sr-only');
+        sportLabel.textContent = 'Sport';
+        const sportInput = document.createElement('input');
+        sportInput.type = 'text';
+        sportInput.id = `${uniqueId}-sport`;
+        sportInput.placeholder = 'Sport (e.g., NBA)';
+        sportInput.value = sport;
+        sportInput.classList.add('sport-input', 'w-full', 'p-2', 'border', 'border-gray-300', 'rounded-md', 'focus:ring-2', 'focus:ring-blue-500', 'focus:border-transparent', 'text-sm', 'bg-white', 'text-gray-800');
+        sportDiv.appendChild(sportLabel);
+        sportDiv.appendChild(sportInput);
+        advancedFieldsContainer.appendChild(sportDiv);
+
+        // League Input
+        const leagueDiv = document.createElement('div');
+        leagueDiv.classList.add('flex-grow');
+        const leagueLabel = document.createElement('label');
+        leagueLabel.htmlFor = `${uniqueId}-league`;
+        leagueLabel.classList.add('sr-only');
+        leagueLabel.textContent = 'League';
+        const leagueInput = document.createElement('input');
+        leagueInput.type = 'text';
+        leagueInput.id = `${uniqueId}-league`;
+        leagueInput.placeholder = 'League (e.g., EuroLeague)';
+        leagueInput.value = league;
+        leagueInput.classList.add('league-input', 'w-full', 'p-2', 'border', 'border-gray-300', 'rounded-md', 'focus:ring-2', 'focus:ring-blue-500', 'focus:border-transparent', 'text-sm', 'bg-white', 'text-gray-800');
+        leagueDiv.appendChild(leagueLabel);
+        leagueDiv.appendChild(leagueInput);
+        advancedFieldsContainer.appendChild(leagueDiv);
+
+        // Prop Category Input
+        const propCategoryDiv = document.createElement('div');
+        propCategoryDiv.classList.add('flex-grow');
+        const propCategoryLabel = document.createElement('label');
+        propCategoryLabel.htmlFor = `${uniqueId}-prop-category`;
+        propCategoryLabel.classList.add('sr-only');
+        propCategoryLabel.textContent = 'Prop Category';
+        const propCategoryInput = document.createElement('input');
+        propCategoryInput.type = 'text';
+        propCategoryInput.id = `${uniqueId}-prop-category`;
+        propCategoryInput.placeholder = 'Category (e.g., Points)';
+        propCategoryInput.value = propCategory;
+        propCategoryInput.classList.add('prop-category-input', 'w-full', 'p-2', 'border', 'border-gray-300', 'rounded-md', 'focus:ring-2', 'focus:ring-blue-500', 'focus:border-transparent', 'text-sm', 'bg-white', 'text-gray-800');
+        propCategoryDiv.appendChild(propCategoryLabel);
+        propCategoryDiv.appendChild(propCategoryInput);
+        advancedFieldsContainer.appendChild(propCategoryDiv);
+        inputsContainer.appendChild(advancedFieldsContainer);
+
+        // Create Remove Button
+        const removeBtnWrapper = document.createElement('div');
+        removeBtnWrapper.classList.add('flex-shrink-0', 'ml-auto');
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.classList.add('remove-prop-btn', 'text-red-500', 'hover:text-red-700', 'p-2', 'rounded-full', 'transition-colors', 'duration-200');
+        removeButton.setAttribute('aria-label', 'Remove this player prop bet');
+        const removeIcon = document.createElement('i');
+        removeIcon.classList.add('fas', 'fa-times-circle', 'text-xl');
+        removeButton.appendChild(removeIcon);
+        removeBtnWrapper.appendChild(removeButton);
+
+        // Append all parts to the main row div
+        rowDiv.appendChild(inputsContainer);
+        rowDiv.appendChild(removeBtnWrapper);
+
+        // Append the complete row to the container
+        this.playerPropInputsContainer.appendChild(rowDiv);
 
         // Attach event listener to the newly created remove button
-        const removeButton = div.querySelector('.remove-prop-btn');
-        if (removeButton) {
-            removeButton.addEventListener('click', (e) => {
-                const row = e.target.closest('.player-prop-row');
-                if (row) {
-                    // Add the 'removing' class to trigger the fadeOut animation
-                    row.classList.add('removing');
-                    // Listen for the animation to end, then remove the element from the DOM
-                    row.addEventListener('animationend', () => {
-                        row.remove();
-                        console.log('Player prop row removed after animation.');
-                    }, { once: true }); // Use { once: true } to automatically remove listener after it fires
-                }
-            });
-        }
+        removeButton.addEventListener('click', () => {
+            // Add the 'removing' class to trigger the fadeOut animation
+            rowDiv.classList.add('removing');
+            // Listen for the animation to end, then remove the element from the DOM
+            rowDiv.addEventListener('animationend', () => {
+                rowDiv.remove();
+            }, { once: true });
+        });
     }
 
     // Clears all dynamically added player prop input rows
@@ -650,18 +850,47 @@ class ParlayTracker {
             const playerPropRows = this.playerPropInputsContainer.querySelectorAll('.player-prop-row');
             let allPropsValid = true;
             playerPropRows.forEach(row => {
+                // Determine which set of fields is currently visible to extract data from
+                const basicContainer = row.querySelector('.basic-fields-container');
+                const advancedContainer = row.querySelector('.advanced-fields-container');
+
+                let playerVal = '';
+                let propVal = '';
+                let propResultVal = 'Win'; // Default
+
+                let sportVal = '';
+                let leagueVal = '';
+                let propCategoryVal = '';
+
+                // Always attempt to get values from both, as they might have been filled
+                // and then the view toggled. We prioritize the *potentially* filled basic
+                // fields for required data.
                 const playerInput = row.querySelector('.player-name');
                 const propInput = row.querySelector('.prop-type');
                 const propResultInput = row.querySelector('.prop-result');
+                const sportInput = row.querySelector('.sport-input');
+                const leagueInput = row.querySelector('.league-input');
+                const propCategoryInput = row.querySelector('.prop-category-input');
+                
+                playerVal = playerInput ? playerInput.value.trim() : '';
+                propVal = propInput ? propInput.value.trim() : '';
+                propResultVal = propResultInput ? propResultInput.value : 'Win';
+                sportVal = sportInput ? sportInput.value.trim() : '';
+                leagueVal = leagueInput ? leagueInput.value.trim() : '';
+                propCategoryVal = propCategoryInput ? propCategoryInput.value.trim() : '';
 
-                // Check if player and prop fields are filled
-                if (!playerInput || !playerInput.value.trim() || !propInput || !propInput.value.trim()) {
-                    allPropsValid = false; // Mark as invalid if any field is empty
+                // Basic required fields are always required, regardless of advanced fields visibility
+                if (!playerVal || !propVal) {
+                    allPropsValid = false;
                 }
+
                 individualBets.push({
-                    player: playerInput ? playerInput.value.trim() : '',
-                    prop: propInput ? propInput.value.trim() : '',
-                    result: propResultInput ? propResultInput.value : 'Win'
+                    player: playerVal,
+                    prop: propVal,
+                    result: propResultVal,
+                    sport: sportVal,
+                    league: leagueVal,
+                    propCategory: propCategoryVal
                 });
             });
 
@@ -748,6 +977,7 @@ class ParlayTracker {
             this.parlaySectionDetails.open = false; // Close the "Add New Parlay" section
         }
         this.clearAllValidationErrors(); // Clear any remaining validation errors
+        this.toggleAdvancedBetDetails(false); // Explicitly hide advanced details on form reset
     }
 
     // Populates the form with data from a selected parlay for editing
@@ -779,9 +1009,21 @@ class ParlayTracker {
 
         this.clearPlayerPropRows(); // Clear existing player prop rows
         // Add player prop rows based on the individual bets in the parlay
+        let hasAdvancedData = parlay.individualBets.some(bet => bet.sport || bet.league || bet.propCategory);
+
         parlay.individualBets.forEach(bet => {
-            this.addPlayerPropRow(bet.player, bet.prop, bet.result);
+            this.addPlayerPropRow(
+                bet.player,
+                bet.prop,
+                bet.result,
+                bet.sport, // Pass sport
+                bet.league, // Pass league
+                bet.propCategory // Pass propCategory
+            );
         });
+
+        // Set visibility of advanced details for the form based on whether any edited bet has advanced data
+        this.toggleAdvancedBetDetails(hasAdvancedData);
 
         if (this.submitBtn) {
             this.submitBtn.textContent = 'Update Parlay Entry'; // Change button text to "Update"
@@ -877,11 +1119,11 @@ class ParlayTracker {
         const headers = [
             "Date", "Result", "Play Type", "Amount Wagered", "Amount Won/Loss",
             // Dynamic headers for individual bets
-            "Individual Bet 1 Player", "Individual Bet 1 Prop", "Individual Bet 1 Result",
-            "Individual Bet 2 Player", "Individual Bet 2 Prop", "Individual Bet 2 Result",
-            "Individual Bet 3 Player", "Individual Bet 3 Prop", "Individual Bet 3 Result",
-            "Individual Bet 4 Player", "Individual Bet 4 Prop", "Individual Bet 4 Result",
-            "Individual Bet 5 Player", "Individual Bet 5 Prop", "Individual Bet 5 Result"
+            "Individual Bet 1 Player", "Individual Bet 1 Prop", "Individual Bet 1 Result", "Individual Bet 1 Sport", "Individual Bet 1 League", "Individual Bet 1 Prop Category", // New
+            "Individual Bet 2 Player", "Individual Bet 2 Prop", "Individual Bet 2 Result", "Individual Bet 2 Sport", "Individual Bet 2 League", "Individual Bet 2 Prop Category", // New
+            "Individual Bet 3 Player", "Individual Bet 3 Prop", "Individual Bet 3 Result", "Individual Bet 3 Sport", "Individual Bet 3 League", "Individual Bet 3 Prop Category", // New
+            "Individual Bet 4 Player", "Individual Bet 4 Prop", "Individual Bet 4 Result", "Individual Bet 4 Sport", "Individual Bet 4 League", "Individual Bet 4 Prop Category", // New
+            "Individual Bet 5 Player", "Individual Bet 5 Prop", "Individual Bet 5 Result", "Individual Bet 5 Sport", "Individual Bet 5 League", "Individual Bet 5 Prop Category"  // New
         ]; // Max 5 individual bets to keep headers reasonable
 
         let csvContent = headers.join(',') + '\n'; // Start CSV string with headers
@@ -903,8 +1145,11 @@ class ParlayTracker {
                     row.push(`"${bet.player.replace(/"/g, '""')}"`);
                     row.push(`"${bet.prop.replace(/"/g, '""')}"`);
                     row.push(`"${bet.result.replace(/"/g, '""')}"`);
+                    row.push(`"${(bet.sport || '').replace(/"/g, '""')}"`); // New: add sport (empty string if undefined)
+                    row.push(`"${(bet.league || '').replace(/"/g, '""')}"`); // New: add league (empty string if undefined)
+                    row.push(`"${(bet.propCategory || '').replace(/"/g, '""')}"`); // New: add propCategory (empty string if undefined)
                 } else {
-                    row.push('', '', ''); // Add empty columns for missing bets
+                    row.push('', '', '', '', '', ''); // Add empty columns for missing bets (3 original + 3 new)
                 }
             }
             csvContent += row.join(',') + '\n'; // Add row to CSV content
@@ -1146,7 +1391,24 @@ class ParlayTracker {
                 day: 'numeric'
             });
 
+            // Helper to format advanced bet details (used within the modal)
+            const formatAdvancedBetDetails = (bet) => {
+                const details = [];
+                if (bet.sport) details.push(`Sport: <strong>${bet.sport}</strong>`);
+                if (bet.league) details.push(`League: <strong>${bet.league}</strong>`);
+                if (bet.propCategory) details.push(`Category: <strong>${bet.propCategory}</strong>`);
+                return details.length > 0 ? `<p class="text-xs text-gray-500 mt-1 space-x-2">${details.join(' | ')}</p>` : '';
+            };
+
+            // Generate HTML for individual bets to display directly in the table cell
+            const individualBetsHtml = parlay.individualBets.map(bet => {
+                const resultClass = getResultTextColor(bet.result);
+                return `<li>${bet.player}: ${bet.prop} (<span class="${resultClass}">${bet.result}</span>)</li>`;
+            }).join('');
+
+
             // HTML for desktop table row
+            // Modified Individual Bets column to show a button
             const tableRow = `
                 <tr data-index="${this.parlays.indexOf(parlay)}"> <!-- Use original index for editing/deleting -->
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formattedDate}</td>
@@ -1155,17 +1417,24 @@ class ParlayTracker {
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">$${parlay.amountWagered.toFixed(2)}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${getResultTextColor(parlay.amountWonLoss > 0 ? 'Win' : parlay.amountWonLoss < 0 ? 'Loss' : 'Push')}">$${parlay.amountWonLoss.toFixed(2)}</td>
                     <td class="px-6 py-4 text-sm text-gray-900">
-                        ${parlay.individualBets.map(bet => `<div>${bet.player}: ${bet.prop} (<span class="${getResultTextColor(bet.result)}">${bet.result}</span>)</div>`).join('')}
+                        <ul class="list-disc list-inside text-xs space-y-0.5 mb-1">
+                            ${individualBetsHtml}
+                        </ul>
+                        <button class="view-individual-bets-btn text-blue-600 hover:text-blue-800 font-medium mt-1" data-index="${this.parlays.indexOf(parlay)}">
+                            View All Details
+                        </button>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button class="edit-parlay-btn text-indigo-600 hover:text-indigo-900 mr-3" data-index="${this.parlays.indexOf(parlay)}" aria-label="Edit parlay entry from ${formattedDate}">Edit</button>
-                        <button class="delete-parlay-btn bg-red-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-red-600 transition-colors duration-200" data-index="${this.parlays.indexOf(parlay)}">Delete</button>
+                    <td class="px-6 py-4 text-right text-sm font-medium">
+                        <div class="flex flex-col space-y-2">
+                            <button class="edit-parlay-btn bg-indigo-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-600 transition-colors duration-200" data-index="${this.parlays.indexOf(parlay)}" aria-label="Edit parlay entry from ${formattedDate}">Edit</button>
+                            <button class="delete-parlay-btn bg-red-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-red-600 transition-colors duration-200" data-index="${this.parlays.indexOf(parlay)}" aria-label="Delete parlay entry from ${formattedDate}">Delete</button>
+                        </div>
                     </td>
                 </tr>
             `;
             this.parlayTableBody.insertAdjacentHTML('beforeend', tableRow);
 
-            // HTML for mobile card view
+            // HTML for mobile card view (remains unchanged, already has toggle)
             const cardHtml = `
                 <div class="parlay-card border-gray-200 bg-white" data-index="${this.parlays.indexOf(parlay)}">
                     <div class="parlay-card-summary">
@@ -1186,10 +1455,10 @@ class ParlayTracker {
                     <div class="parlay-card-toggle-details hidden">
                         <p class="text-sm font-medium text-gray-700 mb-1">Individual Bets:</p>
                         <ul class="parlay-card-bets">
-                            ${parlay.individualBets.map(bet => `<li>${bet.player}: ${bet.prop} (<span class="${getResultTextColor(bet.result)}">${bet.result}</span>)</li>`).join('')}
+                            ${parlay.individualBets.map(bet => `<li>${bet.player}: ${bet.prop} (<span class="${getResultTextColor(bet.result)}">${bet.result}</span>)${formatAdvancedBetDetails(bet)}</li>`).join('')}
                         </ul>
                     </div>
-                    <div class="parlay-card-actions mt-4 flex justify-end space-x-2">
+                    <div class="parlay-card-actions mt-4 flex flex-col justify-end gap-2">
                         <button class="edit-parlay-btn bg-indigo-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-indigo-600 transition-colors duration-200" data-index="${this.parlays.indexOf(parlay)}">Edit</button>
                         <button class="delete-parlay-btn bg-red-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-red-600 transition-colors duration-200" data-index="${this.parlays.indexOf(parlay)}">Delete</button>
                     </div>
@@ -1323,7 +1592,7 @@ class ParlayTracker {
             toDateObj = new Date(this.filterToDate + 'T00:00:00');
         }
 
-        // Validate date range: 'From' date cannot be after 'To' date
+        // Date range validation: 'From' date cannot be after 'To' date
         if (fromDateObj && toDateObj && fromDateObj > toDateObj) {
             this.showValidationError(this.filterFromDateInput, 'Start date cannot be after end date.', this.dateFilterError);
             isValidDateRange = false;
@@ -1365,7 +1634,7 @@ class ParlayTracker {
         let to = '';
         let displayString = '';
 
-        // Helper to format date to YYYY-MM-DD for input fields
+        // Helper to format date toYYYY-MM-DD for input fields
         const formatDate = (date) => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1422,6 +1691,10 @@ class ParlayTracker {
     initializeUI() {
         this.applySavedTheme(); // Apply saved theme (dark/light)
         
+        // Explicitly set advanced fields to hidden on UI initialization
+        this.advancedFieldsVisible = false; 
+        this.toggleAdvancedBetDetails(false); // Call with 'false' to ensure hidden state and correct button text
+
         // Re-apply date filters from localStorage and update display on initial load
         this.filterFromDate = localStorage.getItem(ParlayTracker.STORAGE_KEYS.DATE_FILTER_FROM) || '';
         this.filterToDate = localStorage.getItem(ParlayTracker.STORAGE_KEYS.DATE_FILTER_TO) || '';
@@ -1461,6 +1734,7 @@ class ParlayTracker {
         this.renderParlays();
         this.updateSummary();
         this.resetForm(); // Reset form to clear inputs and add one default prop row
+        // Note: resetForm also calls toggleAdvancedBetDetails(false) to ensure they are hidden.
 
         // Show welcome modal on first load if it's never been dismissed
         this.checkAndShowWelcomeModal();
@@ -1626,6 +1900,85 @@ class ParlayTracker {
         } else {
             this.showInfoModal('Oops!', 'Please type a message before sending feedback.');
         }
+    }
+
+    /**
+     * Displays the individual bet details for a specific parlay in a modal.
+     * @param {number} parlayIndex - The index of the parlay in the `this.parlays` array.
+     */
+    showIndividualBetDetailsModal(parlayIndex) {
+        if (!this.individualBetDetailsModal || !this.individualBetDetailsTitle || !this.individualBetsList) {
+            console.error("Individual bet details modal elements not found. Cannot show modal.");
+            return;
+        }
+
+        const parlay = this.parlays[parlayIndex];
+        if (!parlay) {
+            console.error(`Parlay not found at index: ${parlayIndex}`);
+            return;
+        }
+
+        // Format date for modal title
+        const formattedDate = new Date(parlay.date + 'T00:00:00').toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        this.individualBetDetailsTitle.textContent = `Individual Bets for ${formattedDate}`;
+        this.individualBetsList.innerHTML = ''; // Clear previous list items
+
+        // Helper function to get text color based on result (for Tailwind classes)
+        const getResultTextColor = (result) => {
+            if (result === 'Win') return 'text-green-600';
+            if (result === 'Loss') return 'text-red-600';
+            if (result === 'Push') return 'text-yellow-600';
+            return ''; // Default if no match
+        };
+
+        parlay.individualBets.forEach(bet => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('p-3', 'rounded-md', 'border', 'border-gray-200', 'bg-white', 'shadow-sm');
+
+            // Basic details
+            const basicInfo = document.createElement('p');
+            basicInfo.classList.add('text-base', 'font-semibold');
+            basicInfo.innerHTML = `<strong>${bet.player}</strong>: <span>${bet.prop}</span> (<span class="${getResultTextColor(bet.result)}">${bet.result}</span>)`;
+            listItem.appendChild(basicInfo);
+
+            // Advanced details (only if they exist)
+            const advancedDetails = [];
+            if (bet.sport) advancedDetails.push(`Sport: <strong>${bet.sport}</strong>`);
+            if (bet.league) advancedDetails.push(`League: <strong>${bet.league}</strong>`);
+            if (bet.propCategory) advancedDetails.push(`Category: <strong>${bet.propCategory}</strong>`);
+
+            if (advancedDetails.length > 0) {
+                const advancedInfo = document.createElement('p');
+                advancedInfo.classList.add('text-xs', 'text-gray-500', 'mt-1', 'space-x-2');
+                advancedInfo.innerHTML = advancedDetails.join(' | ');
+                listItem.appendChild(advancedInfo);
+            }
+
+            this.individualBetsList.appendChild(listItem);
+        });
+
+        // Show the modal with a slight delay to allow CSS transitions
+        this.individualBetDetailsModal.classList.remove('hidden');
+        setTimeout(() => {
+            this.individualBetDetailsModal.classList.add('show');
+        }, 10);
+    }
+
+    /**
+     * Hides the individual bet details modal.
+     */
+    hideIndividualBetDetailsModal() {
+        if (!this.individualBetDetailsModal) return;
+
+        this.individualBetDetailsModal.classList.remove('show'); // Trigger fade-out transition
+        this.individualBetDetailsModal.addEventListener('transitionend', () => {
+            this.individualBetDetailsModal.classList.add('hidden'); // Fully hide after transition
+        }, { once: true });
     }
 }
 
