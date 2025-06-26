@@ -45,7 +45,7 @@ body.dark {
 
 body.dark .container {
     background-color: #303640; /* Softer dark container background */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Darker shadow */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Darker shadow */
 }
 
 /* Header elements */
@@ -122,19 +122,42 @@ body.dark .text-red-500 {
 
 /* Player Prop Form Rows */
 .player-prop-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) auto;
-    gap: 0.75rem;
+    /* This is now a flex container for its children: basic-fields-container, advanced-fields-container, remove-prop-btn */
+    display: flex;
+    flex-wrap: nowrap; /* Prevent wrapping initially to keep all items on one line if space allows */
+    align-items: center; /* Vertically align items */
+    gap: 0.75rem; /* Space between flex items */
     padding: 0.75rem;
     background-color: #f9fafb;
     border-radius: 0.5rem;
     border: 1px solid #e5e7eb;
-    align-items: center;
     transition: all 0.3s ease; /* Ensure transitions for non-animation properties */
-    /* Initial state for entrance animation (controlled by .fade-in) */
-    opacity: 0;
+    opacity: 0; /* Initial state for entrance animation (controlled by .fade-in) */
     transform: translateY(20px);
 }
+
+/* Media query for small screens: allow wrapping for player prop rows */
+@media (max-width: 639px) { /* Tailwind's sm breakpoint - 1px */
+    .player-prop-row {
+        flex-wrap: wrap; /* Allow wrapping on very small screens */
+    }
+    /* Adjust the input containers to take full width when wrapped */
+    .player-prop-row .basic-fields-container,
+    .player-prop-row .advanced-fields-container {
+        flex-basis: 100%; /* Take full width */
+        flex-direction: column; /* Stack inputs vertically */
+        gap: 0.5rem; /* Smaller gap when stacked */
+    }
+    .player-prop-row .basic-fields-container > div,
+    .player-prop-row .advanced-fields-container > div {
+        flex-basis: 100%; /* Ensure individual inputs also take full width */
+    }
+    .player-prop-row .remove-prop-btn {
+        margin-left: 0; /* Reset ml-auto on wrap */
+        width: 100%; /* Ensure button takes full width when wrapped */
+    }
+}
+
 
 /* Animation for adding new player prop rows */
 @keyframes fadeIn {
@@ -199,6 +222,45 @@ body.dark .remove-prop-btn {
 body.dark .remove-prop-btn:hover {
     background-color: #6d7688; /* Hover state for remove button */
 }
+
+/* Styles for basic and advanced input containers */
+.basic-fields-container,
+.advanced-fields-container {
+    flex-grow: 1; /* Allow these containers to take available space */
+    display: flex; /* Make them flex containers internally */
+    align-items: center; /* Vertically align inputs within them */
+    gap: 0.75rem; /* Space between inputs */
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* Keep these for smooth transition */
+    opacity: 1; 
+    transform: translateY(0);
+    /* Important: Initial height/padding/margin setup for transition */
+    height: auto;
+    padding-top: initial;
+    padding-bottom: initial;
+    margin-top: initial;
+    margin-bottom: initial;
+}
+/* Ensure individual input wrappers can grow too */
+.basic-fields-container > div,
+.advanced-fields-container > div {
+    flex-grow: 1; /* Make all direct children grow */
+}
+
+
+/* When 'hidden' is applied via JS, or initially */
+.basic-fields-container.hidden,
+.advanced-fields-container.hidden {
+    opacity: 0;
+    transform: translateY(10px); /* Slight downward translate for fade-out */
+    height: 0; /* Collapse height */
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    overflow: hidden; /* Hide content */
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out;
+}
+
 
 /* ==========================================================================
    BUTTON COMPONENTS
@@ -582,6 +644,47 @@ body.dark #confirmClearBtn.bg-blue-600 {
 body.dark #confirmClearBtn.bg-blue-600:hover {
     background-color: #2563eb;
 }
+
+/* Styles for the new individual bet details modal */
+.individual-bet-modal-content {
+    max-width: 600px; /* Slightly wider for more details */
+    text-align: left; /* Align text left for lists */
+}
+
+.individual-bet-modal-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.individual-bet-modal-content li {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+body.dark .individual-bet-modal-content li {
+    background-color: #4a505b;
+    border-color: #5b6270;
+    color: #e2e8f0;
+}
+
+.individual-bet-modal-content li strong {
+    color: #1f2937; /* Default for light mode */
+}
+body.dark .individual-bet-modal-content li strong {
+    color: #e2e8f0; /* Light text for strong in dark mode */
+}
+.individual-bet-modal-content li span {
+    color: #4a5568; /* Default for light mode */
+}
+body.dark .individual-bet-modal-content li span {
+    color: #cbd5e0; /* Light text for span in dark mode */
+}
+
 
 /* ==========================================================================
    FEEDBACK CHATBOX STYLES
