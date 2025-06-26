@@ -13,7 +13,7 @@ class ParlayTracker {
     };
 
     // Replace with your actual email address
-    static FEEDBACK_EMAIL = 'your_email@example.com'; 
+    static FEEDBACK_EMAIL = '4ayaw55@gmail.com'; 
 
     constructor() {
         this.parlays = [];
@@ -175,7 +175,7 @@ class ParlayTracker {
             const element = document.getElementById(id);
             if (element) {
                 this[propertyName] = element;
-                // console.log(`Element found: ${propertyName} (${id})`); // Temporary log for debugging
+                // console.log(`Element found: ${propertyName} (${id})`); // Uncomment for detailed debugging
             } else {
                 console.error(`ERROR: Element with ID '${id}' for property '${propertyName}' not found. Functionality relying on this element may be broken.`);
                 this[propertyName] = null; // Explicitly set to null if not found
@@ -194,7 +194,7 @@ class ParlayTracker {
             const element = document.getElementById(id);
             if (element) {
                 this[propertyName] = element;
-                // console.log(`Error Span found: ${propertyName} (${id})`); // Temporary log for debugging
+                // console.log(`Error Span found: ${propertyName} (${id})`); // Uncomment for detailed debugging
             } else {
                 console.warn(`WARNING: Error span with ID '${id}' for property '${propertyName}' not found. Validation messages may not display.`);
                 this[propertyName] = null;
@@ -204,11 +204,8 @@ class ParlayTracker {
         // Special query for elements not having an ID directly
         this.parlaySectionDetails = document.querySelector('details.parlay-section');
         if (this.parlaySectionDetails) {
-            // console.log("Element found: parlaySectionDetails (details.parlay-section)"); // Temporary log for debugging
             this.parlayFormSummary = this.parlaySectionDetails.querySelector('summary');
-            if (this.parlayFormSummary) {
-                // console.log("Element found: parlayFormSummary (summary inside details)"); // Temporary log for debugging
-            } else {
+            if (!this.parlayFormSummary) {
                 console.error("ERROR: Summary element within '.parlay-section' not found. Form toggle may not function.");
             }
         } else {
@@ -1162,7 +1159,7 @@ class ParlayTracker {
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button class="edit-parlay-btn text-indigo-600 hover:text-indigo-900 mr-3" data-index="${this.parlays.indexOf(parlay)}" aria-label="Edit parlay entry from ${formattedDate}">Edit</button>
-                        <button class="delete-parlay-btn text-red-600 hover:text-red-900" data-index="${this.parlays.indexOf(parlay)}" aria-label="Delete parlay entry from ${formattedDate}">Delete</button>
+                        <button class="delete-parlay-btn bg-red-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-red-600 transition-colors duration-200" data-index="${this.parlays.indexOf(parlay)}">Delete</button>
                     </td>
                 </tr>
             `;
@@ -1577,7 +1574,10 @@ class ParlayTracker {
             this.openChatBtn.setAttribute('aria-label', 'Close feedback chat');
             this.openChatBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
             this.openChatBtn.classList.add('bg-red-500', 'hover:bg-red-600');
-            this.feedbackMessageInput?.focus(); // Focus on textarea when chat opens
+            // Explicitly check before accessing .value
+            if (this.feedbackMessageInput) {
+                this.feedbackMessageInput.focus(); // Focus on textarea when chat opens
+            }
         } else {
             // HIDE chatbox
             this.chatFormContainer.classList.remove('show'); // Triggers opacity/transform fade-out
@@ -1589,7 +1589,10 @@ class ParlayTracker {
             this.openChatBtn.setAttribute('aria-label', 'Open feedback chat');
             this.openChatBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
             this.openChatBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-            this.feedbackMessageInput?.value = ''; // Clear message when closing
+            // Explicitly check before accessing .value
+            if (this.feedbackMessageInput) {
+                this.feedbackMessageInput.value = ''; // Clear message when closing
+            }
         }
     }
 
@@ -1615,7 +1618,10 @@ class ParlayTracker {
             window.location.href = mailtoLink; // Open mail client
 
             this.showInfoModal('Feedback Sent!', 'Your feedback has been sent. Thank you!');
-            this.feedbackMessageInput.value = ''; // Clear textarea
+            // Explicitly check before accessing .value
+            if (this.feedbackMessageInput) {
+                this.feedbackMessageInput.value = ''; // Clear textarea
+            }
             this.toggleFeedbackChatbox(); // Close the chatbox
         } else {
             this.showInfoModal('Oops!', 'Please type a message before sending feedback.');
@@ -1625,5 +1631,6 @@ class ParlayTracker {
 
 // Initialize the app when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('ParlayTracker script loaded and DOMContentLoaded fired. Initializing app.');
     new ParlayTracker();
 });
