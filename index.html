@@ -705,6 +705,94 @@
       .hidden {
         display: none !important;
       }
+
+      /* ==========================================================================
+   MOBILE BET HISTORY CARD STYLES
+   ========================================================================== */
+
+      /* Base styling for mobile parlay cards */
+      .parlay-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s ease;
+      }
+
+      .parlay-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .parlay-card-summary {
+        margin-bottom: 0.75rem;
+      }
+
+      .parlay-card-detail {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: #374151;
+      }
+
+      .parlay-card-detail span {
+        color: #6b7280;
+      }
+
+      .parlay-card-detail strong {
+        color: #374151;
+      }
+
+      .parlay-card-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      /* Dark mode styling for mobile parlay cards */
+      body.dark .parlay-card {
+        background-color: #303640;
+        border-color: #4a5568;
+      }
+
+      body.dark .parlay-card h3 {
+        color: #e2e8f0;
+      }
+
+      body.dark .parlay-card .parlay-card-detail span {
+        color: #cbd5e0;
+      }
+
+      body.dark .parlay-card .parlay-card-detail strong {
+        color: #e2e8f0;
+      }
+
+      body.dark .parlay-card .parlay-card-bets li {
+        color: #e2e8f0;
+      }
+
+      body.dark .parlay-card .text-base.font-semibold {
+        color: #e2e8f0;
+      }
+
+      /* Dark mode for mobile card action buttons */
+      body.dark .parlay-card button.edit-parlay-btn {
+        background-color: #3b82f6 !important;
+        color: #ffffff !important;
+      }
+
+      body.dark .parlay-card button.edit-parlay-btn:hover {
+        background-color: #2563eb !important;
+      }
+
+      body.dark .parlay-card button.delete-parlay-btn {
+        background-color: #ef4444 !important;
+        color: #ffffff !important;
+      }
+
+      body.dark .parlay-card button.delete-parlay-btn:hover {
+        background-color: #dc2626 !important;
+      }
     </style>
   </head>
 
@@ -868,6 +956,7 @@
                   step="0.01"
                   min="0"
                   placeholder="0.00"
+                  inputmode="decimal"
                   class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
                 />
                 <span
@@ -1437,10 +1526,7 @@
           >
             Bet Details
           </h3>
-          <div
-            id="individualBetsList"
-            class="space-y-4"
-          >
+          <div id="individualBetsList" class="space-y-4">
             <!-- Individual bet details will be populated here -->
           </div>
           <div class="mt-6 flex justify-end">
