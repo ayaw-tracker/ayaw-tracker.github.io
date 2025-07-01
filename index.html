@@ -706,92 +706,71 @@
         display: none !important;
       }
 
-      /* ==========================================================================
-   MOBILE BET HISTORY CARD STYLES
-   ========================================================================== */
+      /* Enhanced input spacing for better touch targets and usability */
+      .form-section input[type="date"],
+      .form-section input[type="number"],
+      .form-section input[type="text"],
+      .form-section select,
+      .money-input,
+      .odds-input {
+        padding: 12px 16px !important;
+        font-size: 16px;
+        line-height: 1.5;
+        min-height: 48px;
+      }
 
-      /* Base styling for mobile parlay cards */
-      .parlay-card {
-        background-color: #ffffff;
+      /* Additional spacing for form groups */
+      .form-section .grid > div {
+        margin-bottom: 20px;
+      }
+
+      /* Better spacing for player prop input containers */
+      #playerPropInputs > div {
+        padding: 16px;
+        margin-bottom: 16px;
         border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        transition: all 0.2s ease;
+        border-radius: 8px;
+        background-color: #f9fafb;
       }
 
-      .parlay-card:hover {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      body.dark #playerPropInputs > div {
+        background-color: #374151;
+        border-color: #4b5563;
       }
 
-      .parlay-card-summary {
-        margin-bottom: 0.75rem;
+      /* Improved button spacing */
+      .form-section button {
+        padding: 12px 24px;
+        min-height: 48px;
       }
 
-      .parlay-card-detail {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-        color: #374151;
+      /* Mobile/Desktop responsive display for bet history */
+      @media (max-width: 767px) {
+        /* Hide table on mobile */
+        .overflow-x-auto {
+          display: none !important;
+        }
+        /* Show cards on mobile */
+        #betHistoryContainer {
+          display: block !important;
+        }
+        #noBetsMessageDesktop {
+          display: none !important;
+        }
       }
 
-      .parlay-card-detail span {
-        color: #6b7280;
-      }
-
-      .parlay-card-detail strong {
-        color: #374151;
-      }
-
-      .parlay-card-actions {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
-      }
-
-      /* Dark mode styling for mobile parlay cards */
-      body.dark .parlay-card {
-        background-color: #303640;
-        border-color: #4a5568;
-      }
-
-      body.dark .parlay-card h3 {
-        color: #e2e8f0;
-      }
-
-      body.dark .parlay-card .parlay-card-detail span {
-        color: #cbd5e0;
-      }
-
-      body.dark .parlay-card .parlay-card-detail strong {
-        color: #e2e8f0;
-      }
-
-      body.dark .parlay-card .parlay-card-bets li {
-        color: #e2e8f0;
-      }
-
-      body.dark .parlay-card .text-base.font-semibold {
-        color: #e2e8f0;
-      }
-
-      /* Dark mode for mobile card action buttons */
-      body.dark .parlay-card button.edit-parlay-btn {
-        background-color: #3b82f6 !important;
-        color: #ffffff !important;
-      }
-
-      body.dark .parlay-card button.edit-parlay-btn:hover {
-        background-color: #2563eb !important;
-      }
-
-      body.dark .parlay-card button.delete-parlay-btn {
-        background-color: #ef4444 !important;
-        color: #ffffff !important;
-      }
-
-      body.dark .parlay-card button.delete-parlay-btn:hover {
-        background-color: #dc2626 !important;
+      @media (min-width: 768px) {
+        /* Show table on desktop */
+        .overflow-x-auto {
+          display: block !important;
+        }
+        /* Hide cards on desktop */
+        #betHistoryContainer {
+          display: none !important;
+        }
+        #noBetsMessage {
+          display: none !important;
+        }
       }
     </style>
   </head>
@@ -828,7 +807,7 @@
       </section>
 
       <!-- Bet Input Form -->
-      <details class="parlay-section bg-white p-4 sm:p-6 rounded-lg shadow-sm mb-8">
+      <details class="parlay-section bg-white p-6 rounded-lg shadow-sm mb-8">
         <summary
           class="cursor-pointer flex justify-center items-center text-2xl font-semibold text-gray-700 mb-4"
           aria-controls="betFormContent"
@@ -842,7 +821,7 @@
             <button
               type="button"
               id="selectStraightBetBtn"
-              class="bet-type-btn bg-blue-600 text-white py-3 px-8 text-base font-medium rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 active"
+              class="bet-type-btn bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 active"
               data-bet-type="straight"
             >
               Straight Bet
@@ -850,7 +829,7 @@
             <button
               type="button"
               id="selectParlayBtn"
-              class="bet-type-btn bg-gray-200 text-gray-800 py-3 px-8 text-base font-medium rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              class="bet-type-btn bg-gray-200 text-gray-800 py-2 px-6 rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
               data-bet-type="parlay"
             >
               Parlay
@@ -858,7 +837,7 @@
           </div>
 
           <form id="betForm" class="space-y-6" novalidate>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <!-- Date -->
               <div class="col-span-full flex justify-center">
                 <div class="w-full sm:w-1/2 lg:w-1/3">
@@ -871,7 +850,7 @@
                     type="date"
                     id="date"
                     required
-                    class="w-full px-4 py-3 text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
                   />
                   <span
                     class="text-red-500 text-xs mt-1 hidden"
@@ -889,7 +868,7 @@
                 >
                 <select
                   id="result"
-                  class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
                 >
                   <option value="Win">Win</option>
                   <option value="Loss">Loss</option>
@@ -913,7 +892,7 @@
                 >
                 <select
                   id="playType"
-                  class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
                 >
                   <option value="Power">Power Play</option>
                   <option value="Flex">Flex Play</option>
@@ -935,7 +914,7 @@
                   type="text"
                   id="straightOdds"
                   placeholder="+100 or -110"
-                  class="w-full px-4 py-3 text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
                 />
                 <span
                   class="text-red-500 text-xs mt-1 hidden"
@@ -956,8 +935,7 @@
                   step="0.01"
                   min="0"
                   placeholder="0.00"
-                  inputmode="decimal"
-                  class="money-input w-full px-4 py-3 text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                  class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
                 />
                 <span
                   class="text-red-500 text-xs mt-1 hidden"
@@ -977,7 +955,7 @@
                   id="amountWonLoss"
                   step="0.01"
                   placeholder="0.00"
-                  class="money-input w-full px-4 py-3 text-base border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                  class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
                 />
                 <span
                   class="text-red-500 text-xs mt-1 hidden"
@@ -999,7 +977,7 @@
               <button
                 type="button"
                 id="addPlayerPropBtn"
-                class="w-full bg-gray-200 text-gray-800 py-3 px-4 text-base rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out"
+                class="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out"
               >
                 + Add Player/Team Bet
               </button>
@@ -1021,7 +999,7 @@
               <button
                 type="submit"
                 id="submitBtn"
-                class="bg-blue-600 text-white py-3 px-6 text-base font-medium rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+                class="bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
               >
                 Add Bet Entry
               </button>
@@ -1241,7 +1219,7 @@
         />
 
         <!-- Desktop Table View -->
-        <div class="hidden md:block overflow-x-auto">
+        <div class="overflow-x-auto">
           <table class="w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
@@ -1296,7 +1274,7 @@
         </div>
 
         <!-- Mobile Card View -->
-        <div id="betHistoryContainer" class="block md:hidden space-y-4 px-2">
+        <div id="betHistoryContainer" class="space-y-4">
           <div id="noBetsMessage" class="text-center text-gray-500 py-8">
             No bets recorded yet. Add your first bet above to get started!
           </div>
@@ -1305,7 +1283,7 @@
         <!-- No bets message for desktop -->
         <div
           id="noBetsMessageDesktop"
-          class="hidden md:block text-center text-gray-500 py-8"
+          class="text-center text-gray-500 py-8"
         >
           No bets recorded yet. Add your first bet above to get started!
         </div>
