@@ -1019,13 +1019,17 @@ resetPlayerProps() {
         
         // Set styling based on current bet type
         if (this.currentBetType === 'straight') {
-            this.amountWonLossInput.placeholder = 'Enter wager & odds';
+            this.amountWonLossInput.placeholder = 'Calculated';
             this.amountWonLossInput.readOnly = true;
             this.amountWonLossInput.classList.add('bg-gray-200', 'text-gray-500');
         } else {
-            this.amountWonLossInput.placeholder = '0.00';
+            // For parlays, set up the field properly based on current result
+            this.amountWonLossInput.placeholder = 'Enter win amount';
             this.amountWonLossInput.readOnly = false;
             this.amountWonLossInput.classList.remove('bg-gray-200', 'text-gray-500');
+            
+            // Update the field based on current result selection
+            setTimeout(() => this.updateWonLossBasedOnResult(), 0);
         }
         
         this.straightBetOddsInput.value = '';
