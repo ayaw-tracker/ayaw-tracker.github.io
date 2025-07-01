@@ -398,6 +398,45 @@ body.dark .bet-card {
     border-color: #4a5568;
 }
 
+/* Base styling for mobile parlay cards */
+.parlay-card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.parlay-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.parlay-card-summary {
+    margin-bottom: 0.75rem;
+}
+
+.parlay-card-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+.parlay-card-detail span {
+    color: #6b7280;
+}
+
+.parlay-card-detail strong {
+    color: #374151;
+}
+
+.parlay-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
 /* Dark mode styling for bet card text */
 body.dark .parlay-card {
     background-color: #303640;
