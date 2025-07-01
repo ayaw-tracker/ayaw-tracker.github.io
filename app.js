@@ -148,13 +148,11 @@ class ParlayTracker {
                 if (['0', '0.00'].includes(e.target.value)) e.target.select();
             });
             this.amountWageredInput.addEventListener('input', e => {
-                e.target.value = e.target.value.replace(/[^0-9.]/g, '');
                 if (this.currentBetType === 'straight') this.updateWonLossForStraightBet();
                 else this.updateWonLossBasedOnResult();
             });
-            this.amountWageredInput.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
         }
-        if (this.amountWonLossInput) this.amountWonLossInput.addEventListener('blur', this.formatCurrencyOnBlur.bind(this));
+
         if (this.straightBetOddsInput) {
             this.straightBetOddsInput.addEventListener('input', e => {
                 e.target.value = e.target.value.replace(/[^0-9+-]/g, '');
@@ -1683,8 +1681,13 @@ resetPlayerProps() {
         const isOptedIn = localStorage.getItem('caseStudyOptIn') === 'true';
         
         if (isOptedIn) {
-            // Gray styling for opt-out button
-            optInBtn.className = 'fixed bottom-6 left-6 bg-gray-500 text-white text-xs px-3 py-2 rounded-full shadow-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 z-50';
+            // Different styling based on theme
+            const isDarkMode = document.body.classList.contains('dark');
+            if (isDarkMode) {
+                optInBtn.className = 'fixed bottom-6 left-6 bg-slate-600 text-gray-100 text-xs px-3 py-2 rounded-full shadow-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 z-50';
+            } else {
+                optInBtn.className = 'fixed bottom-6 left-6 bg-gray-600 text-white text-xs px-3 py-2 rounded-full shadow-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all duration-200 z-50';
+            }
             optInBtn.textContent = 'Opt Out?';
             optInBtn.title = 'Click to leave case study';
             optInBtn.setAttribute('aria-label', 'Leave case study');
@@ -1864,6 +1867,7 @@ resetPlayerProps() {
             this.themeToggle.setAttribute('aria-label', `Switch to ${isDark ? 'light' : 'dark'} mode`);
         }
         this.applyDarkModeButtonStyles();
+        this.updateOptInButtonState(); // Update opt-in button for theme change
     }
 
     applySavedTheme() {
