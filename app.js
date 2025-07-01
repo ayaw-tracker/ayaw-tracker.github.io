@@ -571,7 +571,7 @@ class ParlayTracker {
     }
 
     updateWonLossBasedOnResult() {
-        if (this.currentBetType === 'straight') return;
+        if (this.currentBetType !== 'parlay') return;
         if (!this.resultInput || !this.amountWageredInput || !this.amountWonLossInput) return;
         const result = this.resultInput.value;
         const wagered = parseFloat(this.amountWageredInput.value) || 0;
@@ -827,6 +827,11 @@ handleBetTypeSelection(type) {
     // Reset form inputs and player props for the selected bet type
     this.resetFormInputs();
     this.resetPlayerProps();
+    
+    // Update won/loss calculation for parlays
+    if (type === 'parlay') {
+        this.updateWonLossBasedOnResult();
+    }
 }
 
 // Resets general form inputs (date, odds, wagered, won/loss, etc.)
@@ -842,9 +847,13 @@ resetFormInputs() {
         this.amountWonLossInput.readOnly = true;
         this.amountWonLossInput.classList.add('bg-gray-200', 'text-gray-500');
     } else {
-        this.amountWonLossInput.placeholder = '0.00';
+        // For parlays, set up the field properly based on current result
+        this.amountWonLossInput.placeholder = 'Enter win amount';
         this.amountWonLossInput.readOnly = false;
         this.amountWonLossInput.classList.remove('bg-gray-200', 'text-gray-500');
+        
+        // Update the field based on current result selection
+        setTimeout(() => this.updateWonLossBasedOnResult(), 0);
     }
 
     this.straightBetOddsInput.value = '';
@@ -1717,7 +1726,7 @@ resetPlayerProps() {
         }
 
         // Recent performance
-        const weekWins = recentWeek.filter(bet => bet.result === 'win').length;
+        const weekWins = recentWeek.filter(bet => bet.result.toLowerCase() === 'win').length;
         const weekTotal = recentWeek.length;
         if (weekTotal >= 5) {
             const weekRate = Math.round((weekWins / weekTotal) * 100);
@@ -1741,9 +1750,9 @@ resetPlayerProps() {
         insights.push(...teamInsights);
 
         // Bet type performance
-        const parlayWins = recentBets.filter(bet => bet.betType === 'parlay' && bet.result === 'win').length;
+        const parlayWins = recentBets.filter(bet => bet.betType === 'parlay' && bet.result.toLowerCase() === 'win').length;
         const parlayTotal = recentBets.filter(bet => bet.betType === 'parlay').length;
-        const straightWins = recentBets.filter(bet => bet.betType === 'straight' && bet.result === 'win').length;
+        const straightWins = recentBets.filter(bet => bet.betType === 'straight' && bet.result.toLowerCase() === 'win').length;
         const straightTotal = recentBets.filter(bet => bet.betType === 'straight').length;
         
         if (parlayTotal >= 5 && straightTotal >= 5) {
@@ -1778,17 +1787,17 @@ resetPlayerProps() {
             }
         }
         
-        return { type: lastResult === 'win' ? 'winning' : 'losing', count };
+        return { type: lastResult.toLowerCase() === 'win' ? 'winning' : 'losing', count };
     }
 
     getAverageWinAmount(bets) {
-        const wins = bets.filter(bet => bet.result === 'win');
+        const wins = bets.filter(bet => bet.result.toLowerCase() === 'win');
         if (wins.length === 0) return 0;
         return wins.reduce((sum, bet) => sum + bet.amountWonLoss, 0) / wins.length;
     }
 
     getAverageLossAmount(bets) {
-        const losses = bets.filter(bet => bet.result === 'loss');
+        const losses = bets.filter(bet => bet.result.toLowerCase() === 'loss');
         if (losses.length === 0) return 0;
         return Math.abs(losses.reduce((sum, bet) => sum + bet.amountWonLoss, 0) / losses.length);
     }
@@ -1808,7 +1817,7 @@ resetPlayerProps() {
                     if (!teamStats[team]) teamStats[team] = { wins: 0, total: 0, profit: 0 };
                     teamStats[team].total++;
                     teamStats[team].profit += bet.amountWonLoss;
-                    if (bet.result === 'win') teamStats[team].wins++;
+                    if (bet.result.toLowerCase() === 'win') teamStats[team].wins++;
                 }
             });
         });
