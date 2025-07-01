@@ -1,1117 +1,1494 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Are You Actually Winning? | Sports Betting Tracker</title>
-    <meta name="description" content="Track your sports betting performance honestly with our free parlay and straight bet tracker. Get the black and white truth about your wins and losses.">
-    
+    <meta
+      name="description"
+      content="Track your sports betting performance honestly with our free parlay and straight bet tracker. Get the black and white truth about your wins and losses."
+    />
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Configure Tailwind -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'inter': ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              inter: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
     </script>
-    
+
     <style>
-/* ==========================================================================
+      /* ==========================================================================
    PARLAY BETTING APP STYLES
    ========================================================================== */
 
-/* ==========================================================================
+      /* ==========================================================================
    BASE STYLES
    ========================================================================== */
 
-html, body {
-    height: 100%; /* Ensure HTML and Body take full viewport height */
-    min-height: 100vh; /* Ensure minimum viewport height */
-    margin: 0; /* Remove default body margin */
-    padding: 0; /* Remove default body padding */
-    line-height: 1.5; /* Default line height for readability */
-}
+      html,
+      body {
+        height: 100%; /* Ensure HTML and Body take full viewport height */
+        min-height: 100vh; /* Ensure minimum viewport height */
+        margin: 0; /* Remove default body margin */
+        padding: 0; /* Remove default body padding */
+        line-height: 1.5; /* Default line height for readability */
+      }
 
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f3f4f6; /* Light mode default background */
-    color: #4a5568; /* Light mode default text color */
-    transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
-}
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6; /* Light mode default background */
+        color: #4a5568; /* Light mode default text color */
+        transition:
+          background-color 0.1s ease-in-out,
+          color 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
+      }
 
-/* Dark Mode Styles - Modern Clean Palette */
-body.dark {
-    background-color: #0f172a; /* Deep navy background */
-    color: #e2e8f0; /* Light text */
-}
+      /* Dark Mode Styles - Modern Clean Palette */
+      body.dark {
+        background-color: #0f172a; /* Deep navy background */
+        color: #e2e8f0; /* Light text */
+      }
 
-/* ==========================================================================
+      /* ==========================================================================
    LAYOUT COMPONENTS
    ========================================================================== */
 
-.container {
-    /* Tailwind already handles max-width, margin auto, padding, border-radius, box-shadow */
-    /* Keeping for clarity, but these align with initial Tailwind classes */
-    max-width: 1024px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    background-color: #ffffff; /* Light mode container background */
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
-}
+      .container {
+        /* Tailwind already handles max-width, margin auto, padding, border-radius, box-shadow */
+        /* Keeping for clarity, but these align with initial Tailwind classes */
+        max-width: 1024px;
+        margin: 2rem auto;
+        padding: 1.5rem;
+        background-color: #ffffff; /* Light mode container background */
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition:
+          background-color 0.1s ease-in-out,
+          box-shadow 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
+      }
 
-body.dark .container {
-    background-color: #1e293b; /* Modern slate container */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Deeper shadow for contrast */
-}
+      body.dark .container {
+        background-color: #1e293b; /* Modern slate container */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Deeper shadow for contrast */
+      }
 
-/* Header elements */
-body.dark header h1 {
-    color: #e2e8f0; /* Light text for dark mode header */
-}
-body.dark header p {
-    color: #cbd5e0; /* Slightly darker light text for dark mode header */
-}
+      /* Header elements */
+      body.dark header h1 {
+        color: #e2e8f0; /* Light text for dark mode header */
+      }
+      body.dark header p {
+        color: #cbd5e0; /* Slightly darker light text for dark mode header */
+      }
 
-/* Mission statement section */
-body.dark section.bg-gray-50 {
-    background-color: #383e47; /* Softer background for mission statement */
-}
-body.dark section.bg-gray-50 p {
-    color: #cbd5e0; /* Light text for mission statement */
-}
+      /* Mission statement section */
+      body.dark section.bg-gray-50 {
+        background-color: #383e47; /* Softer background for mission statement */
+      }
+      body.dark section.bg-gray-50 p {
+        color: #cbd5e0; /* Light text for mission statement */
+      }
 
-/* ==========================================================================
+      /* ==========================================================================
    FORM COMPONENTS
    ========================================================================== */
 
-/* Remove spinner arrows from number inputs */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
+      /* Remove spinner arrows from number inputs */
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
 
-input[type="number"] {
-    -moz-appearance: textfield;
-}
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
 
-/* Ensure calculated field styling is properly applied */
-input.bg-gray-200 {
-    background-color: #e5e7eb !important;
-    color: #6b7280 !important;
-}
+      /* Ensure calculated field styling is properly applied */
+      input.bg-gray-200 {
+        background-color: #e5e7eb !important;
+        color: #6b7280 !important;
+      }
 
-/* Dark mode styling for calculated fields */
-body.dark input.bg-gray-200 {
-    background-color: #4b5563 !important;
-    color: #9ca3af !important;
-}
+      /* Dark mode styling for calculated fields */
+      body.dark input.bg-gray-200 {
+        background-color: #4b5563 !important;
+        color: #9ca3af !important;
+      }
 
-/* Dark mode styling for form elements */
-body.dark input,
-body.dark select,
-body.dark textarea {
-    background-color: #334155 !important;
-    border-color: #475569 !important;
-    color: #f1f5f9 !important;
-}
+      /* Dark mode styling for form elements */
+      body.dark input,
+      body.dark select,
+      body.dark textarea {
+        background-color: #334155 !important;
+        border-color: #475569 !important;
+        color: #f1f5f9 !important;
+      }
 
-body.dark input:focus,
-body.dark select:focus,
-body.dark textarea:focus {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4) !important;
-}
+      body.dark input:focus,
+      body.dark select:focus,
+      body.dark textarea:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4) !important;
+      }
 
-/* Dark mode styling for buttons */
-body.dark button {
-    background-color: #475569;
-    color: #f1f5f9;
-    border-color: #64748b;
-}
+      /* Dark mode styling for buttons */
+      body.dark button {
+        background-color: #475569;
+        color: #f1f5f9;
+        border-color: #64748b;
+      }
 
-body.dark button:hover {
-    background-color: #334155;
-}
+      body.dark button:hover {
+        background-color: #334155;
+      }
 
-body.dark button.bg-blue-600 {
-    background-color: #2563eb !important;
-    color: #ffffff !important;
-}
+      body.dark button.bg-blue-600 {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+      }
 
-body.dark button.bg-gray-200 {
-    background-color: #475569 !important;
-    color: #f1f5f9 !important;
-}
+      body.dark button.bg-gray-200 {
+        background-color: #475569 !important;
+        color: #f1f5f9 !important;
+      }
 
-/* Dark mode for summary statistics */
-body.dark .bg-white {
-    background-color: #334155 !important;
-}
+      /* Dark mode for summary statistics */
+      body.dark .bg-white {
+        background-color: #334155 !important;
+      }
 
-body.dark .bg-gray-50 {
-    background-color: #475569 !important;
-}
+      body.dark .bg-gray-50 {
+        background-color: #475569 !important;
+      }
 
-body.dark .text-gray-800 {
-    color: #f1f5f9 !important;
-}
+      body.dark .text-gray-800 {
+        color: #f1f5f9 !important;
+      }
 
-body.dark .text-gray-600 {
-    color: #cbd5e1 !important;
-}
+      body.dark .text-gray-600 {
+        color: #cbd5e1 !important;
+      }
 
-body.dark .text-red-600 {
-    color: #f87171 !important;
-}
+      body.dark .text-red-600 {
+        color: #f87171 !important;
+      }
 
-body.dark .text-green-600 {
-    color: #34d399 !important;
-}
+      body.dark .text-green-600 {
+        color: #34d399 !important;
+      }
 
-/* Dark mode for table elements */
-body.dark table {
-    background-color: #334155 !important;
-}
+      /* Dark mode for table elements */
+      body.dark table {
+        background-color: #334155 !important;
+      }
 
-body.dark th {
-    background-color: #475569 !important;
-    color: #f1f5f9 !important;
-}
+      body.dark th {
+        background-color: #475569 !important;
+        color: #f1f5f9 !important;
+      }
 
-body.dark td {
-    color: #cbd5e1 !important;
-    border-color: #475569 !important;
-}
+      body.dark td {
+        color: #cbd5e1 !important;
+        border-color: #475569 !important;
+      }
 
-body.dark tr:nth-child(even) {
-    background-color: #475569 !important;
-}
+      body.dark tr:nth-child(even) {
+        background-color: #475569 !important;
+      }
 
-/* Dark mode for summary statistics section */
-body.dark .bg-blue-100 {
-    background-color: #1e293b !important;
-}
+      /* Dark mode for summary statistics section */
+      body.dark .bg-blue-100 {
+        background-color: #1e293b !important;
+      }
 
-body.dark .text-blue-800 {
-    color: #e5e7eb !important;
-}
+      body.dark .text-blue-800 {
+        color: #e5e7eb !important;
+      }
 
-body.dark .text-blue-700 {
-    color: #d1d5db !important;
-}
+      body.dark .text-blue-700 {
+        color: #d1d5db !important;
+      }
 
-body.dark .text-blue-600 {
-    color: #9ca3af !important;
-}
+      body.dark .text-blue-600 {
+        color: #9ca3af !important;
+      }
 
-body.dark .text-blue-900 {
-    color: #f9fafb !important;
-}
+      body.dark .text-blue-900 {
+        color: #f9fafb !important;
+      }
 
-body.dark .border-blue-300 {
-    border-color: #4b5563 !important;
-}
+      body.dark .border-blue-300 {
+        border-color: #4b5563 !important;
+      }
 
-/* Toggle box hover effects in dark mode */
-body.dark #profitLossToggle:hover {
-    background-color: #374151 !important;
-}
+      /* Toggle box hover effects in dark mode */
+      body.dark #profitLossToggle:hover {
+        background-color: #374151 !important;
+      }
 
-body.dark #profitLossToggle .group-hover\:text-blue-700 {
-    color: #cbd5e1 !important;
-}
+      body.dark #profitLossToggle .group-hover\:text-blue-700 {
+        color: #cbd5e1 !important;
+      }
 
-body.dark #profitLossToggle .group-hover\:text-blue-800 {
-    color: #e5e7eb !important;
-}
+      body.dark #profitLossToggle .group-hover\:text-blue-800 {
+        color: #e5e7eb !important;
+      }
 
-/* View All button in dark mode */
-body.dark .view-individual-bets-btn {
-    color: #60a5fa !important;
-}
+      /* View All button in dark mode */
+      body.dark .view-individual-bets-btn {
+        color: #60a5fa !important;
+      }
 
-body.dark .view-individual-bets-btn:hover {
-    color: #3b82f6 !important;
-}
+      body.dark .view-individual-bets-btn:hover {
+        color: #3b82f6 !important;
+      }
 
-/* Feedback interface in dark mode */
-body.dark #chatFormContainer {
-    background-color: #374151 !important;
-    border-color: #4b5563 !important;
-}
+      /* Feedback interface in dark mode */
+      body.dark #chatFormContainer {
+        background-color: #374151 !important;
+        border-color: #4b5563 !important;
+      }
 
-body.dark #chatFormContainer h3 {
-    color: #f9fafb !important;
-}
+      body.dark #chatFormContainer h3 {
+        color: #f9fafb !important;
+      }
 
-body.dark #chatFormContainer label {
-    color: #e5e7eb !important;
-}
+      body.dark #chatFormContainer label {
+        color: #e5e7eb !important;
+      }
 
-body.dark #chatFormContainer textarea {
-    background-color: #4b5563 !important;
-    border-color: #6b7280 !important;
-    color: #f9fafb !important;
-}
+      body.dark #chatFormContainer textarea {
+        background-color: #4b5563 !important;
+        border-color: #6b7280 !important;
+        color: #f9fafb !important;
+      }
 
-body.dark #chatFormContainer textarea::placeholder {
-    color: #9ca3af !important;
-}
+      body.dark #chatFormContainer textarea::placeholder {
+        color: #9ca3af !important;
+      }
 
-body.dark #chatFormContainer textarea:focus {
-    border-color: #60a5fa !important;
-    ring-color: #60a5fa !important;
-}
+      body.dark #chatFormContainer textarea:focus {
+        border-color: #60a5fa !important;
+        ring-color: #60a5fa !important;
+      }
 
-body.dark #openChatBtn {
-    background-color: #3b82f6 !important;
-}
+      body.dark #openChatBtn {
+        background-color: #3b82f6 !important;
+      }
 
-body.dark #openChatBtn:hover {
-    background-color: #2563eb !important;
-}
+      body.dark #openChatBtn:hover {
+        background-color: #2563eb !important;
+      }
 
-/* Ensure close button is clickable */
-#closeChatBtn {
-    z-index: 10;
-    cursor: pointer;
-}
+      /* Ensure close button is clickable */
+      #closeChatBtn {
+        z-index: 10;
+        cursor: pointer;
+      }
 
-#closeChatBtn:hover {
-    color: #374151 !important;
-}
+      #closeChatBtn:hover {
+        color: #374151 !important;
+      }
 
-body.dark #closeChatBtn:hover {
-    color: #d1d5db !important;
-}
+      body.dark #closeChatBtn:hover {
+        color: #d1d5db !important;
+      }
 
-/* Timeline filter section dark mode */
-body.dark #timelineDetails summary {
-    background-color: #334155 !important;
-    border-color: #6b7280 !important;
-}
+      /* Timeline filter section dark mode */
+      body.dark #timelineDetails summary {
+        background-color: #334155 !important;
+        border-color: #6b7280 !important;
+      }
 
-body.dark #timelineDetails summary span:first-child {
-    color: #f3f4f6 !important;
-}
+      body.dark #timelineDetails summary span:first-child {
+        color: #f3f4f6 !important;
+      }
 
-body.dark #timelineDetails summary:hover {
-    background-color: #475569 !important;
-}
+      body.dark #timelineDetails summary:hover {
+        background-color: #475569 !important;
+      }
 
-body.dark #timelineDetails .bg-white {
-    background-color: #334155 !important;
-    border-color: #6b7280 !important;
-}
+      body.dark #timelineDetails .bg-white {
+        background-color: #334155 !important;
+        border-color: #6b7280 !important;
+      }
 
-body.dark #timelineDetails label {
-    color: #f3f4f6 !important;
-}
+      body.dark #timelineDetails label {
+        color: #f3f4f6 !important;
+      }
 
-body.dark #timelineDetails input[type="date"] {
-    background-color: #374151 !important;
-    border-color: #6b7280 !important;
-    color: #f9fafb !important;
-}
+      body.dark #timelineDetails input[type="date"] {
+        background-color: #374151 !important;
+        border-color: #6b7280 !important;
+        color: #f9fafb !important;
+      }
 
-body.dark #timelineDetails input[type="date"]:focus {
-    border-color: #60a5fa !important;
-}
+      body.dark #timelineDetails input[type="date"]:focus {
+        border-color: #60a5fa !important;
+      }
 
-body.dark #timelineDetails .bg-blue-100 {
-    background-color: #2563eb !important;
-    color: #f0f9ff !important;
-}
+      body.dark #timelineDetails .bg-blue-100 {
+        background-color: #2563eb !important;
+        color: #f0f9ff !important;
+      }
 
-body.dark #timelineDetails .bg-blue-100:hover {
-    background-color: #1d4ed8 !important;
-}
+      body.dark #timelineDetails .bg-blue-100:hover {
+        background-color: #1d4ed8 !important;
+      }
 
-body.dark #timelineDetails .bg-gray-100 {
-    background-color: #374151 !important;
-    color: #f3f4f6 !important;
-}
+      body.dark #timelineDetails .bg-gray-100 {
+        background-color: #374151 !important;
+        color: #f3f4f6 !important;
+      }
 
-body.dark #timelineDetails .bg-gray-100:hover {
-    background-color: #4b5563 !important;
-}
+      body.dark #timelineDetails .bg-gray-100:hover {
+        background-color: #4b5563 !important;
+      }
 
-body.dark #currentTimelineDisplay {
-    color: #93c5fd !important;
-}
+      body.dark #currentTimelineDisplay {
+        color: #93c5fd !important;
+      }
 
-/* Remove default details marker */
-#timelineDetails summary::-webkit-details-marker {
-    display: none;
-}
+      /* Remove default details marker */
+      #timelineDetails summary::-webkit-details-marker {
+        display: none;
+      }
 
-/* Remove box shadow and background from View All links */
-.view-individual-bets-btn {
-    box-shadow: none !important;
-    background: none !important;
-    border: none !important;
-    padding: 0 !important;
-    text-decoration: none !important;
-}
+      /* Remove box shadow and background from View All links */
+      .view-individual-bets-btn {
+        box-shadow: none !important;
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        text-decoration: none !important;
+      }
 
-.view-individual-bets-btn:hover {
-    box-shadow: none !important;
-    background: none !important;
-    text-decoration: underline !important;
-}
+      .view-individual-bets-btn:hover {
+        box-shadow: none !important;
+        background: none !important;
+        text-decoration: underline !important;
+      }
 
-/* Remove glossy appearance from select dropdowns */
-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23374151' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.5rem center;
-    background-size: 14px 10px;
-    padding-right: 2rem !important;
-}
+      /* Remove glossy appearance from select dropdowns */
+      select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23374151' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.5rem center;
+        background-size: 14px 10px;
+        padding-right: 2rem !important;
+      }
 
-/* Dark mode dropdown arrow */
-body.dark select {
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23cbd5e1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
-}
+      /* Dark mode dropdown arrow */
+      body.dark select {
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23cbd5e1' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+      }
 
-/* ==========================================================================
+      /* ==========================================================================
    AUTOCOMPLETE DROPDOWN STYLES
    ========================================================================== */
 
-.autocomplete-dropdown {
-    z-index: 1000 !important;
-    margin-top: 1px;
-    border-top: none;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    animation: fadeInDown 0.15s ease-out;
-}
+      .autocomplete-dropdown {
+        z-index: 1000 !important;
+        margin-top: 1px;
+        border-top: none;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        animation: fadeInDown 0.15s ease-out;
+      }
 
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-.autocomplete-item {
-    transition: background-color 0.1s ease-in-out;
-    border-bottom: 1px solid #f3f4f6;
-}
+      .autocomplete-item {
+        transition: background-color 0.1s ease-in-out;
+        border-bottom: 1px solid #f3f4f6;
+      }
 
-.autocomplete-item:last-child {
-    border-bottom: none;
-    border-bottom-left-radius: 0.375rem;
-    border-bottom-right-radius: 0.375rem;
-}
+      .autocomplete-item:last-child {
+        border-bottom: none;
+        border-bottom-left-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+      }
 
-.autocomplete-item:hover,
-.autocomplete-item.selected {
-    background-color: #eff6ff !important;
-}
+      .autocomplete-item:hover,
+      .autocomplete-item.selected {
+        background-color: #eff6ff !important;
+      }
 
-/* Dark mode autocomplete styles */
-body.dark .autocomplete-dropdown {
-    background-color: #374151 !important;
-    border-color: #4b5563 !important;
-    color: #f9fafb !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
-}
+      /* Dark mode autocomplete styles */
+      body.dark .autocomplete-dropdown {
+        background-color: #374151 !important;
+        border-color: #4b5563 !important;
+        color: #f9fafb !important;
+        box-shadow:
+          0 10px 15px -3px rgba(0, 0, 0, 0.5),
+          0 4px 6px -2px rgba(0, 0, 0, 0.25);
+      }
 
-body.dark .autocomplete-item {
-    border-bottom-color: #4b5563;
-    color: #f9fafb;
-}
+      body.dark .autocomplete-item {
+        border-bottom-color: #4b5563;
+        color: #f9fafb;
+      }
 
-body.dark .autocomplete-item:hover,
-body.dark .autocomplete-item.selected {
-    background-color: #4b5563 !important;
-    color: #f9fafb !important;
-}
+      body.dark .autocomplete-item:hover,
+      body.dark .autocomplete-item.selected {
+        background-color: #4b5563 !important;
+        color: #f9fafb !important;
+      }
 
-/* Ensure autocomplete works with form layout */
-.player-prop-row > div:first-child {
-    position: relative;
-}
+      /* Ensure autocomplete works with form layout */
+      .player-prop-row > div:first-child {
+        position: relative;
+      }
 
-.player-prop-row > div:first-child > div {
-    position: relative;
-}
+      .player-prop-row > div:first-child > div {
+        position: relative;
+      }
 
-/* Parlay Input Form section */
-.parlay-section {
-    background-color: #ffffff; /* Light mode default */
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
-}
+      /* Parlay Input Form section */
+      .parlay-section {
+        background-color: #ffffff; /* Light mode default */
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition:
+          background-color 0.1s ease-in-out,
+          box-shadow 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
+      }
 
-body.dark .parlay-section {
-    background-color: #303640; /* Softer dark background for form section */
-}
-body.dark .parlay-section summary {
-    color: #e2e8f0; /* Light text for summary */
-}
-/* This specific H3 rule inside parlay-section wasn't strictly necessary as the general dark body rule covers it,
+      body.dark .parlay-section {
+        background-color: #303640; /* Softer dark background for form section */
+      }
+      body.dark .parlay-section summary {
+        color: #e2e8f0; /* Light text for summary */
+      }
+      /* This specific H3 rule inside parlay-section wasn't strictly necessary as the general dark body rule covers it,
    but keeping it if there's a specific intention. Tailwind overrides might affect it. */
-body.dark .parlay-section h3 {
-    color: #e2e8f0; /* Light text for headings within dark form sections */
-}
-body.dark .parlay-section summary h3 {
-    color: #e2e8f0; /* Light text for summary heading */
-}
-/* The border-top-color on parlay-content isn't directly applied in your HTML,
+      body.dark .parlay-section h3 {
+        color: #e2e8f0; /* Light text for headings within dark form sections */
+      }
+      body.dark .parlay-section summary h3 {
+        color: #e2e8f0; /* Light text for summary heading */
+      }
+      /* The border-top-color on parlay-content isn't directly applied in your HTML,
    but if it were, this rule would style it. */
-body.dark .parlay-section .parlay-content {
-    border-top-color: #4a5568; /* Darker border */
-}
+      body.dark .parlay-section .parlay-content {
+        border-top-color: #4a5568; /* Darker border */
+      }
 
-/* Form inputs and labels */
-body.dark label {
-    color: #cbd5e0; /* Light text for labels */
-}
-body.dark input,
-body.dark select {
-    background-color: #4a505b; /* Softer dark input background */
-    border-color: #5b6270; /* Softer dark border */
-    color: #e2e8f0; /* Light text in inputs */
-    transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out, color 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
-}
-body.dark input::placeholder {
-    color: #a0aec0; /* Lighter placeholder text */
-}
-body.dark input:focus,
-body.dark select:focus {
-    border-color: #63b3ed; /* Brighter focus ring in dark mode */
-    --tw-ring-color: #63b3ed; /* Tailwind ring color for dark mode */
-}
-body.dark .text-red-500 {
-    color: #fca5a5; /* Adjust validation error color for dark mode */
-}
+      /* Form inputs and labels */
+      body.dark label {
+        color: #cbd5e0; /* Light text for labels */
+      }
+      body.dark input,
+      body.dark select {
+        background-color: #4a505b; /* Softer dark input background */
+        border-color: #5b6270; /* Softer dark border */
+        color: #e2e8f0; /* Light text in inputs */
+        transition:
+          background-color 0.1s ease-in-out,
+          border-color 0.1s ease-in-out,
+          color 0.1s ease-in-out; /* Smooth theme transition - Adjusted to 0.1s */
+      }
+      body.dark input::placeholder {
+        color: #a0aec0; /* Lighter placeholder text */
+      }
+      body.dark input:focus,
+      body.dark select:focus {
+        border-color: #63b3ed; /* Brighter focus ring in dark mode */
+        --tw-ring-color: #63b3ed; /* Tailwind ring color for dark mode */
+      }
+      body.dark .text-red-500 {
+        color: #fca5a5; /* Adjust validation error color for dark mode */
+      }
 
-/* ==========================================================================
+      /* ==========================================================================
    BUTTON COMPONENTS
    ========================================================================== */
 
-/* Buttons often benefit from direct styling or consistent Tailwind application.
+      /* Buttons often benefit from direct styling or consistent Tailwind application.
    These custom rules provide specific transitions and effects. */
-.btn-primary {
-    transition: all 0.2s ease;
-}
+      .btn-primary {
+        transition: all 0.2s ease;
+      }
 
-.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
+      .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      }
 
-/* Theme toggle button specific styles in dark mode */
-body.dark #themeToggle {
-    background-color: #5b6270; /* Softer dark background for toggle */
-    color: #e2e8f0;
-    transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out; /* Adjusted to 0.1s */
-}
-body.dark #themeToggle:hover {
-    background-color: #6d7688; /* Softer hover state */
-}
+      /* Theme toggle button specific styles in dark mode */
+      body.dark #themeToggle {
+        background-color: #5b6270; /* Softer dark background for toggle */
+        color: #e2e8f0;
+        transition:
+          background-color 0.1s ease-in-out,
+          color 0.1s ease-in-out; /* Adjusted to 0.1s */
+      }
+      body.dark #themeToggle:hover {
+        background-color: #6d7688; /* Softer hover state */
+      }
 
-/* Opt In button dark mode styling */
-body.dark #optInBtn {
-    background-color: #059669 !important; /* Green-600 for consistency */
-    color: #ffffff !important;
-}
+      /* Opt In button dark mode styling */
+      body.dark #optInBtn {
+        background-color: #059669 !important; /* Green-600 for consistency */
+        color: #ffffff !important;
+      }
 
-body.dark #optInBtn:hover {
-    background-color: #047857 !important; /* Green-700 on hover */
-}
+      body.dark #optInBtn:hover {
+        background-color: #047857 !important; /* Green-700 on hover */
+      }
 
-/* Dark mode for case study modal */
-body.dark #caseStudyModal .bg-white {
-    background-color: #303640 !important;
-}
+      /* Dark mode for case study modal */
+      body.dark #caseStudyModal .bg-white {
+        background-color: #303640 !important;
+      }
 
-body.dark #caseStudyModal h3 {
-    color: #e2e8f0 !important;
-}
+      body.dark #caseStudyModal h3 {
+        color: #e2e8f0 !important;
+      }
 
-body.dark #caseStudyModal p,
-body.dark #caseStudyModal .text-gray-700 {
-    color: #cbd5e0 !important;
-}
+      body.dark #caseStudyModal p,
+      body.dark #caseStudyModal .text-gray-700 {
+        color: #cbd5e0 !important;
+      }
 
-body.dark #caseStudyModal .text-gray-600 {
-    color: #a0aec0 !important;
-}
+      body.dark #caseStudyModal .text-gray-600 {
+        color: #a0aec0 !important;
+      }
 
-body.dark #caseStudyModal .bg-blue-50 {
-    background-color: #1e3a8a !important;
-}
+      body.dark #caseStudyModal .bg-blue-50 {
+        background-color: #1e3a8a !important;
+      }
 
-body.dark #caseStudyModal .text-blue-900,
-body.dark #caseStudyModal .text-blue-800 {
-    color: #dbeafe !important;
-}
+      body.dark #caseStudyModal .text-blue-900,
+      body.dark #caseStudyModal .text-blue-800 {
+        color: #dbeafe !important;
+      }
 
-body.dark #caseStudyModal .bg-green-50 {
-    background-color: #14532d !important;
-}
+      body.dark #caseStudyModal .bg-green-50 {
+        background-color: #14532d !important;
+      }
 
-body.dark #caseStudyModal .text-green-900,
-body.dark #caseStudyModal .text-green-800 {
-    color: #dcfce7 !important;
-}
+      body.dark #caseStudyModal .text-green-900,
+      body.dark #caseStudyModal .text-green-800 {
+        color: #dcfce7 !important;
+      }
 
-/* Dark mode for welcome modal */
-body.dark #welcomeModal .bg-white {
-    background-color: #303640 !important;
-}
+      /* Dark mode for welcome modal */
+      body.dark #welcomeModal .bg-white {
+        background-color: #303640 !important;
+      }
 
-body.dark #welcomeModal h3,
-body.dark #welcomeModal #welcomeModalTitle {
-    color: #e2e8f0 !important;
-}
+      body.dark #welcomeModal h3,
+      body.dark #welcomeModal #welcomeModalTitle {
+        color: #e2e8f0 !important;
+      }
 
-body.dark #welcomeModal p,
-body.dark #welcomeModal .text-gray-700 {
-    color: #cbd5e0 !important;
-}
+      body.dark #welcomeModal p,
+      body.dark #welcomeModal .text-gray-700 {
+        color: #cbd5e0 !important;
+      }
 
-body.dark #welcomeModal .text-gray-600 {
-    color: #a0aec0 !important;
-}
+      body.dark #welcomeModal .text-gray-600 {
+        color: #a0aec0 !important;
+      }
 
-/* Dark mode for smart insights */
-body.dark #smartInsight {
-    background-color: #4a5568 !important;
-}
+      /* Dark mode for smart insights */
+      body.dark #smartInsight {
+        background-color: #4a5568 !important;
+      }
 
-body.dark #smartInsightText {
-    color: #e2e8f0 !important;
-}
+      body.dark #smartInsightText {
+        color: #e2e8f0 !important;
+      }
 
-/* Dark mode for import/export buttons */
-body.dark #importDataBtn,
-body.dark #exportCsvBtn,
-body.dark #exportJsonBtn {
-    background-color: #3b82f6 !important;
-    color: #ffffff !important;
-}
+      /* Dark mode for import/export buttons */
+      body.dark #importDataBtn,
+      body.dark #exportCsvBtn,
+      body.dark #exportJsonBtn {
+        background-color: #3b82f6 !important;
+        color: #ffffff !important;
+      }
 
-body.dark #importDataBtn:hover,
-body.dark #exportCsvBtn:hover,
-body.dark #exportJsonBtn:hover {
-    background-color: #2563eb !important;
-}
+      body.dark #importDataBtn:hover,
+      body.dark #exportCsvBtn:hover,
+      body.dark #exportJsonBtn:hover {
+        background-color: #2563eb !important;
+      }
 
-/* Form submit button in dark mode */
-body.dark #submitBtn {
-    background-color: #3b82f6; /* Keep original blue or adjust */
-    color: #ffffff;
-}
-body.dark #submitBtn:hover {
-    background-color: #2563eb;
-}
+      /* Form submit button in dark mode */
+      body.dark #submitBtn {
+        background-color: #3b82f6; /* Keep original blue or adjust */
+        color: #ffffff;
+      }
+      body.dark #submitBtn:hover {
+        background-color: #2563eb;
+      }
 
-/* Clear All button in dark mode */
-body.dark #clearAllBtn {
-    background-color: #ef4444; /* Keep original red or adjust */
-    color: #ffffff;
-}
-body.dark #clearAllBtn:hover {
-    background-color: #dc2626;
-}
+      /* Clear All button in dark mode */
+      body.dark #clearAllBtn {
+        background-color: #ef4444; /* Keep original red or adjust */
+        color: #ffffff;
+      }
+      body.dark #clearAllBtn:hover {
+        background-color: #dc2626;
+      }
 
-/* Bet Type Selection Buttons */
-.bet-type-btn.active {
-    background-color: #3b82f6; /* Tailwind blue-600 */
-    color: white;
-}
+      /* Bet Type Selection Buttons */
+      .bet-type-btn.active {
+        background-color: #3b82f6; /* Tailwind blue-600 */
+        color: white;
+      }
 
-.bet-type-btn:not(.active) {
-    background-color: #e5e7eb; /* Tailwind gray-200 */
-    color: #4b5563; /* Tailwind gray-700 */
-}
+      .bet-type-btn:not(.active) {
+        background-color: #e5e7eb; /* Tailwind gray-200 */
+        color: #4b5563; /* Tailwind gray-700 */
+      }
 
-/* Added hover styles for inactive bet-type buttons */
-.bet-type-btn:not(.active):hover {
-    background-color: #d1d5db; /* Light gray hover */
-    color: #1f2937; /* Darker text */
-    cursor: pointer;
-}
+      /* Added hover styles for inactive bet-type buttons */
+      .bet-type-btn:not(.active):hover {
+        background-color: #d1d5db; /* Light gray hover */
+        color: #1f2937; /* Darker text */
+        cursor: pointer;
+      }
 
-body.dark .bet-type-btn.active {
-    background-color: #63b3ed; /* Lighter blue for dark mode */
-    color: #1a202c; /* Darker text for contrast */
-}
+      body.dark .bet-type-btn.active {
+        background-color: #63b3ed; /* Lighter blue for dark mode */
+        color: #1a202c; /* Darker text for contrast */
+      }
 
-body.dark .bet-type-btn:not(.active) {
-    background-color: #4a505b; /* Softer dark gray */
-    color: #e2e8f0; /* Light text */
-}
+      body.dark .bet-type-btn:not(.active) {
+        background-color: #4a505b; /* Softer dark gray */
+        color: #e2e8f0; /* Light text */
+      }
 
-/* Hover for inactive bet-type buttons in dark mode */
-body.dark .bet-type-btn:not(.active):hover {
-    background-color: #5a6070; /* Dark mode lighter gray */
-    color: #ffffff; /* White text */
-    cursor: pointer;
-}
+      /* Hover for inactive bet-type buttons in dark mode */
+      body.dark .bet-type-btn:not(.active):hover {
+        background-color: #5a6070; /* Dark mode lighter gray */
+        color: #ffffff; /* White text */
+        cursor: pointer;
+      }
 
-.hidden {
-    display: none !important;
-}
+      .hidden {
+        display: none !important;
+      }
     </style>
-</head>
+  </head>
 
-<body class="bg-gray-100 p-4 sm:p-6 md:p-8 text-gray-800 font-inter">
-  <div class="container mx-auto max-w-6xl bg-white rounded-xl shadow-lg p-6 sm:p-8 md:p-10 relative">
+  <body class="bg-gray-100 p-4 sm:p-6 md:p-8 text-gray-800 font-inter">
+    <div
+      class="container mx-auto max-w-6xl bg-white rounded-xl shadow-lg p-6 sm:p-8 md:p-10 relative"
+    >
+      <!-- Header -->
+      <header class="text-center mb-8 relative">
+        <button
+          id="themeToggle"
+          class="absolute top-4 right-4 p-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300"
+          aria-label="Toggle light and dark mode"
+        >
+          <i class="fas fa-sun text-xl"></i>
+        </button>
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
+          Are You Actually Winning?
+        </h1>
+        <p class="text-gray-600">Track your betting performance honestly</p>
+      </header>
 
-    <!-- Header -->
-    <header class="text-center mb-8 relative">
-      <button id="themeToggle" 
-              class="absolute top-4 right-4 p-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300" 
-              aria-label="Toggle light and dark mode">
-        <i class="fas fa-sun text-xl"></i>
-      </button>
-      <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Are You Actually Winning?</h1>
-      <p class="text-gray-600">Track your betting performance honestly</p>
-    </header>
-
-    <!-- Smart Insights -->
-    <section class="bg-gray-50 p-6 rounded-lg shadow-sm mb-8 text-center">
-      <div id="smartInsight" class="text-gray-700 text-lg font-medium min-h-[1.75rem] flex items-center justify-center">
-        <span id="smartInsightText">Track your bets to unlock personalized insights</span>
-      </div>
-    </section>
-
-    <!-- Bet Input Form -->
-    <details class="parlay-section bg-white p-6 rounded-lg shadow-sm mb-8">
-      <summary class="cursor-pointer flex justify-center items-center text-2xl font-semibold text-gray-700 mb-4"
-               aria-controls="betFormContent" aria-expanded="true">
-        Add New Bet
-      </summary>
-
-      <div class="parlay-content" id="betFormContent">
-        <div class="flex justify-center space-x-4 mb-6">
-          <button type="button" id="selectStraightBetBtn" class="bet-type-btn bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 active" data-bet-type="straight">
-            Straight Bet
-          </button>
-          <button type="button" id="selectParlayBtn" class="bet-type-btn bg-gray-200 text-gray-800 py-2 px-6 rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400" data-bet-type="parlay">
-            Parlay
-          </button>
+      <!-- Smart Insights -->
+      <section class="bg-gray-50 p-6 rounded-lg shadow-sm mb-8 text-center">
+        <div
+          id="smartInsight"
+          class="text-gray-700 text-lg font-medium min-h-[1.75rem] flex items-center justify-center"
+        >
+          <span id="smartInsightText"
+            >Track your bets to unlock personalized insights</span
+          >
         </div>
+      </section>
 
-        <form id="betForm" class="space-y-6" novalidate>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Bet Input Form -->
+      <details class="parlay-section bg-white p-6 rounded-lg shadow-sm mb-8">
+        <summary
+          class="cursor-pointer flex justify-center items-center text-2xl font-semibold text-gray-700 mb-4"
+          aria-controls="betFormContent"
+          aria-expanded="true"
+        >
+          Add New Bet
+        </summary>
 
-            <!-- Date -->
-            <div class="col-span-full flex justify-center">
-              <div class="w-full sm:w-1/2 lg:w-1/3">
-                <label for="date" class="block text-sm font-medium text-gray-700 mb-1 text-center">Date</label>
-                <input type="date" id="date" required
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-                <span class="text-red-500 text-xs mt-1 hidden" id="dateError"></span>
+        <div class="parlay-content" id="betFormContent">
+          <div class="flex justify-center space-x-4 mb-6">
+            <button
+              type="button"
+              id="selectStraightBetBtn"
+              class="bet-type-btn bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 active"
+              data-bet-type="straight"
+            >
+              Straight Bet
+            </button>
+            <button
+              type="button"
+              id="selectParlayBtn"
+              class="bet-type-btn bg-gray-200 text-gray-800 py-2 px-6 rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              data-bet-type="parlay"
+            >
+              Parlay
+            </button>
+          </div>
+
+          <form id="betForm" class="space-y-6" novalidate>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Date -->
+              <div class="col-span-full flex justify-center">
+                <div class="w-full sm:w-1/2 lg:w-1/3">
+                  <label
+                    for="date"
+                    class="block text-sm font-medium text-gray-700 mb-1 text-center"
+                    >Date</label
+                  >
+                  <input
+                    type="date"
+                    id="date"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                  />
+                  <span
+                    class="text-red-500 text-xs mt-1 hidden"
+                    id="dateError"
+                  ></span>
+                </div>
+              </div>
+
+              <!-- Bet Result -->
+              <div class="col-span-1 lg:col-span-2">
+                <label
+                  for="result"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Bet Result</label
+                >
+                <select
+                  id="result"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                >
+                  <option value="Win">Win</option>
+                  <option value="Loss">Loss</option>
+                  <option value="Push">Push</option>
+                </select>
+                <span
+                  class="text-red-500 text-xs mt-1 hidden"
+                  id="resultError"
+                ></span>
+              </div>
+
+              <!-- Parlay Payout Type (hidden for straight bets) -->
+              <div
+                id="parlayPayoutTypeGroup"
+                class="col-span-1 lg:col-span-2 hidden"
+              >
+                <label
+                  for="playType"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Payout Type</label
+                >
+                <select
+                  id="playType"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                >
+                  <option value="Power">Power Play</option>
+                  <option value="Flex">Flex Play</option>
+                </select>
+                <span
+                  class="text-red-500 text-xs mt-1 hidden"
+                  id="playTypeError"
+                ></span>
+              </div>
+
+              <!-- Straight Bet Odds (hidden for parlays) -->
+              <div id="straightBetOddsGroup" class="col-span-1 lg:col-span-2">
+                <label
+                  for="straightOdds"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Odds</label
+                >
+                <input
+                  type="text"
+                  id="straightOdds"
+                  placeholder="+100 or -110"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                />
+                <span
+                  class="text-red-500 text-xs mt-1 hidden"
+                  id="straightOddsError"
+                ></span>
+              </div>
+
+              <!-- Amount Wagered -->
+              <div class="col-span-1 lg:col-span-2">
+                <label
+                  for="amountWagered"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Amount Wagered ($)</label
+                >
+                <input
+                  type="number"
+                  id="amountWagered"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                />
+                <span
+                  class="text-red-500 text-xs mt-1 hidden"
+                  id="amountWageredError"
+                ></span>
+              </div>
+
+              <!-- Amount Won/Loss -->
+              <div class="col-span-1 lg:col-span-2">
+                <label
+                  for="amountWonLoss"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >Amount Won/Loss ($)</label
+                >
+                <input
+                  type="number"
+                  id="amountWonLoss"
+                  step="0.01"
+                  placeholder="0.00"
+                  class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                />
+                <span
+                  class="text-red-500 text-xs mt-1 hidden"
+                  id="amountWonLossError"
+                ></span>
               </div>
             </div>
 
-            <!-- Bet Result -->
-            <div class="col-span-1 lg:col-span-2">
-              <label for="result" class="block text-sm font-medium text-gray-700 mb-1">Bet Result</label>
-              <select id="result" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-                <option value="Win">Win</option>
-                <option value="Loss">Loss</option>
-                <option value="Push">Push</option>
-              </select>
-              <span class="text-red-500 text-xs mt-1 hidden" id="resultError"></span>
-            </div>
-
-            <!-- Parlay Payout Type (hidden for straight bets) -->
-            <div id="parlayPayoutTypeGroup" class="col-span-1 lg:col-span-2 hidden">
-              <label for="playType" class="block text-sm font-medium text-gray-700 mb-1">Payout Type</label>
-              <select id="playType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-                <option value="Power">Power Play</option>
-                <option value="Flex">Flex Play</option>
-              </select>
-              <span class="text-red-500 text-xs mt-1 hidden" id="playTypeError"></span>
-            </div>
-
-            <!-- Straight Bet Odds (hidden for parlays) -->
-            <div id="straightBetOddsGroup" class="col-span-1 lg:col-span-2">
-              <label for="straightOdds" class="block text-sm font-medium text-gray-700 mb-1">Odds</label>
-              <input type="text" id="straightOdds" placeholder="+100 or -110"
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-              <span class="text-red-500 text-xs mt-1 hidden" id="straightOddsError"></span>
-            </div>
-
-            <!-- Amount Wagered -->
-            <div class="col-span-1 lg:col-span-2">
-              <label for="amountWagered" class="block text-sm font-medium text-gray-700 mb-1">Amount Wagered ($)</label>
-              <input type="number" id="amountWagered" step="0.01" min="0" placeholder="0.00" 
-                     class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-              <span class="text-red-500 text-xs mt-1 hidden" id="amountWageredError"></span>
-            </div>
-
-            <!-- Amount Won/Loss -->
-            <div class="col-span-1 lg:col-span-2">
-              <label for="amountWonLoss" class="block text-sm font-medium text-gray-700 mb-1">Amount Won/Loss ($)</label>
-              <input type="number" id="amountWonLoss" step="0.01" placeholder="0.00"
-                     class="money-input w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-              <span class="text-red-500 text-xs mt-1 hidden" id="amountWonLossError"></span>
-            </div>
-
-          </div>
-
-          <!-- Individual Bets Section -->
-          <div id="parlayIndividualBetsSection">
-            <div class="flex justify-between items-center mb-3">
-              <label class="block text-lg font-semibold text-gray-700">Individual Player/Team Bets</label>
-            </div>
-            <div id="playerPropInputs" class="space-y-3 mb-4">
-              <!-- Dynamic player prop inputs inserted here -->
-            </div>
-            <button type="button" id="addPlayerPropBtn" 
-                    class="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out">
-              + Add Player/Team Bet
-            </button>
-            <span class="text-red-500 text-xs mt-1 hidden" id="individualBetsError"></span>
-          </div>
-
-          <!-- Submit and More Details -->
-          <div class="flex justify-between items-center">
-            <button type="button" id="toggleAdvancedDetailsBtn"
-                    class="bg-gray-200 text-gray-700 py-1.5 px-3 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out text-sm">
-              <i class="fas fa-plus mr-1"></i><span>More Details</span>
-            </button>
-            <button type="submit" id="submitBtn" 
-                    class="bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
-              Add Bet Entry
-            </button>
-          </div>
-        </form>
-      </div>
-    </details>
-
-    <!-- Summary Statistics -->
-    <section class="bg-blue-100 p-6 rounded-lg shadow-sm mb-8">
-      <h2 class="text-2xl font-semibold text-blue-800 mb-4">Summary Statistics</h2>
-
-      <!-- Timeline Filter Section -->
-      <details id="timelineDetails" class="mb-4">
-        <summary class="cursor-pointer bg-white px-4 py-3 rounded-lg border flex justify-between items-center hover:bg-gray-50 transition-colors list-none">
-          <span class="text-sm font-medium text-gray-700">Timeline</span>
-          <span id="currentTimelineDisplay" class="text-sm text-blue-600 font-semibold">All Time</span>
-        </summary>
-        <div class="mt-3 bg-white p-4 rounded-lg border">
-          <!-- Custom Date Range -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label for="filterFromDate" class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-              <input type="date" id="filterFromDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-            </div>
-            <div>
-              <label for="filterToDate" class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-              <input type="date" id="filterToDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800">
-            </div>
-          </div>
-          
-          <!-- Quick Views -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Quick Views</label>
-            <div class="flex justify-center flex-wrap gap-2">
-              <button id="filterLast7Days" type="button" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors">
-                Last 7 Days
+            <!-- Individual Bets Section -->
+            <div id="parlayIndividualBetsSection">
+              <div class="flex justify-between items-center mb-3">
+                <label class="block text-lg font-semibold text-gray-700"
+                  >Individual Player/Team Bets</label
+                >
+              </div>
+              <div id="playerPropInputs" class="space-y-3 mb-4">
+                <!-- Dynamic player prop inputs inserted here -->
+              </div>
+              <button
+                type="button"
+                id="addPlayerPropBtn"
+                class="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out"
+              >
+                + Add Player/Team Bet
               </button>
-              <button id="filterLast30Days" type="button" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors">
-                Last 30 Days
+              <span
+                class="text-red-500 text-xs mt-1 hidden"
+                id="individualBetsError"
+              ></span>
+            </div>
+
+            <!-- Submit and More Details -->
+            <div class="flex justify-between items-center">
+              <button
+                type="button"
+                id="toggleAdvancedDetailsBtn"
+                class="bg-gray-200 text-gray-700 py-1.5 px-3 rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-150 ease-in-out text-sm"
+              >
+                <i class="fas fa-plus mr-1"></i><span>More Details</span>
               </button>
-              <button id="clearDateFilterBtn" type="button" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm transition-colors">
-                Clear Custom Dates
+              <button
+                type="submit"
+                id="submitBtn"
+                class="bg-blue-600 text-white py-2 px-6 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+              >
+                Add Bet Entry
               </button>
             </div>
-          </div>
-          
-          <!-- Date Filter Error -->
-          <div id="dateFilterError" class="text-red-500 text-sm hidden mt-2"></div>
+          </form>
         </div>
       </details>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-blue-700 mb-6">
-        <div class="bg-white p-4 rounded-lg">
-          <p class="text-sm text-blue-600 mb-1">Total Wagered</p>
-          <p class="text-2xl font-bold">$<span id="totalWagered">0.00</span></p>
-        </div>
-        <div class="bg-white p-4 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:bg-blue-50 group" 
-             id="profitLossToggle" 
-             title="Click to toggle between Net Profit/Loss and ROI">
-          <p class="text-sm text-blue-600 mb-1 group-hover:text-blue-700 transition-colors duration-200">
-            <span id="profitLossLabel">Net Profit/Loss</span>
-            <i class="fas fa-exchange-alt ml-1 text-xs opacity-60 group-hover:opacity-100 transition-opacity duration-200"></i>
-          </p>
-          <p class="text-2xl font-bold group-hover:text-blue-800 transition-colors duration-200">
-            <span id="profitLossValue">$<span id="netProfitLoss">0.00</span></span>
-          </p>
-        </div>
-        <div class="bg-white p-4 rounded-lg">
-          <p class="text-sm text-blue-600 mb-1">Total Bets</p>
-          <p class="text-2xl font-bold"><span id="totalBets">0</span></p>
-        </div>
-        <div class="bg-white p-4 rounded-lg">
-          <p class="text-sm text-green-600 mb-1">Wins</p>
-          <p class="text-xl font-bold text-green-700"><span id="totalWins">0</span></p>
-        </div>
-        <div class="bg-white p-4 rounded-lg">
-          <p class="text-sm text-red-600 mb-1">Losses</p>
-          <p class="text-xl font-bold text-red-700"><span id="totalLosses">0</span></p>
-        </div>
-        <div class="bg-white p-4 rounded-lg">
-          <p class="text-sm text-yellow-600 mb-1">Pushes</p>
-          <p class="text-xl font-bold text-yellow-700"><span id="totalPushes">0</span></p>
-        </div>
-      </div>
+      <!-- Summary Statistics -->
+      <section class="bg-blue-100 p-6 rounded-lg shadow-sm mb-8">
+        <h2 class="text-2xl font-semibold text-blue-800 mb-4">
+          Summary Statistics
+        </h2>
 
-      <div class="bg-white p-4 rounded-lg mb-6">
-        <label for="successPercentageCalc" class="block text-sm font-medium text-blue-700 mb-2">Success Rate</label>
-        <div class="flex items-center space-x-3 flex-wrap">
-          <select id="successPercentageCalc" 
-                  class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800">
-            <option value="bets">All Bets</option>
-            <option value="straight">Straight</option>
-            <option value="parlays">Parlay</option>
-            <option value="individualBets">Individual Prop</option>
-          </select>
-          <p class="text-2xl font-bold text-blue-900"><span id="successPercentage">0.00</span>%</p>
+        <!-- Timeline Filter Section -->
+        <details id="timelineDetails" class="mb-4">
+          <summary
+            class="cursor-pointer bg-white px-4 py-3 rounded-lg border flex justify-between items-center hover:bg-gray-50 transition-colors list-none"
+          >
+            <span class="text-sm font-medium text-gray-700">Timeline</span>
+            <span
+              id="currentTimelineDisplay"
+              class="text-sm text-blue-600 font-semibold"
+              >All Time</span
+            >
+          </summary>
+          <div class="mt-3 bg-white p-4 rounded-lg border">
+            <!-- Custom Date Range -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label
+                  for="filterFromDate"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >From Date</label
+                >
+                <input
+                  type="date"
+                  id="filterFromDate"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                />
+              </div>
+              <div>
+                <label
+                  for="filterToDate"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  >To Date</label
+                >
+                <input
+                  type="date"
+                  id="filterToDate"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800"
+                />
+              </div>
+            </div>
+
+            <!-- Quick Views -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Quick Views</label
+              >
+              <div class="flex justify-center flex-wrap gap-2">
+                <button
+                  id="filterLast7Days"
+                  type="button"
+                  class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors"
+                >
+                  Last 7 Days
+                </button>
+                <button
+                  id="filterLast30Days"
+                  type="button"
+                  class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors"
+                >
+                  Last 30 Days
+                </button>
+                <button
+                  id="clearDateFilterBtn"
+                  type="button"
+                  class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm transition-colors"
+                >
+                  Clear Custom Dates
+                </button>
+              </div>
+            </div>
+
+            <!-- Date Filter Error -->
+            <div
+              id="dateFilterError"
+              class="text-red-500 text-sm hidden mt-2"
+            ></div>
+          </div>
+        </details>
+
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-blue-700 mb-6"
+        >
+          <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-blue-600 mb-1">Total Wagered</p>
+            <p class="text-2xl font-bold">
+              $<span id="totalWagered">0.00</span>
+            </p>
+          </div>
+          <div
+            class="bg-white p-4 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md hover:bg-blue-50 group"
+            id="profitLossToggle"
+            title="Click to toggle between Net Profit/Loss and ROI"
+          >
+            <p
+              class="text-sm text-blue-600 mb-1 group-hover:text-blue-700 transition-colors duration-200"
+            >
+              <span id="profitLossLabel">Net Profit/Loss</span>
+              <i
+                class="fas fa-exchange-alt ml-1 text-xs opacity-60 group-hover:opacity-100 transition-opacity duration-200"
+              ></i>
+            </p>
+            <p
+              class="text-2xl font-bold group-hover:text-blue-800 transition-colors duration-200"
+            >
+              <span id="profitLossValue"
+                >$<span id="netProfitLoss">0.00</span></span
+              >
+            </p>
+          </div>
+          <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-blue-600 mb-1">Total Bets</p>
+            <p class="text-2xl font-bold"><span id="totalBets">0</span></p>
+          </div>
+          <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-green-600 mb-1">Wins</p>
+            <p class="text-xl font-bold text-green-700">
+              <span id="totalWins">0</span>
+            </p>
+          </div>
+          <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-red-600 mb-1">Losses</p>
+            <p class="text-xl font-bold text-red-700">
+              <span id="totalLosses">0</span>
+            </p>
+          </div>
+          <div class="bg-white p-4 rounded-lg">
+            <p class="text-sm text-yellow-600 mb-1">Pushes</p>
+            <p class="text-xl font-bold text-yellow-700">
+              <span id="totalPushes">0</span>
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div class="text-center">
-        <button id="clearAllBtn" 
-                class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out">
-          Clear All Entries
-        </button>
-      </div>
-    </section>
+        <div class="bg-white p-4 rounded-lg mb-6">
+          <label
+            for="successPercentageCalc"
+            class="block text-sm font-medium text-blue-700 mb-2"
+            >Success Rate</label
+          >
+          <div class="flex items-center space-x-3 flex-wrap">
+            <select
+              id="successPercentageCalc"
+              class="px-3 py-2 border border-blue-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-blue-800"
+            >
+              <option value="bets">All Bets</option>
+              <option value="straight">Straight</option>
+              <option value="parlays">Parlay</option>
+              <option value="individualBets">Individual Prop</option>
+            </select>
+            <p class="text-2xl font-bold text-blue-900">
+              <span id="successPercentage">0.00</span>%
+            </p>
+          </div>
+        </div>
 
-    <!-- Bet History -->
-    <section class="bg-white p-6 rounded-lg shadow-sm">
-      <div class="parlay-history-header flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4">
-        <h2 class="text-2xl font-semibold text-gray-800">Bet History</h2>
-        <div class="flex flex-wrap gap-2">
-          <button id="importDataBtn" class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 flex items-center gap-2">
-            <i class="fas fa-upload"></i>
-            Import
+        <div class="text-center">
+          <button
+            id="clearAllBtn"
+            class="bg-red-500 text-white py-2 px-6 rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+          >
+            Clear All Entries
           </button>
-          <button id="exportCsvBtn" class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 flex items-center gap-2">
-            <i class="fas fa-download"></i>
-            Export CSV
-          </button>
-          <button id="exportJsonBtn" class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 flex items-center gap-2">
-            <i class="fas fa-download"></i>
-            Export JSON
-          </button>
         </div>
-      </div>
-      
-      <!-- Hidden file input for import functionality -->
-      <input type="file" id="importFileInput" accept=".json,.csv" style="display: none;">
+      </section>
 
-      <!-- Desktop Table View -->
-      <div class="block">
-        <table class="w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Date</th>
-              <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Result</th>
-              <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Type</th>
-              <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Wagered</th>
-              <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Profit/Loss</th>
-              <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-              <th scope="col" class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="betTableBody" class="bg-white divide-y divide-gray-200">
-            <!-- Table rows will be inserted here -->
-          </tbody>
-        </table>
-      </div>
+      <!-- Bet History -->
+      <section class="bg-white p-6 rounded-lg shadow-sm">
+        <div
+          class="parlay-history-header flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-4"
+        >
+          <h2 class="text-2xl font-semibold text-gray-800">Bet History</h2>
+          <div class="flex flex-wrap gap-2">
+            <button
+              id="importDataBtn"
+              class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 flex items-center gap-2"
+            >
+              <i class="fas fa-upload"></i>
+              Import
+            </button>
+            <button
+              id="exportCsvBtn"
+              class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 flex items-center gap-2"
+            >
+              <i class="fas fa-download"></i>
+              Export CSV
+            </button>
+            <button
+              id="exportJsonBtn"
+              class="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 flex items-center gap-2"
+            >
+              <i class="fas fa-download"></i>
+              Export JSON
+            </button>
+          </div>
+        </div>
 
-      <!-- Mobile Card View -->
-      <div id="betHistoryContainer" class="md:hidden space-y-4">
-        <div id="noBetsMessage" class="text-center text-gray-500 py-8">
+        <!-- Hidden file input for import functionality -->
+        <input
+          type="file"
+          id="importFileInput"
+          accept=".json,.csv"
+          style="display: none"
+        />
+
+        <!-- Desktop Table View -->
+        <div class="block">
+          <table class="w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20"
+                >
+                  Date
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16"
+                >
+                  Result
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16"
+                >
+                  Type
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20"
+                >
+                  Wagered
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20"
+                >
+                  Profit/Loss
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Details
+                </th>
+                <th
+                  scope="col"
+                  class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody id="betTableBody" class="bg-white divide-y divide-gray-200">
+              <!-- Table rows will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Card View -->
+        <div id="betHistoryContainer" class="md:hidden space-y-4">
+          <div id="noBetsMessage" class="text-center text-gray-500 py-8">
+            No bets recorded yet. Add your first bet above to get started!
+          </div>
+        </div>
+
+        <!-- No bets message for desktop -->
+        <div
+          id="noBetsMessageDesktop"
+          class="block text-center text-gray-500 py-8"
+        >
           No bets recorded yet. Add your first bet above to get started!
         </div>
-      </div>
+      </section>
+    </div>
 
-      <!-- No bets message for desktop -->
-      <div id="noBetsMessageDesktop" class="block text-center text-gray-500 py-8">
-        No bets recorded yet. Add your first bet above to get started!
-      </div>
-    </section>
+    <!-- Case Study Opt-In Button -->
+    <button
+      id="optInBtn"
+      class="fixed bottom-6 left-6 bg-green-600 text-white text-xs px-3 py-2 rounded-full shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 z-50"
+      title="Learn about case study participation"
+      aria-label="Learn about case study participation"
+    >
+      Opt In?
+    </button>
 
-  </div>
+    <!-- Feedback Button -->
+    <button
+      id="openChatBtn"
+      class="fixed bottom-6 right-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 z-50"
+      title="Send Feedback"
+      aria-label="Open feedback chat"
+    >
+      <i class="fas fa-comment-dots"></i>
+    </button>
 
-  <!-- Case Study Opt-In Button -->
-  <button id="optInBtn" 
-          class="fixed bottom-6 left-6 bg-green-600 text-white text-xs px-3 py-2 rounded-full shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 z-50" 
-          title="Learn about case study participation"
-          aria-label="Learn about case study participation">
-    Opt In?
-  </button>
-
-  <!-- Feedback Button -->
-  <button id="openChatBtn" class="fixed bottom-6 right-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 z-50" title="Send Feedback" aria-label="Open feedback chat">
-    <i class="fas fa-comment-dots"></i>
-  </button>
-
-  <!-- Feedback Chatbox -->
-  <div id="feedbackChatbox" class="fixed bottom-24 right-6 w-80 z-50">
-    <div id="chatFormContainer" class="bg-white rounded-lg shadow-xl border border-gray-200 hidden transition-all duration-300 transform">
-      <div class="p-4">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-800">Send Feedback</h3>
-          <button id="closeChatBtn" class="text-gray-400 hover:text-gray-600 focus:outline-none" aria-label="Close feedback chat">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <form id="feedbackForm" class="space-y-4">
-          <div>
-            <label for="feedbackMessage" class="block text-sm font-medium text-gray-700 mb-2">Your feedback helps improve AYAW</label>
-            <textarea id="feedbackMessage" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" placeholder="Share your thoughts, suggestions, or report issues..."></textarea>
+    <!-- Feedback Chatbox -->
+    <div id="feedbackChatbox" class="fixed bottom-24 right-6 w-80 z-50">
+      <div
+        id="chatFormContainer"
+        class="bg-white rounded-lg shadow-xl border border-gray-200 hidden transition-all duration-300 transform"
+      >
+        <div class="p-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">Send Feedback</h3>
+            <button
+              id="closeChatBtn"
+              class="text-gray-400 hover:text-gray-600 focus:outline-none"
+              aria-label="Close feedback chat"
+            >
+              <i class="fas fa-times"></i>
+            </button>
           </div>
-          <button type="submit" id="sendFeedbackBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
-            Send Feedback
-          </button>
-        </form>
+          <form id="feedbackForm" class="space-y-4">
+            <div>
+              <label
+                for="feedbackMessage"
+                class="block text-sm font-medium text-gray-700 mb-2"
+                >Your feedback helps improve AYAW</label
+              >
+              <textarea
+                id="feedbackMessage"
+                rows="4"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                placeholder="Share your thoughts, suggestions, or report issues..."
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              id="sendFeedbackBtn"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              Send Feedback
+            </button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Case Study Opt-In Modal -->
-  <div id="caseStudyModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-      <div class="p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Join Our Betting Behavior Case Study</h3>
-        <div class="space-y-4 text-gray-700">
-          <p class="font-medium">Help us understand how sports betting affects us all by contributing to our research.</p>
-          
-          <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
-            <h4 class="font-semibold text-blue-900 mb-2">What We're Exploring</h4>
-            <ul class="text-blue-800 text-sm space-y-1">
-              <li>• Patterns in betting behavior across different user types</li>
-              <li>• Collective success trends within the community</li>
-              <li>• How betting methods and techniques correlate with outcomes</li>
-              <li>• Whether we're all in similar performance areas or truly chasing highs while stuck in lows</li>
-            </ul>
+    <!-- Case Study Opt-In Modal -->
+    <div
+      id="caseStudyModal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden z-50"
+    >
+      <div
+        class="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+      >
+        <div class="p-6">
+          <h3 class="text-xl font-bold text-gray-900 mb-4">
+            Join Our Betting Behavior Case Study
+          </h3>
+          <div class="space-y-4 text-gray-700">
+            <p class="font-medium">
+              Help us understand how sports betting affects us all by
+              contributing to our research.
+            </p>
+
+            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+              <h4 class="font-semibold text-blue-900 mb-2">
+                What We're Exploring
+              </h4>
+              <ul class="text-blue-800 text-sm space-y-1">
+                <li>
+                  • Patterns in betting behavior across different user types
+                </li>
+                <li>• Collective success trends within the community</li>
+                <li>
+                  • How betting methods and techniques correlate with outcomes
+                </li>
+                <li>
+                  • Whether we're all in similar performance areas or truly
+                  chasing highs while stuck in lows
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+              <h4 class="font-semibold text-green-900 mb-2">
+                Your Privacy Remains Protected
+              </h4>
+              <ul class="text-green-800 text-sm space-y-1">
+                <li>• All data contributions are completely anonymous</li>
+                <li>• No personal information is collected or stored</li>
+                <li>• You can opt-out at any time</li>
+                <li>• Local data storage remains unchanged</li>
+              </ul>
+            </div>
+
+            <p class="text-sm text-gray-600">
+              This case study aims to reveal insights that could benefit the
+              entire betting community. There's no single question we're trying
+              to answer—we're exploring many aspects of how sports betting
+              affects us collectively.
+            </p>
           </div>
-          
-          <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
-            <h4 class="font-semibold text-green-900 mb-2">Your Privacy Remains Protected</h4>
-            <ul class="text-green-800 text-sm space-y-1">
-              <li>• All data contributions are completely anonymous</li>
-              <li>• No personal information is collected or stored</li>
-              <li>• You can opt-out at any time</li>
-              <li>• Local data storage remains unchanged</li>
-            </ul>
+
+          <div class="mt-6 flex flex-col sm:flex-row gap-3">
+            <button
+              id="joinCaseStudyBtn"
+              class="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              Join Case Study
+            </button>
+            <button
+              id="closeCaseStudyBtn"
+              class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              Maybe Later
+            </button>
           </div>
-          
-          <p class="text-sm text-gray-600">This case study aims to reveal insights that could benefit the entire betting community. There's no single question we're trying to answer—we're exploring many aspects of how sports betting affects us collectively.</p>
-        </div>
-        
-        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-          <button id="joinCaseStudyBtn" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200">
-            Join Case Study
-          </button>
-          <button id="closeCaseStudyBtn" class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
-            Maybe Later
-          </button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Welcome Modal -->
-  <div id="welcomeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-      <div class="p-6">
-        <h3 id="welcomeModalTitle" class="text-xl font-bold text-gray-900 mb-4">Your Reality Check</h3>
-        <div class="space-y-4 text-gray-700">
-          <p>Like you, I've experienced the highs and lows of sports betting. Good weeks can mask poor decisions, and bad weeks can cloud our judgment. The books profit when we chase losses and make emotional decisions.</p>
-          
-          <p><strong>Are You Actually Winning?</strong> provides the tools to build your own honest assessment. Track every bet to see what's really happening with your money - beyond selective memory and emotional reactions.</p>
-          
-          <p>This platform reveals patterns in your betting history, calculates true performance metrics, and gives you the data needed to make informed decisions. The insights are yours to interpret and act upon.</p>
-          
-          <p class="text-sm text-gray-600">Optional: Contribute anonymous data to our research on betting patterns across the community.</p>
-        </div>
-        
-        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-          <button id="participateBtn" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200">
-            Join Case Study
-          </button>
-          <button id="keepLocalBtn" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
-            Keep Local Only
-          </button>
+    <!-- Welcome Modal -->
+    <div
+      id="welcomeModal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden z-50"
+    >
+      <div
+        class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+      >
+        <div class="p-6">
+          <h3
+            id="welcomeModalTitle"
+            class="text-xl font-bold text-gray-900 mb-4"
+          >
+            Your Reality Check
+          </h3>
+          <div class="space-y-4 text-gray-700">
+            <p>
+              Like you, I've experienced the highs and lows of sports betting.
+              Good weeks can mask poor decisions, and bad weeks can cloud our
+              judgment. The books profit when we chase losses and make emotional
+              decisions.
+            </p>
+
+            <p>
+              <strong>Are You Actually Winning?</strong> provides the tools to
+              build your own honest assessment. Track every bet to see what's
+              really happening with your money - beyond selective memory and
+              emotional reactions.
+            </p>
+
+            <p>
+              This platform reveals patterns in your betting history, calculates
+              true performance metrics, and gives you the data needed to make
+              informed decisions. The insights are yours to interpret and act
+              upon.
+            </p>
+
+            <p class="text-sm text-gray-600">
+              Optional: Contribute anonymous data to our research on betting
+              patterns across the community.
+            </p>
+          </div>
+
+          <div class="mt-6 flex flex-col sm:flex-row gap-3">
+            <button
+              id="participateBtn"
+              class="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              Join Case Study
+            </button>
+            <button
+              id="keepLocalBtn"
+              class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              Keep Local Only
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Individual Bet Details Modal -->
-  <div id="individualBetDetailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
-      <div class="p-6">
-        <h3 id="individualBetDetailsTitle" class="text-lg font-medium text-gray-900 mb-4">Bet Details</h3>
-        <div id="individualBetsList" class="space-y-4 max-h-96 overflow-y-auto">
-          <!-- Individual bet details will be populated here -->
-        </div>
-        <div class="mt-6 flex justify-end">
-          <button id="closeIndividualBetDetailsModalBtn" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Confirmation Modal -->
-  <div id="confirmationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-      <div class="p-6">
-        <h3 id="confirmationModalTitle" class="text-lg font-medium text-gray-900 mb-4">Confirm Action</h3>
-        <p id="confirmationModalMessage" class="text-gray-600 mb-6">Are you sure you want to proceed?</p>
-        <div class="flex justify-end space-x-3">
-          <button id="cancelClearBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
-            Cancel
-          </button>
-          <button id="confirmClearBtn" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
-            Confirm
-          </button>
+    <!-- Individual Bet Details Modal -->
+    <div
+      id="individualBetDetailsModal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden"
+    >
+      <div
+        class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+      >
+        <div class="p-6">
+          <h3
+            id="individualBetDetailsTitle"
+            class="text-lg font-medium text-gray-900 mb-4"
+          >
+            Bet Details
+          </h3>
+          <div
+            id="individualBetsList"
+            class="space-y-4"
+          >
+            <!-- Individual bet details will be populated here -->
+          </div>
+          <div class="mt-6 flex justify-end">
+            <button
+              id="closeIndividualBetDetailsModalBtn"
+              class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="app.js"></script>
-</body>
+    <!-- Confirmation Modal -->
+    <div
+      id="confirmationModal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 hidden"
+    >
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+        <div class="p-6">
+          <h3
+            id="confirmationModalTitle"
+            class="text-lg font-medium text-gray-900 mb-4"
+          >
+            Confirm Action
+          </h3>
+          <p id="confirmationModalMessage" class="text-gray-600 mb-6">
+            Are you sure you want to proceed?
+          </p>
+          <div class="flex justify-end space-x-3">
+            <button
+              id="cancelClearBtn"
+              class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+            <button
+              id="confirmClearBtn"
+              class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
 </html>
