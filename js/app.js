@@ -7,7 +7,8 @@ class ParlayTracker {
         DATE_FILTER_FROM: 'dateFilterFrom',
         DATE_FILTER_TO: 'dateFilterTo',
         TIMELINE_SUMMARY_TEXT: 'timelineSummaryText',
-        HAS_VISITED_BEFORE: 'hasVisitedBefore'
+        HAS_VISITED_BEFORE: 'hasVisitedBefore',
+        AUTOCOMPLETE_DATA: 'autocompleteData'
     };
     static FEEDBACK_EMAIL = '4ayaw55@gmail.com';
 
@@ -27,6 +28,15 @@ class ParlayTracker {
 
         this.pendingAction = null;
         this.showingROI = false;
+
+        // Autocomplete data structure
+        this.autocompleteData = {
+            players: new Set(),
+            props: new Set(),
+            sports: new Set(),
+            leagues: new Set(),
+            propCategories: new Set()
+        };
 
         this._initElementRefs();
         this.init();
@@ -167,7 +177,12 @@ class ParlayTracker {
         if (this.clearAllBtn) this.clearAllBtn.addEventListener('click', this.promptClearAll.bind(this));
         if (this.successPercentageCalcSelect) this.successPercentageCalcSelect.addEventListener('change', this.handleSuccessCalcChange.bind(this));
         if (this.keepLocalBtn) this.keepLocalBtn.addEventListener('click', this.closeWelcomeModal.bind(this));
-        if (this.participateBtn) this.participateBtn.addEventListener('click', this.closeWelcomeModal.bind(this));
+        if (this.participateBtn) this.participateBtn.addEventListener('click', () => {
+            // Store the opt-in preference
+            localStorage.setItem('caseStudyOptIn', 'true');
+            this.updateOptInButtonState();
+            this.closeWelcomeModal();
+        });
         if (this.cancelClearBtn) this.cancelClearBtn.addEventListener('click', this.hideConfirmationModal.bind(this));
         if (this.confirmClearBtn) this.confirmClearBtn.addEventListener('click', this.handleConfirmationClick.bind(this));
         if (this.themeToggle) this.themeToggle.addEventListener('click', this.toggleTheme.bind(this));
@@ -259,9 +274,241 @@ class ParlayTracker {
             if (this.filterFromDateInput) this.filterFromDateInput.value = this.filterFromDate;
             if (this.filterToDateInput) this.filterToDateInput.value = this.filterToDate;
             if (this.currentTimelineDisplay) this.currentTimelineDisplay.textContent = this.currentTimelineSummaryText;
+            
+            // Load autocomplete data
+            this.loadAutocompleteData();
         } catch {
             this.bets = [];
         }
+    }
+
+    loadAutocompleteData() {
+        try {
+            const stored = localStorage.getItem(ParlayTracker.STORAGE_KEYS.AUTOCOMPLETE_DATA);
+            if (stored) {
+                const data = JSON.parse(stored);
+                this.autocompleteData = {
+                    players: new Set(data.players || []),
+                    props: new Set(data.props || []),
+                    sports: new Set(data.sports || []),
+                    leagues: new Set(data.leagues || []),
+                    propCategories: new Set(data.propCategories || [])
+                };
+            }
+            
+            // Extract existing data from current bets for autocomplete
+            this.bets.forEach(bet => {
+                if (bet.type === 'parlay' && bet.playerProps) {
+                    bet.playerProps.forEach(prop => {
+                        this.extractAutocompleteData(prop);
+                    });
+                }
+                // Also extract from straight bet data
+                if (bet.sport) this.autocompleteData.sports.add(bet.sport.trim());
+                if (bet.league) this.autocompleteData.leagues.add(bet.league.trim());
+                if (bet.propCategory) this.autocompleteData.propCategories.add(bet.propCategory.trim());
+            });
+            
+        } catch {
+            // Initialize with empty sets if loading fails
+            this.autocompleteData = {
+                players: new Set(),
+                props: new Set(),
+                sports: new Set(),
+                leagues: new Set(),
+                propCategories: new Set()
+            };
+        }
+    }
+
+    extractAutocompleteData(propString) {
+        if (!propString || typeof propString !== 'string') return;
+        
+        // Parse the prop string format: "Player - Prop | Sport | League | Category"
+        const parts = propString.split('|').map(p => p.trim());
+        if (parts.length >= 1) {
+            const playerProp = parts[0].split(' - ');
+            if (playerProp.length >= 2) {
+                const player = playerProp[0].trim();
+                const prop = playerProp[1].trim();
+                if (player) this.autocompleteData.players.add(player);
+                if (prop) this.autocompleteData.props.add(prop);
+            }
+        }
+        if (parts.length >= 2 && parts[1]) this.autocompleteData.sports.add(parts[1]);
+        if (parts.length >= 3 && parts[2]) this.autocompleteData.leagues.add(parts[2]);
+        if (parts.length >= 4 && parts[3]) this.autocompleteData.propCategories.add(parts[3]);
+    }
+
+    saveAutocompleteData() {
+        try {
+            const data = {
+                players: Array.from(this.autocompleteData.players),
+                props: Array.from(this.autocompleteData.props),
+                sports: Array.from(this.autocompleteData.sports),
+                leagues: Array.from(this.autocompleteData.leagues),
+                propCategories: Array.from(this.autocompleteData.propCategories)
+            };
+            localStorage.setItem(ParlayTracker.STORAGE_KEYS.AUTOCOMPLETE_DATA, JSON.stringify(data));
+        } catch {}
+    }
+
+    createAutocompleteDropdown(input, suggestions, onSelect) {
+        // Remove existing dropdown
+        this.removeAutocompleteDropdown(input);
+        
+        if (!suggestions || suggestions.length === 0) return;
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'autocomplete-dropdown absolute bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto z-10 w-full';
+        dropdown.style.top = '100%';
+        dropdown.style.left = '0';
+
+        suggestions.forEach(suggestion => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm';
+            item.textContent = suggestion;
+            item.addEventListener('click', () => {
+                onSelect(suggestion);
+                this.removeAutocompleteDropdown(input);
+            });
+            dropdown.appendChild(item);
+        });
+
+        // Position dropdown relative to input
+        const container = input.parentElement;
+        if (container.style.position === '' || container.style.position === 'static') {
+            container.style.position = 'relative';
+        }
+        container.appendChild(dropdown);
+
+        // Handle dark mode
+        if (document.body.classList.contains('dark')) {
+            dropdown.className = dropdown.className.replace('bg-white border-gray-300', 'bg-gray-700 border-gray-600 text-white');
+            dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                item.className = item.className.replace('hover:bg-blue-50', 'hover:bg-gray-600');
+            });
+        }
+
+        return dropdown;
+    }
+
+    removeAutocompleteDropdown(input) {
+        const container = input.parentElement;
+        const existingDropdown = container.querySelector('.autocomplete-dropdown');
+        if (existingDropdown) {
+            existingDropdown.remove();
+        }
+    }
+
+    getSuggestions(input, type) {
+        const value = input.trim().toLowerCase();
+        if (value.length < 1) return [];
+
+        let dataSet;
+        switch (type) {
+            case 'player':
+                dataSet = this.autocompleteData.players;
+                break;
+            case 'prop':
+                dataSet = this.autocompleteData.props;
+                break;
+            case 'sport':
+                dataSet = this.autocompleteData.sports;
+                break;
+            case 'league':
+                dataSet = this.autocompleteData.leagues;
+                break;
+            case 'propCategory':
+                dataSet = this.autocompleteData.propCategories;
+                break;
+            default:
+                return [];
+        }
+
+        return Array.from(dataSet)
+            .filter(item => item.toLowerCase().includes(value))
+            .sort((a, b) => {
+                // Prioritize exact matches and matches at the beginning
+                const aLower = a.toLowerCase();
+                const bLower = b.toLowerCase();
+                const aStarts = aLower.startsWith(value);
+                const bStarts = bLower.startsWith(value);
+                
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                if (aLower === value) return -1;
+                if (bLower === value) return 1;
+                
+                return a.localeCompare(b);
+            })
+            .slice(0, 8); // Limit to 8 suggestions
+    }
+
+    setupAutocompleteForInput(input, type, onSelect = null) {
+        if (!input) return;
+
+        const handleInput = () => {
+            const suggestions = this.getSuggestions(input.value, type);
+            if (suggestions.length > 0) {
+                this.createAutocompleteDropdown(input, suggestions, (suggestion) => {
+                    input.value = suggestion;
+                    if (onSelect) onSelect(suggestion);
+                    input.focus();
+                });
+            } else {
+                this.removeAutocompleteDropdown(input);
+            }
+        };
+
+        input.addEventListener('input', handleInput);
+        input.addEventListener('focus', handleInput);
+        
+        // Hide dropdown when clicking outside or losing focus
+        input.addEventListener('blur', (e) => {
+            // Delay removal to allow for clicking on dropdown items
+            setTimeout(() => {
+                if (!input.parentElement.querySelector('.autocomplete-dropdown:hover')) {
+                    this.removeAutocompleteDropdown(input);
+                }
+            }, 150);
+        });
+
+        // Handle keyboard navigation
+        input.addEventListener('keydown', (e) => {
+            const dropdown = input.parentElement.querySelector('.autocomplete-dropdown');
+            if (!dropdown) return;
+
+            const items = dropdown.querySelectorAll('.autocomplete-item');
+            let selected = dropdown.querySelector('.autocomplete-item.selected');
+            
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (selected) {
+                    selected.classList.remove('selected', 'bg-blue-100');
+                    const next = selected.nextElementSibling || items[0];
+                    next.classList.add('selected', 'bg-blue-100');
+                } else if (items.length > 0) {
+                    items[0].classList.add('selected', 'bg-blue-100');
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (selected) {
+                    selected.classList.remove('selected', 'bg-blue-100');
+                    const prev = selected.previousElementSibling || items[items.length - 1];
+                    prev.classList.add('selected', 'bg-blue-100');
+                } else if (items.length > 0) {
+                    items[items.length - 1].classList.add('selected', 'bg-blue-100');
+                }
+            } else if (e.key === 'Enter') {
+                if (selected) {
+                    e.preventDefault();
+                    selected.click();
+                }
+            } else if (e.key === 'Escape') {
+                this.removeAutocompleteDropdown(input);
+            }
+        });
     }
 
     saveData() {
@@ -271,6 +518,7 @@ class ParlayTracker {
             localStorage.setItem(ParlayTracker.STORAGE_KEYS.DATE_FILTER_FROM, this.filterFromDate);
             localStorage.setItem(ParlayTracker.STORAGE_KEYS.DATE_FILTER_TO, this.filterToDate);
             localStorage.setItem(ParlayTracker.STORAGE_KEYS.TIMELINE_SUMMARY_TEXT, this.currentTimelineSummaryText);
+            this.saveAutocompleteData();
         } catch {}
     }
 
@@ -491,6 +739,13 @@ class ParlayTracker {
         row.append(inputsContainer, removeWrapper);
         this.playerPropInputsContainer.appendChild(row);
 
+        // Setup autocomplete for input fields
+        this.setupAutocompleteForInput(playerInput, 'player');
+        this.setupAutocompleteForInput(propInput, 'prop');
+        this.setupAutocompleteForInput(sportInput, 'sport');
+        this.setupAutocompleteForInput(leagueInput, 'league');
+        this.setupAutocompleteForInput(propCategoryInput, 'propCategory');
+
         if (isSingleLeg) {
             propResultDiv.classList.add('hidden');
             propResultSelect.required = false;
@@ -498,9 +753,22 @@ class ParlayTracker {
             this.resultInput.addEventListener('change', () => propResultSelect.value = this.resultInput.value);
             propResultSelect.value = this.resultInput.value;
         } else {
-            removeBtn.addEventListener('click', () => {
+            removeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Add removing class for animation
                 row.classList.add('removing');
-                row.addEventListener('animationend', () => row.remove(), { once: true });
+                
+                // Remove the row after animation completes, or as fallback after timeout
+                const handleRemoval = () => {
+                    row.remove();
+                };
+                
+                row.addEventListener('animationend', handleRemoval, { once: true });
+                
+                // Fallback: remove after 500ms if animation doesn't fire
+                setTimeout(handleRemoval, 500);
             });
         }
     }
@@ -717,6 +985,15 @@ resetPlayerProps() {
         } else {
             this.bets.unshift(newBet);
         }
+
+        // Extract autocomplete data from the new bet
+        individualBets.forEach(bet => {
+            if (bet.player) this.autocompleteData.players.add(bet.player.trim());
+            if (bet.prop) this.autocompleteData.props.add(bet.prop.trim());
+            if (bet.sport) this.autocompleteData.sports.add(bet.sport.trim());
+            if (bet.league) this.autocompleteData.leagues.add(bet.league.trim());
+            if (bet.propCategory) this.autocompleteData.propCategories.add(bet.propCategory.trim());
+        });
 
         this.saveData();
         this.resetForm();
@@ -1102,9 +1379,9 @@ resetPlayerProps() {
                         <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">$${bet.amountWagered.toFixed(2)}</td>
                         <td class="px-3 py-4 whitespace-nowrap text-sm font-medium ${getResultTextColor(profitColor)} text-center">$${displayProfit.toFixed(2)}</td>
                         <td class="px-3 py-4 text-sm text-gray-900">
-                            <div class="flex justify-between items-start">
+                            <div class="flex justify-between items-center">
                                 <div class="text-center flex-1">${tableDetails}</div>
-                                <div class="ml-2">${viewBtn}</div>
+                                <div class="ml-2 flex-shrink-0">${viewBtn}</div>
                             </div>
                         </td>
                         <td class="px-3 py-4 text-center text-sm font-medium">
