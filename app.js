@@ -10,7 +10,7 @@ class ParlayTracker {
         HAS_VISITED_BEFORE: 'hasVisitedBefore',
         AUTOCOMPLETE_DATA: 'autocompleteData'
     };
-    static FEEDBACK_EMAIL = '4ayaw55@gmail.com';
+
 
     constructor() {
         this.bets = [];
@@ -1922,7 +1922,7 @@ resetPlayerProps() {
         }, 100); // 100ms debounce
     }
 
-    sendFeedback(e) {
+    async sendFeedback(e) {
         e.preventDefault();
         if (!this.feedbackMessageInput) return;
         const msg = this.feedbackMessageInput.value.trim();
@@ -1930,10 +1930,46 @@ resetPlayerProps() {
             this.showInfoModal('Oops!', 'Please type a message before sending feedback.');
             return;
         }
-        const subject = encodeURIComponent('Feedback for Are You Actually Winning?');
-        const body = encodeURIComponent(msg);
-        window.location.href = `mailto:${ParlayTracker.FEEDBACK_EMAIL}?subject=${subject}&body=${body}`;
-        this.showInfoModal('Feedback Sent!', 'Your feedback has been sent. Thank you!');
+        
+        // Send feedback via Formspree
+        const formspreeEndpoint = 'https://formspree.io/f/xanjvlje';
+        
+        try {
+            const response = await fetch(formspreeEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: msg,
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href
+                })
+            });
+            
+            if (response.ok) {
+                this.showInfoModal('Feedback Sent!', 'Thank you for your feedback! Your input helps improve the app.');
+                this.feedbackMessageInput.value = '';
+                this.toggleFeedbackChatbox();
+                return;
+            }
+        } catch (error) {
+            console.log('Formspree submission failed, using local storage fallback');
+        }
+        
+        // Fallback: Store locally if Formspree fails or isn't configured
+        const feedback = {
+            message: msg,
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent
+        };
+        
+        const existingFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
+        existingFeedback.push(feedback);
+        localStorage.setItem('userFeedback', JSON.stringify(existingFeedback));
+        
+        this.showInfoModal('Feedback Received!', 'Thank you for your feedback! Your input helps improve the app.');
         this.feedbackMessageInput.value = '';
         this.toggleFeedbackChatbox();
     }
