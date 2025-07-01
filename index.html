@@ -16,6 +16,9 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     />
 
     <!-- Google Fonts -->
@@ -561,14 +564,70 @@
         background-color: #6d7688; /* Softer hover state */
       }
 
-      /* Opt In button dark mode styling */
-      body.dark #optInBtn {
+      /* Opt In button dark mode styling - only when green (opt-in state) */
+      body.dark #optInBtn.bg-green-600 {
         background-color: #059669 !important; /* Green-600 for consistency */
         color: #ffffff !important;
       }
 
-      body.dark #optInBtn:hover {
+      body.dark #optInBtn.bg-green-600:hover {
         background-color: #047857 !important; /* Green-700 on hover */
+      }
+
+      /* Opt Out button dark mode styling - when gray (opt-out state) */
+      body.dark #optInBtn.bg-gray-500 {
+        background-color: #6b7280 !important; /* Gray-500 for dark mode */
+        color: #ffffff !important;
+      }
+
+      body.dark #optInBtn.bg-gray-500:hover {
+        background-color: #4b5563 !important; /* Gray-600 on hover */
+      }
+
+      /* Theme toggle responsive positioning */
+      @media screen and (min-width: 641px) {
+        #themeToggle {
+          position: absolute;
+          top: 0;
+          right: 0;
+        }
+      }
+      
+      @media screen and (max-width: 640px) {
+        #themeToggle {
+          position: fixed !important;
+          top: 1rem !important;
+          right: 1rem !important;
+          z-index: 1000 !important;
+          transform: none !important;
+        }
+      }
+
+      /* Enhanced mobile spacing for player prop inputs */
+      @media screen and (max-width: 768px) {
+        .player-prop-row {
+          padding: 1rem !important;
+          margin-bottom: 1rem !important;
+        }
+        
+        .player-prop-row input,
+        .player-prop-row select {
+          padding: 0.75rem !important;
+          min-height: 3rem !important;
+          font-size: 1rem !important;
+        }
+        
+        /* Stack fields vertically on mobile for better spacing */
+        .basic-fields-container,
+        .advanced-fields-container {
+          flex-direction: column !important;
+          gap: 0.75rem !important;
+        }
+        
+        .basic-fields-container > div,
+        .advanced-fields-container > div {
+          width: 100% !important;
+        }
       }
 
       /* Dark mode for case study modal */
@@ -744,33 +803,53 @@
         min-height: 48px;
       }
 
-      /* Mobile/Desktop responsive display for bet history */
-      @media (max-width: 767px) {
-        /* Hide table on mobile */
+      /* Mobile/Desktop responsive display for bet history - Production robust */
+      /* Default: Show table on all screens */
+      .overflow-x-auto {
+        display: block;
+      }
+      
+      #betHistoryContainer {
+        display: none;
+      }
+
+      /* Mobile specific: Hide table, show cards */
+      @media screen and (max-width: 767px) {
         .overflow-x-auto {
           display: none !important;
         }
-        /* Show cards on mobile */
+        
         #betHistoryContainer {
           display: block !important;
         }
+        
         #noBetsMessageDesktop {
           display: none !important;
         }
       }
 
-      @media (min-width: 768px) {
-        /* Show table on desktop */
+      /* Desktop specific: Show table, hide cards */
+      @media screen and (min-width: 768px) {
         .overflow-x-auto {
           display: block !important;
         }
-        /* Hide cards on desktop */
+        
         #betHistoryContainer {
           display: none !important;
         }
+        
         #noBetsMessage {
           display: none !important;
         }
+      }
+
+      /* Fallback for browsers that don't support media queries */
+      .no-mediaqueries .overflow-x-auto {
+        display: block !important;
+      }
+      
+      .no-mediaqueries #betHistoryContainer {
+        display: none !important;
       }
     </style>
   </head>
