@@ -4,7 +4,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite dev --port 3001",
     "dev:firebase": "firebase emulators:start",
     "dev:all": "concurrently \"npm run dev:firebase\" \"npm run dev\"",
     "build": "vite build",
@@ -13,6 +13,7 @@
     "firebase:init": "firebase init",
     "firebase:deploy": "firebase deploy",
     "firebase:emulators": "firebase emulators:start --only auth,firestore,functions,hosting",
+    "firebase:setup": "npm install firebase && npm install -D firebase-tools concurrently",
     "db:push": "echo 'Using Firestore - no migrations needed'"
   },
   "dependencies": {
@@ -57,6 +58,7 @@
     "embla-carousel-react": "^8.6.0",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "firebase": "^12.0.0",
     "framer-motion": "^11.13.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.453.0",
@@ -97,8 +99,10 @@
     "@types/ws": "^8.5.13",
     "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.2.0",
     "drizzle-kit": "^0.30.4",
     "esbuild": "^0.25.0",
+    "firebase-tools": "^14.11.1",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.1",
